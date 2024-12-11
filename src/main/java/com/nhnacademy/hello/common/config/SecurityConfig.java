@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .and()
 
                 .authorizeRequests()
-                .antMatchers("/login", "/signup").permitAll() // 로그인, 회원가입 허용
+                .requestMatchers("/login", "/signup").permitAll() // 로그인, 회원가입 허용
                 .anyRequest().authenticated(); // 나머지는 인증 필요
 
 //                .and()
