@@ -3,11 +3,8 @@ package com.nhnacademy.hello.common.util;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -19,6 +16,7 @@ public class JwtUtils {
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(jwtProperties.getSecret())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("userId", String.class);
@@ -29,6 +27,7 @@ public class JwtUtils {
 
         return Jwts.parser()
                         .setSigningKey(jwtProperties.getSecret())
+                .build()
                         .parseClaimsJws(token)
                         .getBody()
                         .get("role", String.class);
