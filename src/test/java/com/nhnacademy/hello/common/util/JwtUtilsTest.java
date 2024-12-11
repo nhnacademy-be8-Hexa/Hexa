@@ -1,6 +1,8 @@
 package com.nhnacademy.hello.common.util;
 
 import com.nhnacademy.hello.common.properties.JwtProperties;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,11 @@ class JwtUtilsTest {
 
     @BeforeEach
     void setUp() {
-        token = "eyJ0eXAiOiJCZWFyZXIiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ0ZXN0TWVtYmVyIiwicm9sZSI6IlJPTEVfTUVNQkVSIiwiaWF0IjoxNzMzODk5NjEwLCJleHAiOjE3MzM5MDMyMTB9.fsf_a4jz8SrjQ1_11b2uyxoN70yF0TMTzrL8HAqo6yQ";
+        token = Jwts.builder()
+                .claim("userId", "testMember")
+                .claim("role", "ROLE_MEMBER")
+                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecret())
+                .compact();
     }
 
     @Test
@@ -32,6 +38,6 @@ class JwtUtilsTest {
 
     @Test
     void getAuthoritiesFromToken() {
-        Assertions.assertEquals("ROLE_MEMBER", jwtUtils.getAuthoritiesFromToken(token).getFirst().getAuthority());
+        Assertions.assertEquals("ROLE_MEMBER", jwtUtils.getRoleFromToken(token));
     }
 }
