@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -23,7 +24,7 @@ public class LoginController {
 
     @PostMapping("/login/process")
     public String process(
-            @RequestBody LoginRequest loginRequest,
+            @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response) {
         // 로그인 요청을 하고 토큰을 받는다.
         //todo 페인클라를 쏴서 인증 서버와 통신해야 한다
@@ -33,6 +34,7 @@ public class LoginController {
         Cookie cookie = new Cookie("token", token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setMaxAge(3600);
         response.addCookie(cookie);
 
         return "redirect:/";

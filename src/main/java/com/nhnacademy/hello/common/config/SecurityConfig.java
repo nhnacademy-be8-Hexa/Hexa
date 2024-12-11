@@ -15,13 +15,12 @@ public class SecurityConfig {
 
                 .formLogin()
                 .loginPage("/login") // 커스텀 로그인 페이지
-                .loginProcessingUrl("/login/process") // 로그인 요청 처리 URL
-                .permitAll()
+//                .loginProcessingUrl("/login/process") // 로그인 요청 처리 URL
 
                 .and()
 
                 .authorizeRequests()
-                .requestMatchers("/login", "/signup").permitAll() // 로그인, 회원가입 허용
+                .requestMatchers("/login", "/login/process", "/signup").permitAll() // 로그인, 회원가입 허용
                 .anyRequest().authenticated(); // 나머지는 인증 필요
 
 //                .and()
