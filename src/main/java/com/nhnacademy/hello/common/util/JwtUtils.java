@@ -25,15 +25,14 @@ public class JwtUtils {
     }
 
     // JWT에서 권한 추출
-    public List<GrantedAuthority> getAuthoritiesFromToken(String token) {
+    public String getRoleFromToken(String token) {
 
-        return List.of(new SimpleGrantedAuthority(
-                Jwts.parser()
+        return Jwts.parser()
                         .setSigningKey(jwtProperties.getSecret())
                         .parseClaimsJws(token)
                         .getBody()
-                        .get("role", String.class)
-        ));
+                        .get("role", String.class);
+
     }
 
 }

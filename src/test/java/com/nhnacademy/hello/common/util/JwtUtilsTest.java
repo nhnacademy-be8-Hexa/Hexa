@@ -32,6 +32,6 @@ class JwtUtilsTest {
 
     @Test
     void getAuthoritiesFromToken() {
-        Assertions.assertEquals("ROLE_MEMBER", jwtUtils.getAuthoritiesFromToken(token).getFirst().getAuthority());
+        Assertions.assertEquals("ROLE_MEMBER", jwtUtils.getRoleFromToken(token));
     }
 }
