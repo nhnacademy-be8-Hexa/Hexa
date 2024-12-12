@@ -5,5 +5,4 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 @FeignClient(name = "hexa-gateway")
 public interface HexaGateway {
-
 }

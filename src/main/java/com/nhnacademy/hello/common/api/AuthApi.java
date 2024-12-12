@@ -10,6 +10,6 @@ public interface AuthApi {
 
     // login request (id, password) 를 보내고 토큰을 받음
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request);
+    String login(@RequestBody LoginRequest request);
 
 }
