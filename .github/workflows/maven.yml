@@ -49,8 +49,7 @@ jobs:
             username: ${{ secrets.SSH_ID }}
             key: ${{ secrets.SSH_KEY }}
             port: ${{ secrets.SSH_PORT }}
-            source: "script/deploy1.sh"
-            target: "~/script/"
+            script: "./deploy1.sh"
 
       - name: Execute shell script2
         uses: appleboy/ssh-action@master
@@ -59,5 +58,4 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "script/deploy2.sh"
-          target: "~/script/"
+          script: "./deploy2.sh"
