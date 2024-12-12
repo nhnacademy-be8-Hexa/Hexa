@@ -1,7 +1,7 @@
 ports=("3333" "3334")
 ip="127.0.0.1"
 
-# 8080과 8081포트에 spring boot가 띄워져 있는지 확인
+# 3333과 3334포트에 spring boot가 띄워져 있는지 확인
 for port in "${ports[@]}";
 do
   echo "http://$ip:$port/management/health_check"
