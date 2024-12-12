@@ -49,7 +49,14 @@ jobs:
             username: ${{ secrets.SSH_ID }}
             key: ${{ secrets.SSH_KEY }}
             port: ${{ secrets.SSH_PORT }}
-            script: "./script/deploy1.sh"
+            script: |
+              if [ -f ./script/deploy1.sh ]; then
+                chmod +x ./script/deploy1.sh
+                ./script/deploy1.sh
+              else
+                echo "Error: ./script/deploy1.sh does not exist."
+                exit 1
+              fi
 
       - name: Execute shell script2
         uses: appleboy/ssh-action@master
@@ -58,4 +65,11 @@ jobs:
           username: ${{ secrets.SSH_ID }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: "./script/deploy2.sh"
+          script: |
+            if [ -f ./script/deploy2.sh ]; then
+              chmod +x ./script/deploy2.sh
+              ./script/deploy2.sh
+            else
+              echo "Error: ./script/deploy2.sh does not exist."
+              exit 1
+            fi
