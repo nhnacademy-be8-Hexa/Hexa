@@ -14,7 +14,7 @@ do
   else
     echo -e "$port에 spring boot가 실행 중이 아닙니다."
     echo -e "$port에 spring boot를 실행시킵니다."
-    nohup java -jar -Dserver.port=${port} ~/target/gitAction_practice-0.0.1-SNAPSHOT.jar > log 2>&1 &
+    nohup java -jar -Dserver.port=${port} ~/target/target/hello.jar > log 2>&1 &
 
     for retry in {1..10}
     do

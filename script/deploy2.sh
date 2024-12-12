@@ -1,4 +1,4 @@
-ports=("8080" "8081")
+ports=("3333" "3334")
 ip="127.0.0.1"
 
 for port in "${ports[@]}";
@@ -18,7 +18,7 @@ do
     fuser -s -k -TERM $port/tcp
 
     echo -e "jar파일을 $port포트에 실행합니다."
-    nohup java -jar -Dserver.port=${port} ~/target/gitAction_practice-0.0.1-SNAPSHOT.jar > log 2>&1 &
+    nohup java -jar -Dserver.port=${port} ~/target/target/hello.jar > log 2>&1 &
 
     for retry in {1..10}
     do
