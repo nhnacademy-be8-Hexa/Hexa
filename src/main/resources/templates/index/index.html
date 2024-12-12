@@ -8,5 +8,16 @@
 <h1>hello spring!!</h1>
 <p>Click the link below to visit the GitHub repository:</p>
 <a href="https://github.com/nhnacademy-be8-Hexa" target="_blank">Visit GitHub Repository</a>
+<br>
+
+<div th:if="${userId == null}">
+<a href="/login">login</a>
+</div>
+<div th:if="${userId != null}">
+    <p th:text=" '현재 로그인된 유저 아이디: ' + ${userId}"></p>
+    <p th:text="${role}"></p>
+    <a href="/logout">logout</a>
+</div>
+
 </body>
 </html>
