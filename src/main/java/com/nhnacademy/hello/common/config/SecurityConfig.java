@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 .requestMatchers("/login/**").permitAll()
                                 .requestMatchers("/signup").permitAll()
                                 .requestMatchers("/", "/index.html").permitAll()
+                                .requestMatchers("/actuator/**").permitAll()
                                 .anyRequest().authenticated()
         );
 
