@@ -6,13 +6,16 @@ import com.nhnacademy.hello.common.feignclient.HexaGateway;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 public class LoginController {
@@ -28,11 +31,18 @@ public class LoginController {
     @PostMapping("/login/process")
     public String process(
             @ModelAttribute LoginRequest loginRequest,
-            HttpServletResponse response) throws IOException {
+            HttpServletResponse response,
+            Model model
+            ) throws IOException {
         // 인증 서버에 로그인 요청을 하고 토큰을 받는다.
         String token = hexaGateway.login(loginRequest);
 
-        // todo 토큰 예외처리
+        // 토큰 예외처리 (로그인 실패)
+        if(token == null) {
+            log.error("Authorization failure id: {}", loginRequest.id());
+            model.addAttribute("error", "로그인 실패!");
+            return "login";
+        }
 
         // 토큰을 쿠키에 저장한다
         Cookie cookie = new Cookie("token", token);
