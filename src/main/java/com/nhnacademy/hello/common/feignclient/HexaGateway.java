@@ -1,4 +1,4 @@
-package com.nhnacademy.hello.feignclient;
+package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.dto.LoginRequest;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -30,19 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwtToken = null;
-
-//        String header = jwtProperties.getHeaderString();
-
-        // 요청 헤더에서 액세스 토큰을 읽기
-//        final String authorizationHeader = request.getHeader(header);
-
-//        if (authorizationHeader != null && authorizationHeader.startsWith(header)) {
-//            jwtToken = authorizationHeader.substring(header.length());
-//        }
 
         // 쿠키에서 토큰 가져오기
-        jwtToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+        String jwtToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
                 .filter(cookie -> "token".equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst()

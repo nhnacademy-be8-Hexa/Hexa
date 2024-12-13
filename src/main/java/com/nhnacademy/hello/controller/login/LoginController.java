@@ -2,7 +2,7 @@ package com.nhnacademy.hello.controller.login;
 
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.dto.LoginRequest;
-import com.nhnacademy.hello.feignclient.HexaGateway;
+import com.nhnacademy.hello.common.feignclient.HexaGateway;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
