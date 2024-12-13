@@ -1,10 +1,9 @@
 package com.nhnacademy.hello.controller.login;
 
-import com.nhnacademy.hello.common.api.AuthApi;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.dto.LoginRequest;
+import com.nhnacademy.hello.feignclient.HexaGateway;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -18,8 +17,8 @@ import java.io.IOException;
 @Controller
 public class LoginController {
 
-    private final AuthApi authApi;
     private final JwtProperties jwtProperties;
+    private final HexaGateway hexaGateway;
 
     @GetMapping("/login")
     public String login() {
@@ -31,7 +30,7 @@ public class LoginController {
             @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response) throws IOException {
         // 인증 서버에 로그인 요청을 하고 토큰을 받는다.
-        String token = authApi.login(loginRequest);
+        String token = hexaGateway.login(loginRequest);
 
         // todo 토큰 예외처리
 

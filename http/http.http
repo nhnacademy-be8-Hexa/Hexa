@@ -1,0 +1,5 @@
+### login Request test
+POST http://localhost:5555/login/process
+Content-Type: application/x-www-form-urlencoded
+
+id=testMember&password=1234
