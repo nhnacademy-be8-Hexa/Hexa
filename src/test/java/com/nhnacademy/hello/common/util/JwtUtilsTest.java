@@ -40,4 +40,14 @@ class JwtUtilsTest {
     void getAuthoritiesFromToken() {
         Assertions.assertEquals("ROLE_MEMBER", jwtUtils.getRoleFromToken(token));
     }
+
+    @Test
+    void validateToken() {
+        assertTrue(jwtUtils.validateToken(token));
+    }
+
+    @Test
+    void invalidToken() {
+        assertFalse(jwtUtils.validateToken(token+"asdasfa"));
+    }
 }
