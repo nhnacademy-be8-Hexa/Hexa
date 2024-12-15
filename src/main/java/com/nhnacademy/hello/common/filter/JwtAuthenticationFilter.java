@@ -38,8 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .findFirst()
                 .orElse(null);
 
-        if(jwtToken != null && jwtUtils.validateToken(jwtToken) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // 토큰을 파싱 해서 security context에 인증 정보를 저장한다
+        // 토큰을 파싱 해서 security context에 인증 정보를 저장한다
+        if( jwtToken != null
+                && jwtUtils.validateToken(jwtToken)
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = jwtUtils.getUsernameFromToken(jwtToken);
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(jwtUtils.getRoleFromToken(jwtToken)));
 
