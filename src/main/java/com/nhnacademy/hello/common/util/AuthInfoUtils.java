@@ -11,7 +11,9 @@ public class AuthInfoUtils {
 
     // 현재 로그인 되어 있는지 여부
     static public boolean isLogin(){
-        return !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
+        return
+                SecurityContextHolder.getContext().getAuthentication() != null &&
+                !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken);
     }
 
     // 현재 로그인된 아이디, 로그인 안했으면 null
