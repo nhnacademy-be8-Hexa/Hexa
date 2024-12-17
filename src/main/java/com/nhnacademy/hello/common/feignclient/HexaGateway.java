@@ -2,6 +2,7 @@ package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.dto.member.MemberDTO;
+import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public interface HexaGateway {
 
     // Create a new member
     @PostMapping("/api/members")
-    ResponseEntity<MemberDTO> createMember(@RequestBody MemberDTO memberRequestDto);
+    ResponseEntity<MemberDTO> createMember(@RequestBody MemberRequestDTO memberRequestDto);
 
     // Update an existing member
     @PatchMapping("/api/members/{memberId}")

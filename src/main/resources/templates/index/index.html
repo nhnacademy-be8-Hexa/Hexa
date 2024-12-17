@@ -12,6 +12,7 @@
 
 <div th:if="${userId == null}">
 <a href="/login">login</a>
+<a href="/register">register</a>
 </div>
 <div th:if="${userId != null}">
     <p th:text=" '현재 로그인된 유저 아이디: ' + ${userId}"></p>
