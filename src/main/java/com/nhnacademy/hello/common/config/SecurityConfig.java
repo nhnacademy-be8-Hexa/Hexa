@@ -32,11 +32,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/login/**").permitAll()
-                                .requestMatchers("/signup").permitAll()
-                                .requestMatchers("/", "/index.html").permitAll()
-                                .requestMatchers("/actuator/**").permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
         );
 
         // 로그인 설정
