@@ -5,10 +5,79 @@
     <title>welcome page</title>
 </head>
 <body>
-<h1>hello spring!!</h1>
-<p>Click the link below to visit the GitHub repository!!!</p>
-<a href="https://github.com/nhnacademy-be8-Hexa" target="_blank">Visit GitHub Repository</a>
-<br>
+
+<div class="container">
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+    <!-- 베스트셀러 도서 목록 -->
+    <section>
+        <h2 class="section-title">베스트셀러</h2>
+        <div class="book-list">
+            <!-- 책 1 -->
+            <div class="book-item" onclick="goToBookPage(1)">
+                <img src="book1.jpg" alt="책 1">
+                <div class="book-title">책 제목 1</div>
+            </div>
+
+            <!-- 책 2 -->
+            <div class="book-item" onclick="goToBookPage(2)">
+                <img src="book2.jpg" alt="책 2">
+                <div class="book-title">책 제목 2</div>
+            </div>
+
+            <!-- 책 3 -->
+            <div class="book-item" onclick="goToBookPage(3)">
+                <img src="book3.jpg" alt="책 3">
+                <div class="book-title">책 제목 3</div>
+            </div>
+
+            <!-- 책 4 -->
+            <div class="book-item" onclick="goToBookPage(4)">
+                <img src="book4.jpg" alt="책 4">
+                <div class="book-title">책 제목 4</div>
+            </div>
+
+            <!-- 책 5 -->
+            <div class="book-item" onclick="goToBookPage(5)">
+                <img src="book5.jpg" alt="책 5">
+                <div class="book-title">책 제목 5</div>
+            </div>
+
+            <!-- 책 6 -->
+            <div class="book-item" onclick="goToBookPage(6)">
+                <img src="book6.jpg" alt="책 6">
+                <div class="book-title">책 제목 6</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 가장 많이 클릭한 도서 목록 -->
+    <section>
+        <h2 class="section-title">가장 많이 클릭한 책</h2>
+        <div class="book-list">
+            <!-- 책 7 -->
+            <div class="book-item" onclick="goToBookPage(7)">
+                <img src="book7.jpg" alt="책 7">
+                <div class="book-title">책 제목 7</div>
+            </div>
+
+            <!-- 책 8 -->
+            <div class="book-item" onclick="goToBookPage(8)">
+                <img src="book8.jpg" alt="책 8">
+                <div class="book-title">책 제목 8</div>
+            </div>
+
+            <!-- 책 9 -->
+            <div class="book-item" onclick="goToBookPage(9)">
+                <img src="book9.jpg" alt="책 9">
+                <div class="book-title">책 제목 9</div>
+            </div>
+
+            <!-- 책 10 -->
+            <div class="book-item" onclick="goToBookPage(10)">
+                <img src="book10.jpg" alt="책 10">
+                <div class="book-title">책 제목 10</div>
+            </div>
 
 <div th:if="${userId == null}">
 <a href="/login">login</a>
@@ -20,5 +89,5 @@
     <a href="/logout">logout</a>
 </div>
 
-</body>
+    </body>
 </html>

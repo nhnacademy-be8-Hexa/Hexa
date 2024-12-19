@@ -1,0 +1,88 @@
+<div th:fragment="header">
+    <!-- 상단 네비게이션 바 -->
+    <header>
+        <nav>
+            <div class="top-menu">
+                <!-- 메뉴는 JavaScript로 동적으로 생성 -->
+            </div>
+
+            <div class="search-container">
+                <form class="search-form" onsubmit="searchBooks(event)">
+                    <input type="text" id="search-input" class="search-input" placeholder="검색어를 입력하세요">
+                    <button type="submit" class="search-button">검색</button>
+                </form>
+            </div>
+
+            <!-- 카테고리 메뉴 -->
+            <div class="category-menu">
+                <a href="/bestsellers" class="category-item">베스트셀러</a>
+                <a href="/newarrivals" class="category-item">신작</a>
+
+                <!-- 드롭다운 카테고리 -->
+                <div class="dropdown">
+                    <a href="#" class="category-item">카테고리</a>
+                    <div class="dropdown-menu">
+                        <!-- 1차 카테고리 -->
+                        <div class="dropdown-item">
+                            <a href="/fiction">소설</a>
+                            <!-- 2차 카테고리 -->
+                            <div class="sub-dropdown-menu">
+                                <a href="/fiction/romance">로맨스</a>
+                                <a href="/fiction/thriller">스릴러</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-item">
+                            <a href="/selfhelp">자기계발서</a>
+                            <!-- 2차 카테고리 -->
+                            <div class="sub-dropdown-menu">
+                                <a href="/selfhelp/motivation">동기부여</a>
+                                <a href="/selfhelp/business">비즈니스</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-item">
+                            <a href="/children">아동도서</a>
+                            <!-- 2차 카테고리 -->
+                            <div class="sub-dropdown-menu">
+                                <a href="/children/story">동화</a>
+                                <a href="/children/education">교육</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <script th:inline="javascript">
+        // 사용자 정보 예제 (서버에서 실제 데이터로 교체)
+        const user = {
+            isLoggedIn: /*[(${userId != null} ? 'true' : 'false')]*/ false, // 로그인 여부
+            id: /*[(${userId != null} ? ${userId} : 'null')]*/ 'guest', // 사용자 ID (null 처리)
+            role: /*[(${role != null} ? ${role} : 'null')]*/ 'guest' // 사용자 역할 (null 처리)
+        };
+        // 메뉴 동적 생성
+        function updateMenu() {
+            const topMenu = document.querySelector('.top-menu');
+            topMenu.innerHTML = ''; // 기존 메뉴 초기화
+
+            if (user.isLoggedIn == 'true') {
+                // 로그인 상태
+                topMenu.innerHTML += `<p>현재 로그인된 유저 아이디: ${user.id}</p>`;
+                if (user.role == "ADMIN") {
+                    // 관리자 권한이 있는 경우
+                    topMenu.innerHTML += '<a href="/admin" class="menu-item">관리자페이지</a>';
+                }
+                topMenu.innerHTML += '<a href="/mypage" class="menu-item">마이페이지</a>';
+                topMenu.innerHTML += '<a href="/cart" class="menu-item">장바구니</a>';
+                topMenu.innerHTML += '<a href="/logout" class="menu-item">로그아웃</a>';
+            } else {
+                // 비로그인 상태
+                topMenu.innerHTML += '<a href="/login" class="menu-item">로그인</a>';
+                topMenu.innerHTML += '<a href="/register" class="menu-item">회원가입</a>';
+                topMenu.innerHTML += '<a href="/cart" class="menu-item">장바구니</a>';
+            }
+        }
+
+        // 페이지 로드 후 메뉴 업데이트
+        document.addEventListener('DOMContentLoaded', updateMenu);
+    </script>
+</div>
