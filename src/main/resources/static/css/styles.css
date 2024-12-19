@@ -1,0 +1,233 @@
+/* 기본 설정 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #EFEDF6; /* 보라색 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 고정된 너비로 레이아웃 중앙 정렬 */
+.container {
+    width: 1200px;
+    max-width: 100%;
+    padding: 0;
+    flex-grow: 1; /* 풋터가 항상 화면 하단에 위치하도록 */
+}
+
+/* 헤더 스타일 */
+header {
+    background-color: #EFEDF6; /* 배경색과 동일 */
+    padding: 15px;
+    width: 100%; /* 헤더가 전체 너비를 차지 */
+}
+
+/* 상단 메뉴 */
+.top-menu {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: #000000; /* 검은색 */
+    margin: 0 15px;
+    font-size: 12px; /* 글씨 크기 줄임 */
+}
+
+.menu-item:hover {
+    color: #b78f00; /* 금자색 */
+}
+
+/* 검색창 스타일 */
+.search-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-form {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-input {
+    padding: 12px 20px; /* 검색창 크기 키움 */
+    font-size: 18px; /* 텍스트 크기 키움 */
+    border: 1px solid #9E8DBF;
+    border-radius: 5px;
+    width: 300px; /* 검색창 폭을 넓힘 */
+}
+
+.search-button {
+    padding: 17px 20px;
+    margin-left: 12px;
+    background-color: #9E8DBF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #003366;
+}
+
+/* 카테고리 메뉴 */
+.category-menu {
+    text-align: center;
+    margin-bottom: 10px; /* 간격을 좀 더 좁힘 */
+    padding-bottom: 10px;
+    justify-content: center;
+    display: flex;
+}
+
+.category-item {
+    text-decoration: none;
+    color: #000000;
+    font-size: 18px;
+    margin: 0 20px;
+}
+
+.category-item:hover {
+    color: #003366;
+}
+
+/* 드롭다운 기본 스타일 */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.dropdown-item {
+    position: relative;
+    padding: 5px 0;
+}
+
+.sub-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+/* 드롭다운 메뉴 표시 */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* 서브 드롭다운 메뉴 표시 */
+.dropdown-item:hover .sub-dropdown-menu {
+    display: block;
+}
+
+/* 드롭다운 메뉴 링크 스타일 */
+.dropdown-menu a, .sub-dropdown-menu a {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 10px;
+    display: block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dropdown-menu a:hover, .sub-dropdown-menu a:hover {
+    background-color: #f0f0f0;
+    color: #9E8DBF;
+}
+
+
+/* 도서 목록 */
+.book-list {
+    display: flex;
+    /*overflow-x: scroll;*/
+    padding: 20px;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.book-item {
+    min-width: 150px;
+    height: 250px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-item img {
+    max-height: 150px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.book-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.book-item:hover {
+    transform: scale(1.05); /* 클릭 시 살짝 확대 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+}
+
+/* 풋터 스타일 */
+footer {
+    background-color: #E4DBF1;
+    padding: 20px;
+    text-align: center;
+    color: #333;
+    width: 100%;
+}
+
+footer a {
+    text-decoration: none;
+    color: #1E9EFF;
+}
+
+footer a:hover {
+    color: #003366;
+}
+
+/* 섹션 제목 */
+.section-title {
+    font-size: 18px; /* 글씨 크기를 조금 더 작게 조정 */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 10px; /* 제목과 책 리스트 간의 간격을 조금 좁힘 */
+}
