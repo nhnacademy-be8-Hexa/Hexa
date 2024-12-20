@@ -53,12 +53,24 @@ header {
     width: 250px;
 }
 
+
 /* 상단 메뉴 */
 .top-menu {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 15px;
     padding-top: 15px;
+}
+
+/* 현재 로그인된 유저 ID 스타일 */
+.top-menu p {
+    margin: 0; /* 여백 제거 */
+    padding: 0 15px; /* 좌우 여백 추가 */
+    font-size: 12px; /* 메뉴 항목과 동일한 글씨 크기 */
+    color: #000000; /* 검은색 텍스트 */
+    line-height: 1.5; /* 수직 정렬 조정 */
+    display: inline-block; /* 메뉴와 같은 라인에 배치 */
+    vertical-align: middle; /* 텍스트가 가운데 정렬되도록 설정 */
 }
 
 .menu-item {
