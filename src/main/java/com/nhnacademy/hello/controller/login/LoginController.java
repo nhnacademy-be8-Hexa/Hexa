@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,9 @@ public class LoginController {
 
     private final JwtProperties jwtProperties;
     private final HexaGateway hexaGateway;
+
+    @Value("${jwt_token_cookie_secure}")
+    private String secure;
 
     @GetMapping("/login")
     public String login() {
@@ -49,6 +53,7 @@ public class LoginController {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(jwtProperties.getExpirationTime());
+        cookie.setSecure(Boolean.parseBoolean(secure));
         response.addCookie(cookie);
 
         // 로그인 후 홈페이지로 이동

@@ -10,13 +10,14 @@ html, body {
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
+    height: 100%;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
-
 /* 고정된 너비로 레이아웃 중앙 정렬 */
 .container {
+    /*display: flex;*/
     width: 1200px;
     max-width: 100%;
     padding: 0;
@@ -52,12 +53,24 @@ header {
     width: 250px;
 }
 
+
 /* 상단 메뉴 */
 .top-menu {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 15px;
     padding-top: 15px;
+}
+
+/* 현재 로그인된 유저 ID 스타일 */
+.top-menu p {
+    margin: 0; /* 여백 제거 */
+    padding: 0 15px; /* 좌우 여백 추가 */
+    font-size: 12px; /* 메뉴 항목과 동일한 글씨 크기 */
+    color: #000000; /* 검은색 텍스트 */
+    line-height: 1.5; /* 수직 정렬 조정 */
+    display: inline-block; /* 메뉴와 같은 라인에 배치 */
+    vertical-align: middle; /* 텍스트가 가운데 정렬되도록 설정 */
 }
 
 .menu-item {
@@ -266,4 +279,58 @@ footer a:hover {
     text-align: center;
     margin-top: 30px;
     margin-bottom: 10px; /* 제목과 책 리스트 간의 간격을 조금 좁힘 */
+}
+
+
+.login-btn {
+    background-color: #9E8DBF;
+    color: white; /* 버튼 글자 색상 */
+}
+
+.login-btn:hover {
+    background-color: #8a7ca3; /* hover시 색상 변화 */
+}
+
+.lang-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #9E8DBF;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.lang-btn.active {
+    border-color: #9E8DBF !important;
+    outline: 0.5px solid #9E8DBF !important;
+    color: #9E8DBF !important;
+}
+
+.lang-btn-outline {
+    border: 1px solid #9E8DBF;
+}
+
+.lang-btn:hover {
+    background-color: #9E8DBF;
+    color: white;
+}
+
+.lang-btn:active {
+    background-color: #9E8DBF;
+    color: white;
+}
+
+
+
+main {
+    flex-grow: 1; /* 중앙 콘텐츠가 남은 공간을 차지 */
+    width: 1200px;
+    max-width: 100%;
+    padding: 100px;
+    margin: 0 auto; /* 중앙 정렬 */
+
 }
