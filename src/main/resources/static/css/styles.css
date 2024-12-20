@@ -261,6 +261,7 @@ footer {
     text-align: center;
     color: #333;
     width: 100%;
+    margin-top: 50px;
 }
 
 footer a {
@@ -324,7 +325,10 @@ footer a:hover {
     color: white;
 }
 
-
+.register-btn{
+    background-color: #8a7ca3;
+    color: white;
+}
 
 main {
     flex-grow: 1; /* 중앙 콘텐츠가 남은 공간을 차지 */
