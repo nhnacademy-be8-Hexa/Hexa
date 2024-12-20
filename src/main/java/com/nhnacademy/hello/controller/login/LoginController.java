@@ -3,6 +3,7 @@ package com.nhnacademy.hello.controller.login;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.common.feignclient.HexaGateway;
+import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,9 @@ public class LoginController {
         cookie.setMaxAge(jwtProperties.getExpirationTime());
         cookie.setSecure(Boolean.parseBoolean(secure));
         response.addCookie(cookie);
+
+        // 로그인 시간 업데이트 요청을 보낸다
+        hexaGateway.loginMember(loginRequest.id());
 
         // 로그인 후 홈페이지로 이동
         return "redirect:/";
