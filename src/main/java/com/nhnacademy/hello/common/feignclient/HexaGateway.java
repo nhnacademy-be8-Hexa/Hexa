@@ -24,7 +24,7 @@ public interface HexaGateway {
     // service api
     // member
     // Get members list with pagination and search
-    @GetMapping("/api/members")
+    @GetMapping("/api/admin/members")
     List<MemberDTO> getMembers(@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String search);
 
     // Get a specific member by ID
@@ -36,9 +36,11 @@ public interface HexaGateway {
     ResponseEntity<MemberDTO> createMember(@RequestBody MemberRequestDTO memberRequestDto);
 
     // Update an existing member
-    @PatchMapping("/api/members/{memberId}")
-    public ResponseEntity<MemberDTO> updateMember(@PathVariable String memberId, @RequestBody @Valid MemberDTO memberRequestDto);
+    @PatchMapping("/api/auth/members/{memberId}")
+    public ResponseEntity<MemberDTO> updateMember(@PathVariable String memberId, @RequestBody @Valid MemberRequestDTO memberRequestDto);
 
+    // 로그인 시간 업데이트
+    @PutMapping("/api/auth/members/{memberId}")
+    public ResponseEntity<Void> loginMember( @PathVariable String memberId );
 
-
-    }
+}
