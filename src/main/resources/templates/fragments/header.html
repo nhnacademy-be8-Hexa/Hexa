@@ -3,7 +3,31 @@
     <header>
         <nav>
             <div class="top-menu">
-                <!-- 메뉴는 JavaScript로 동적으로 생성 -->
+
+                <ul>
+                    <!-- 로그인 상태 확인 -->
+                    <li th:if="${T(com.nhnacademy.hello.common.util.AuthInfoUtils).isLogin()}">
+                        <p>현재 로그인된 유저 아이디: <span th:text="${T(com.nhnacademy.hello.common.util.AuthInfoUtils).getUsername()}"></span></p>
+
+                        <!-- 관리자 권한 확인 -->
+                        <a th:if="${T(com.nhnacademy.hello.common.util.AuthInfoUtils).getRole() == 'ROLE_ADMIN'}"
+                           href="/admin"
+                           class="menu-item">
+                            관리자페이지
+                        </a>
+
+                        <a href="/mypage" class="menu-item">마이페이지</a>
+                        <a href="/cart" class="menu-item">장바구니</a>
+                        <a href="/logout" class="menu-item">로그아웃</a>
+                    </li>
+
+                    <!-- 비로그인 상태 -->
+                    <li th:if="${!T(com.nhnacademy.hello.common.util.AuthInfoUtils).isLogin()}">
+                        <a href="/login" class="menu-item">로그인</a>
+                        <a href="/register" class="menu-item">회원가입</a>
+                        <a href="/cart" class="menu-item">장바구니</a>
+                    </li>
+                </ul>
             </div>
 
             <div class="middle-container">
@@ -62,43 +86,6 @@
                 </div>
             </div>
         </nav>
-        <hr/>
     </header>
-    <script th:inline="javascript">
-        // 사용자 정보 예제 (서버에서 실제 데이터로 교체)
-        const user = {
-            isLoggedIn: /*[(${userId != null} ? 'true' : 'false')]*/ false, // 로그인 여부
-            id: /*[[(${userId != null} ? ${userId} : 'null')]]*/ 'guest', // 사용자 ID (null 처리)
-            role: /*[[(${role != null} ? ${role} : 'null')]]*/ 'guest' // 사용자 역할 (null 처리)
-        };
 
-        console.log(user.isLoggedIn);
-
-        // 메뉴 동적 생성
-        function updateMenu() {
-            const topMenu = document.querySelector('.top-menu');
-            topMenu.innerHTML = ''; // 기존 메뉴 초기화
-            console.log('Top menu element:', topMenu);
-
-            if (user.isLoggedIn) {
-                // 로그인 상태
-                topMenu.innerHTML += `<p>현재 로그인된 유저 아이디: ${user.id}</p>`;
-                if (user.role === "MEMBER_ADMIN") {
-                    // 관리자 권한이 있는 경우
-                    topMenu.innerHTML += '<a href="/admin" class="menu-item">관리자페이지</a>';
-                }
-                topMenu.innerHTML += '<a href="/mypage" class="menu-item">마이페이지</a>';
-                topMenu.innerHTML += '<a href="/cart" class="menu-item">장바구니</a>';
-                topMenu.innerHTML += '<a href="/logout" class="menu-item">로그아웃</a>';
-            } else {
-                // 비로그인 상태
-                topMenu.innerHTML += '<a href="/login" class="menu-item">로그인</a>';
-                topMenu.innerHTML += '<a href="/register" class="menu-item">회원가입</a>';
-                topMenu.innerHTML += '<a href="/cart" class="menu-item">장바구니</a>';
-            }
-        }
-
-        // 페이지 로드 후 메뉴 업데이트
-        document.addEventListener('DOMContentLoaded', updateMenu);
-    </script>
 </div>
