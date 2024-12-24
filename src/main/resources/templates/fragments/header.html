@@ -4,7 +4,7 @@
         <nav>
             <div class="top-menu">
 
-                <ul>
+                <ul style="list-style-type:none">
                     <!-- 로그인 상태 확인 -->
                     <li th:if="${T(com.nhnacademy.hello.common.util.AuthInfoUtils).isLogin()}">
                         <p>현재 로그인된 유저 아이디: <span th:text="${T(com.nhnacademy.hello.common.util.AuthInfoUtils).getUsername()}"></span></p>
