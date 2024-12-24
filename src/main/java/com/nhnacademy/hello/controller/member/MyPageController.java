@@ -3,9 +3,12 @@ package com.nhnacademy.hello.controller.member;
 import com.nhnacademy.hello.common.feignclient.HexaGateway;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
+import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
@@ -30,6 +33,26 @@ public class MyPageController {
         model.addAttribute("member", member);
 
         return "member/myPage";
+    }
+
+    @GetMapping("/mypage/edit")
+    public String editPage(
+            Model model
+    ){
+        MemberDTO member = hexaGateway.getMember(AuthInfoUtils.getUsername());
+        MemberUpdateDTO updateDTO = new MemberUpdateDTO(
+                null,
+                member.memberName(),
+                member.memberNumber(),
+                member.memberEmail(),
+                member.memberBirthAt(),
+                null,
+                null
+        );
+
+        model.addAttribute("updateDTO", updateDTO);
+
+        return "member/edit";
     }
 
 }
