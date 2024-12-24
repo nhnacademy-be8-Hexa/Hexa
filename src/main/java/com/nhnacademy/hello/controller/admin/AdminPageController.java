@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class AdminPageController {
     private final HexaGateway hexaGateway;
 
-    @GetMapping("/admin/adminPage")
+    @GetMapping("/admin")
     public String adminPage(Model model){
         // 로그인 검사
         if(!AuthInfoUtils.isLogin()){
