@@ -1,17 +1,12 @@
 package com.nhnacademy.hello.controller.member;
 
 import com.nhnacademy.hello.common.feignclient.HexaGateway;
-import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.Date;
 
 @Controller
 @RequiredArgsConstructor
