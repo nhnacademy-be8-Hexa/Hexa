@@ -9,51 +9,66 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+
 <div class="container mt-5">
 
     <div th:replace="fragments/header :: header"></div>
 
     <h2 class="text-center mb-4" style="color: #9E8DBF;">Member Registration</h2>
+
+    <!-- 에러 메시지 -->
+    <div th:if="${errors}" class="alert alert-danger text-center" role="alert">
+        <div th:each="error : ${errors}">
+            <p th:text="${error}"></p>
+        </div>
+    </div>
+
     <form action="/register" method="post">
         <!-- Member ID -->
         <div class="mb-3">
             <label for="memberId" class="form-label">Member ID</label>
-            <input type="text" class="form-control" id="memberId" name="memberId" required minlength="3" maxlength="20">
+            <input type="text" class="form-control" id="memberId" name="memberId" required
+                   th:value="${registerDTO != null ? registerDTO.memberId() : ''}">
             <div class="form-text">ID must be between 3 and 20 characters.</div>
         </div>
 
         <!-- Password -->
         <div class="mb-3">
             <label for="memberPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="memberPassword" name="memberPassword" required minlength="8" maxlength="60">
+            <input type="password" class="form-control" id="memberPassword" name="memberPassword" required
+                   th:value="${registerDTO != null ? registerDTO.memberPassword() : ''}">
             <div class="form-text">Password must be between 8 and 20 characters.</div>
         </div>
 
         <!-- Member Name -->
         <div class="mb-3">
             <label for="memberName" class="form-label">Name</label>
-            <input type="text" class="form-control" id="memberName" name="memberName" required minlength="2" maxlength="20">
+            <input type="text" class="form-control" id="memberName" name="memberName" required
+                   th:value="${registerDTO != null ? registerDTO.memberName() : ''}">
             <div class="form-text">Name must be between 2 and 20 characters.</div>
         </div>
 
         <!-- Member Number -->
         <div class="mb-3">
             <label for="memberNumber" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" id="memberNumber" name="memberNumber" required minlength="10" maxlength="11" pattern="\d*">
+            <input type="text" class="form-control" id="memberNumber" name="memberNumber" required
+                   th:value="${registerDTO != null ? registerDTO.memberNumber() : ''}" pattern="\d*">
             <div class="form-text">Phone number must be 10 to 11 digits.</div>
         </div>
 
         <!-- Email -->
         <div class="mb-3">
             <label for="memberEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="memberEmail" name="memberEmail" maxlength="320">
+            <input type="email" class="form-control" id="memberEmail" name="memberEmail"
+                   th:value="${registerDTO != null ? registerDTO.memberEmail() : ''}">
             <div class="form-text">Email address (optional, max 320 characters).</div>
         </div>
 
         <!-- Birth Date -->
         <div class="mb-3">
             <label for="memberBirthAt" class="form-label">Birth Date</label>
-            <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt">
+            <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt"
+            th:value="${registerDTO != null ? registerDTO.memberBirthAt() : null}">
         </div>
 
         <!-- Submit Button -->

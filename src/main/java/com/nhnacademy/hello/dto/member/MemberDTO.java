@@ -8,6 +8,7 @@ public record MemberDTO(
         String memberPassword,
         String memberName,
         String memberNumber,
+        String memberEmail,
         LocalDate memberBirthAt,
         LocalDate memberCreatedAt,
         LocalDateTime memberLastLoginAt,
