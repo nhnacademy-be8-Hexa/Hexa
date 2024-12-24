@@ -1,14 +1,29 @@
+/* 기본 설정 추가 */
 @import url('https://rsms.me/inter/inter.css');
 
 :root {
     --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
 }
 
-body {
-    font-feature-settings: "cv03", "cv04", "cv11";
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #EFEDF6; /* 보라색 */
+    width: 100%;
+    box-sizing: border-box; /* padding 포함 크기 계산 */
 }
 
-/* 세로 메뉴 스타일 */
+body {
+    font-feature-settings: "cv03", "cv04", "cv11";
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 기존 admin-page.css 내용 유지 */
 .admin-page-vertical-menu {
     width: 200px; /* 메뉴 너비 */
     background-color: #f1f1f1; /* 메뉴 배경색 */
@@ -20,7 +35,6 @@ body {
     margin: 20px; /* 외부 여백 */
 }
 
-/* 메뉴 항목 스타일 */
 .admin-page-menu-item {
     display: block;
     padding: 10px 15px; /* 메뉴 항목 여백 */
@@ -30,7 +44,6 @@ body {
     transition: background-color 0.3s ease; /* 배경색 전환 효과 */
 }
 
-/* 메뉴 항목 마우스 오버 효과 */
 .admin-page-menu-item:hover {
     background-color: #9E8DBF; /* 배경색 변경 */
     color: #fff; /* 텍스트 색상 변경 */
