@@ -336,5 +336,44 @@ main {
     max-width: 100%;
     padding: 100px;
     margin: 0 auto; /* 중앙 정렬 */
+}
 
+/* 기존 admin-page.css 내용 유지 */
+.admin-page-vertical-menu {
+    width: 200px; /* 메뉴 너비 */
+    background-color: #f1f1f1; /* 메뉴 배경색 */
+    border: 1px solid #ddd; /* 메뉴 테두리 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    padding: 10px 0; /* 내부 여백 */
+    margin: 20px; /* 외부 여백 */
+}
+
+.admin-page-menu-item {
+    display: block;
+    padding: 10px 15px; /* 메뉴 항목 여백 */
+    text-decoration: none; /* 밑줄 제거 */
+    color: #333; /* 텍스트 색상 */
+    font-size: 16px; /* 글씨 크기 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+}
+
+.admin-page-menu-item:hover {
+    background-color: #9E8DBF; /* 배경색 변경 */
+    color: #fff; /* 텍스트 색상 변경 */
+    border-radius: 3px; /* 둥근 모서리 */
+}
+
+.admin-page-table .admin-page-form-check-input {
+    margin-right: 15px; /* 체크박스와 텍스트 간 간격 */
+}
+
+.admin-page-table td {
+    vertical-align: middle; /* 텍스트 수직 정렬 */
+    padding: 15px 10px; /* 셀 내부 여백 */
+}
+
+.admin-page-task-link {
+    padding-left: 5px; /* 링크와 체크박스 간 여백 */
 }

@@ -8,7 +8,8 @@
         <!-- CSS files -->
         <!-- 필수 -->
         <link href="./dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
-        <link href="./adminPage.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="/css/styles.css">
+
 
 
         <!-- 외부 플러그인의 스타일이 필요하면 유지
@@ -17,8 +18,9 @@
     </head>
 <body>
 <script src="./dist/js/demo-theme.min.js?1692870487"></script>
-<div class="page-wrapper">
-    <!-- Page header -->
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="fragments/header :: header"></div>
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -303,6 +305,8 @@
         })).render();
     });
     </script>
+    <!-- 풋터 -->
+    <div th:replace="fragments/footer :: footer"></div>
 </div>
 </body>
 </html>
