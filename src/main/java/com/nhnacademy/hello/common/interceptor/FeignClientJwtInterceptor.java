@@ -37,9 +37,6 @@ public class FeignClientJwtInterceptor implements RequestInterceptor {
                     jwtProperties.getTokenPrefix() + " " + jwtToken);
         }
 
-        // 디버깅 출력
-        System.out.println("Feign Request Headers: " + requestTemplate.headers());
-
     }
 
 }
