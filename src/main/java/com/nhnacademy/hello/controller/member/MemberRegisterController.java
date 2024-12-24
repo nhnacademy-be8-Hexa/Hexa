@@ -30,9 +30,8 @@ public class MemberRegisterController {
     public String register(@Valid MemberRegisterDTO registerDTO,
                            BindingResult bindingResult,
                            Model model) {
-        // 입력 형식 검증에서 걸리면 에러 보여주고 다시
+        // 입력 형식 검증에서 걸리면 다시
         if (bindingResult.hasErrors()) {
-            model.addAttribute("errors", bindingResult.getAllErrors());
             return "member/register";
         }
 
