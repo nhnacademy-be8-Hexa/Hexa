@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
@@ -7,10 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.List;
-
 
 @FeignClient(name = "hexa-gateway")
 public interface HexaGateway {
@@ -23,24 +21,19 @@ public interface HexaGateway {
 
     // service api
     // member
-    // Get members list with pagination and search
-    @GetMapping("/api/admin/members")
-    List<MemberDTO> getMembers(@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String search);
-
-    // Get a specific member by ID
     @GetMapping("/api/members/{memberId}")
-    MemberDTO getMember(@PathVariable("memberId") String memberId);
+    public MemberDTO getMember(@PathVariable String memberId);
 
-    // Create a new member
     @PostMapping("/api/members")
-    ResponseEntity<MemberDTO> createMember(@RequestBody MemberRequestDTO memberRequestDto);
+    public ResponseEntity<MemberDTO> createMember(@RequestBody @Valid MemberRequestDTO memberRequestDto);
 
-    // Update an existing member
-    @PatchMapping("/api/auth/members/{memberId}")
+    @PatchMapping("/api/members/{memberId}")
     public ResponseEntity<MemberDTO> updateMember(@PathVariable String memberId, @RequestBody @Valid MemberRequestDTO memberRequestDto);
 
-    // 로그인 시간 업데이트
-    @PutMapping("/api/auth/members/{memberId}")
-    public ResponseEntity<Void> loginMember( @PathVariable String memberId );
+    @GetMapping("/api/members/{memberId}/liked-books")
+    public ResponseEntity<List<BookDTO>> getLikedBooks(@PathVariable String memberId);
+
+    @PutMapping("/api/members/{memberId}")
+    public ResponseEntity<Void> loginMember(@PathVariable String memberId);
 
 }
