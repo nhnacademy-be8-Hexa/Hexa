@@ -1,163 +1,343 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>ADMIN PAGE</title>
-    <!-- CSS files -->
-    <link href="./dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
-    <link href="./styles/admin-page.css" rel="stylesheet"/>
-</head>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>ADMIN PAGE</title>
+        <!-- CSS files -->
+        <!-- 필수 -->
+        <link href="/css/dist/tabler.min.css?1692870487" rel="stylesheet"/>
+        <link rel="stylesheet" href="/css/styles.css">
+
+        <!-- 외부 플러그인의 스타일이 필요하면 유지
+        <link href="./dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/> -->
+
+    </head>
 <body>
-<script src="./dist/js/demo-theme.min.js?1692870487"></script>
-<div th:replace="fragments/header :: header"></div>
-<div class="page-wrapper">
-    <!-- Page header -->
+<script src="/css/dist/demo-theme.min.js?1692870487"></script>
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="fragments/header :: header"></div>
+
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
                 <div class="col">
-                    <h2 class="page-title">ADMIN PAGE</h2>
+                    <h1 class="page-title">ADMIN PAGE</h1>
                 </div>
             </div>
         </div>
     </div>
-    <!-- 세로 메뉴와 콘텐츠 -->
-    <div class="container-fluid d-flex gap-4 p-4">
-        <div class="bg-light border rounded p-3" style="width: 250px;">
-            <h4 class="text-center">메뉴</h4>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/members">회원 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/books/add">도서 등록</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/books/edit">도서 수정</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/reviews">리뷰 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/coupons">쿠폰 발행</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/points">포인트 관리</a>
-                </li>
-            </ul>
+        <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+            <!-- 사이드 메뉴 바 -->
+            <div class="bg-light border rounded p-3" style="width: 250px;">
+                <h4 class="text-center">메뉴</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/memberManage">회원 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/bookRegister">도서 등록</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/bookModify">도서 수정</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/coupon">쿠폰 발행</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/point">포인트 관리</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="flex-grow-1">
-            <div class="page-body">
-                <div class="container-xl">
-                    <div class="row row-deck row-cards">
-                        <div class="col-md-12 col-lg-8">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">카테고리별 판매된 도서 수</h3>
-                                    <div id="chart-mentions" class="chart-lg"></div>
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="container-xl">
+                        <div class="row row-deck row-cards">
+                            <div class="col-md-12 col-lg-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title">카테고리별 판매된 도서 수</h3>
+                                        <div id="chart-mentions" class="chart-lg"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Libs JS -->
-                        <div class="col-md-12 col-lg-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Most Visited Books</h3>
-                                </div>
-                                <div class="card-table table-responsive">
-                                    <table class="table admin-page-table">
-                                        <thead>
-                                        <tr>
-                                            <th>BOOK NAME</th>
-                                            <th>AUTHOR</th>
-                                            <th>LIKES</th>
-                                            <th>BOOK VIEW</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>/</td>
-                                            <td class="text-secondary">4,896</td>
-                                            <td class="text-secondary">3,654</td>
-                                            <td class="text-secondary">82.54%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/form-elements.html</td>
-                                            <td class="text-secondary">3,652</td>
-                                            <td class="text-secondary">3,215</td>
-                                            <td class="text-secondary">76.29%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/index.html</td>
-                                            <td class="text-secondary">3,256</td>
-                                            <td class="text-secondary">2,865</td>
-                                            <td class="text-secondary">72.65%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/icons.html</td>
-                                            <td class="text-secondary">986</td>
-                                            <td class="text-secondary">865</td>
-                                            <td class="text-secondary">44.89%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/docs/</td>
-                                            <td class="text-secondary">912</td>
-                                            <td class="text-secondary">822</td>
-                                            <td class="text-secondary">41.12%</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                            <div class="col-md-12 col-lg-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Most Visited Books</h3>
+                                    </div>
+                                    <div class="card-table table-responsive">
+                                        <table class="table admin-page-table">
+                                            <thead>
+                                            <tr>
+                                                <th>BOOK NAME</th>
+                                                <th>AUTHOR</th>
+                                                <th>LIKES</th>
+                                                <th>BOOK VIEW</th>
+                                            </tr>
+                                            </thead>
+                                            <tr>
+                                                <td>/</td>
+                                                <td class="text-secondary">4,896</td>
+                                                <td class="text-secondary">3,654</td>
+                                                <td class="text-secondary">82.54%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>/form-elements.html</td>
+                                                <td class="text-secondary">3,652</td>
+                                                <td class="text-secondary">3,215</td>
+                                                <td class="text-secondary">76.29%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>/index.html</td>
+                                                <td class="text-secondary">3,256</td>
+                                                <td class="text-secondary">2,865</td>
+                                                <td class="text-secondary">72.65%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>/icons.html</td>
+                                                <td class="text-secondary">986</td>
+                                                <td class="text-secondary">865</td>
+                                                <td class="text-secondary">44.89%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>/docs/</td>
+                                                <td class="text-secondary">912</td>
+                                                <td class="text-secondary">822</td>
+                                                <td class="text-secondary">41.12%</td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-12 col-lg-8">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h3 class="card-title">배송 상태 관리</h3>
-                                </div>
+                            <div class="col-md-12 col-lg-8">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h3 class="card-title">배송 상태 관리</h3>
+                                    </div>
 
-                                <div class="table-responsive">
-                                    <table class="table card-table admin-page-table" id="shipping-status-table">
-                                        <tbody>
-                                        <tr data-completed="true">
-                                            <td class="w-1 pe-4">
-                                                <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
-                                            </td>
-                                            <td class="w-100 ps-4">
-                                                <a href="#" class="text-reset admin-page-task-link">Extend the data model.</a>
-                                            </td>
-                                            <td class="text-nowrap text-secondary ps-4">August 04, 2021</td>
-                                        </tr>
-                                        <tr data-completed="false">
-                                            <td class="w-1 pe-4">
-                                                <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
-                                            </td>
-                                            <td class="w-100 ps-4">
-                                                <a href="#" class="text-reset admin-page-task-link">Verify the event flow.</a>
-                                            </td>
-                                            <td class="text-nowrap text-secondary ps-4">January 03, 2019</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table card-table admin-page-table" id="shipping-status-table">
+                                            <tr data-completed="true">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Extend the data model.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">August 04, 2021</td>
+                                            </tr>
+                                            <tr data-completed="false">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Verify the event flow.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">January 03, 2019</td>
+                                            </tr>
+                                            <tr data-completed="false">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Database backup and maintenance</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">December 28, 2018</td>
+                                            </tr>
+                                            <tr data-completed="true">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Identify the implementation team.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">November 07, 2020</td>
+                                            </tr>
+                                            <tr data-completed="false">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Define users and workflow</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">November 23, 2021</td>
+                                            </tr>
+                                            <tr data-completed="true">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Check Pull Requests</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">January 14, 2021</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 col-lg-8">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h3 class="card-title">반품 상태 관리</h3>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table card-table admin-page-table" id="return-status-table">
+                                            <tr data-completed="true">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Process refund request.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">March 15, 2022</td>
+                                            </tr>
+                                            <tr data-completed="false">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Verify returned item condition.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">February 10, 2022</td>
+                                            </tr>
+                                            <tr data-completed="false">
+                                                <td class="w-1 pe-4">
+                                                    <label>
+                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
+                                                    </label>
+                                                </td>
+                                                <td class="w-100 ps-4">
+                                                    <a href="#" class="text-reset admin-page-task-link">Complete refund processing.</a>
+                                                </td>
+                                                <td class="text-nowrap text-secondary ps-4">April 01, 2022</td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
     <!-- Libs JS -->
-    <script src="./dist/js/apexcharts.min.js?1692870487" defer></script>
-    <script src="./dist/js/jsvectormap.min.js?1692870487" defer></script>
-    <script src="./dist/js/world.js?1692870487" defer></script>
-    <script src="./dist/js/world-merc.js?1692870487" defer></script>
+    <script src="/css/dist/apexcharts.min.js?1692870487" defer></script>
+    <script src="/css/dist/jsvectormap.min.js?1692870487" defer></script>
+    <script src="/css/dist/world.js?1692870487" defer></script>
+    <script src="/css/dist/world-merc.js?1692870487" defer></script>
     <!-- Tabler Core -->
-    <script src="./dist/js/tabler.min.js?1692870487" defer></script>
-    <script src="./dist/js/demo.min.js?1692870487" defer></script>
+    <script src="/css/dist/tabler.min.js?1692870487" defer></script>
+    <script src="/css/dist/demo.min.js?1692870487" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        window.ApexCharts && (new ApexCharts(document.getElementById('chart-mentions'), {
+            chart: {
+                type: "bar",
+                fontFamily: 'inherit',
+                height: 240,
+                parentHeightOffset: 0,
+                toolbar: {
+                    show: false,
+                },
+                animations: {
+                    enabled: false
+                },
+                stacked: true,
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%',
+                }
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            fill: {
+                opacity: 1,
+            },
+            series: [{
+                name: "Web",
+                data: [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 12, 5, 8, 22, 6, 8, 6, 4, 1, 8, 24, 29, 51, 40, 47, 23, 26, 50, 26, 41, 22, 46, 47, 81, 46, 6]
+            },{
+                name: "Social",
+                data: [2, 5, 4, 3, 3, 1, 4, 7, 5, 1, 2, 5, 3, 2, 6, 7, 7, 1, 5, 5, 2, 12, 4, 6, 18, 3, 5, 2, 13, 15, 20, 47, 18, 15, 11, 10, 0]
+            },{
+                name: "Other",
+                data: [2, 9, 1, 7, 8, 3, 6, 5, 5, 4, 6, 4, 1, 9, 3, 6, 7, 5, 2, 8, 4, 9, 1, 2, 6, 7, 5, 1, 8, 3, 2, 3, 4, 9, 7, 1, 6]
+            }],
+            tooltip: {
+                theme: 'dark'
+            },
+            grid: {
+                padding: {
+                    top: -20,
+                    right: 0,
+                    left: -4,
+                    bottom: -4
+                },
+                strokeDashArray: 4,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+            },
+            xaxis: {
+                labels: {
+                    padding: 0,
+                },
+                tooltip: {
+                    enabled: false
+                },
+                axisBorder: {
+                    show: false,
+                },
+                type: 'datetime',
+            },
+            yaxis: {
+                labels: {
+                    padding: 4
+                },
+            },
+            labels: [
+                '2020-06-20', '2020-06-21', '2020-06-22', '2020-06-23', '2020-06-24', '2020-06-25', '2020-06-26', '2020-06-27', '2020-06-28', '2020-06-29', '2020-06-30', '2020-07-01', '2020-07-02', '2020-07-03', '2020-07-04', '2020-07-05', '2020-07-06', '2020-07-07', '2020-07-08', '2020-07-09', '2020-07-10', '2020-07-11', '2020-07-12', '2020-07-13', '2020-07-14', '2020-07-15', '2020-07-16', '2020-07-17', '2020-07-18', '2020-07-19'
+            ],
+            colors: [tabler.getColor("primary")],
+            legend: {
+                show: false,
+            },
+            point: {
+                show: false
+            },
+        })).render();
+    });
+    </script>
+    <!-- 풋터 -->
     <div th:replace="fragments/footer :: footer"></div>
 </div>
 </body>
