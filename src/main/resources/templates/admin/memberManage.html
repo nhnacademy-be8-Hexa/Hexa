@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 관리</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="layout">
+        <div class="bg-light border rounded p-3" style="width: 250px;">
+            <h4 class="text-center">메뉴</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/memberManage">회원 관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/bookRegister">도서 등록</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/bookModify">도서 수정</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/coupon">쿠폰 발행</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/point">포인트 관리</a>
+                </li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <header class="header">
+                <h1>회원 목록</h1>
+            </header>
+            <div class="table-container">
+                <div class="table-header">
+                    <div>회원 아이디</div>
+                    <div>회원 이름</div>
+                    <div>회원 연락처</div>
+                    <div>이메일</div>
+                    <div>생일</div>
+                    <div>권한</div>
+                    <div>등급</div>
+                    <div>수정</div>
+                    <div>삭제</div>
+                </div>
+                <div class="table-row">
+                    <div>1</div>
+                    <div>user1</div>
+                    <div>010-1111-1111</div>
+                    <div>user1@naver.com</div>
+                    <div>2001.01.01</div>
+                    <div>member</div>
+                    <div>일반</div>
+                    <div>
+                        <button class="edit-button">수정</button>
+                    </div>
+                    <div>
+                        <button class="delete-button">삭제</button>
+                    </div>
+                </div>
+                <div class="table-row">
+                    <div>2</div>
+                    <div>user2</div>
+                    <div>010-2222-2222</div>
+                    <div>user2@naver.com</div>
+                    <div>1999.12.31</div>
+                    <div>admin</div>
+                    <div>관리자</div>
+                    <div>
+                        <button class="edit-button">수정</button>
+                    </div>
+                    <div>
+                        <button class="delete-button">삭제</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+</div>
+</body>
+</html>
