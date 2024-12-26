@@ -1,6 +1,5 @@
 package com.nhnacademy.hello.controller.admin;
 
-import com.nhnacademy.hello.common.feignclient.HexaGateway;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
