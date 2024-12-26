@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway", path = "/api/books")
+@FeignClient(name = "hexa-gateway", contextId = "bookAdapter")
 public interface BookAdapter {
 
     // 통합된 도서 목록 조회
-    @GetMapping
+    @GetMapping("/api/books")
     public List<BookDTO> getBooks(
             // 페이징
             @RequestParam("page") int page,
@@ -42,38 +42,38 @@ public interface BookAdapter {
     );
 
     // 도서 생성
-    @PostMapping
+    @PostMapping("/api/books")
     public ResponseEntity<BookDTO> createBook(
             @RequestBody @Valid BookRequestDTO bookRequestDTO);
 
     // 도서 아이디로 조회
-    @GetMapping("/{bookId}")
+    @GetMapping("/api/books/{bookId}")
     public BookDTO getBook(@PathVariable Long bookId);
 
     // 도서 수정
-    @PutMapping("/{bookId}")
+    @PutMapping("/api/books/{bookId}")
     public BookDTO updateBook(
             @PathVariable Long bookId,
             @RequestBody @Valid BookUpdateRequestDTO bookRequestDTO);
 
     // 도서 조회수 증가
-    @PutMapping("/{bookId}/view")
+    @PutMapping("/api/books/{bookId}/view")
     public ResponseEntity<Void> incrementBookView(@PathVariable Long bookId);
 
     // 도서 판매량 증가
-    @PutMapping("/{bookId}/sell-count")
+    @PutMapping("/api/books/{bookId}/sell-count")
     public ResponseEntity<Void> incrementBookSellCount(@PathVariable Long bookId, @RequestParam int quantity);
 
     // 도서 삭제
-    @DeleteMapping("/{bookId}")
+    @DeleteMapping("/api/books/{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId);
 
     // 도서 작가 목록 조회
-    @GetMapping("/{bookId}/authors")
+    @GetMapping("/api/books/{bookId}/authors")
     public List<AuthorDTO> getAuthors(@PathVariable Long bookId);
 
     // 책 수량 증가
-    @GetMapping("/{bookId}/amount-increase")
+    @GetMapping("/api/books/{bookId}/amount-increase")
     public ResponseEntity<Void> incrementBookAmountIncrease(
             @PathVariable Long bookId, @RequestParam int quantity);
 

@@ -2,8 +2,7 @@ package com.nhnacademy.hello.controller.login;
 
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.dto.member.LoginRequest;
-import com.nhnacademy.hello.common.feignclient.HexaGateway;
-import com.nhnacademy.hello.dto.member.MemberRequestDTO;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import java.io.IOException;
 public class LoginController {
 
     private final JwtProperties jwtProperties;
-    private final HexaGateway hexaGateway;
+    private final MemberAdapter memberAdapter;
 
     @Value("${jwt_token_cookie_secure}")
     private String secure;
@@ -40,7 +39,7 @@ public class LoginController {
             Model model
             ) throws IOException {
         // 인증 서버에 로그인 요청을 하고 토큰을 받는다.
-        String token = hexaGateway.login(loginRequest);
+        String token = memberAdapter.login(loginRequest);
 
         // 토큰 예외처리 (로그인 실패)
         if(token == null) {
@@ -58,7 +57,7 @@ public class LoginController {
         response.addCookie(cookie);
 
         // 로그인 시간 업데이트 요청을 보낸다
-        hexaGateway.loginMember(loginRequest.id());
+        memberAdapter.loginMember(loginRequest.id());
 
         // 로그인 후 홈페이지로 이동
         return "redirect:/";

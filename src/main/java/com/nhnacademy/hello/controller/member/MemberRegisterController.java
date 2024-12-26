@@ -1,6 +1,6 @@
 package com.nhnacademy.hello.controller.member;
 
-import com.nhnacademy.hello.common.feignclient.HexaGateway;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.dto.member.MemberRegisterDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/register")
 public class MemberRegisterController {
 
-    private final HexaGateway hexaGateway;
+    private final MemberAdapter memberAdapter;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
@@ -57,7 +57,7 @@ public class MemberRegisterController {
                 "1"
         );
 
-        hexaGateway.createMember(requestDTO);
+        memberAdapter.createMember(requestDTO);
 
         return "redirect:/";
     }
