@@ -1,6 +1,6 @@
 package com.nhnacademy.hello.controller.member;
 
-import com.nhnacademy.hello.common.feignclient.HexaGateway;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MyPageController {
 
-    private final HexaGateway hexaGateway;
+    private final MemberAdapter memberAdapter;
 
     @GetMapping("/mypage")
     public String myPage(
@@ -34,7 +34,7 @@ public class MyPageController {
         }
 
         // 현재 로그인된 아이디를 이용해서 api 로부터 멤버 정보 받아옴
-        MemberDTO member = hexaGateway.getMember(AuthInfoUtils.getUsername());
+        MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
         model.addAttribute("member", member);
 
         return "member/myPage";
@@ -44,7 +44,7 @@ public class MyPageController {
     public String editPage(
             Model model
     ){
-        MemberDTO member = hexaGateway.getMember(AuthInfoUtils.getUsername());
+        MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
         MemberUpdateDTO updateDTO = new MemberUpdateDTO(
                 null,
                 member.memberName(),
@@ -77,7 +77,7 @@ public class MyPageController {
             return "member/edit";
         }
 
-        hexaGateway.updateMember(AuthInfoUtils.getUsername(), updateDTO);
+        memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
 
         return "redirect:/mypage";
     }

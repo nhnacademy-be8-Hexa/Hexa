@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway")
-public interface HexaGateway {
+@FeignClient(name = "hexa-gateway", contextId = "memberAdapter")
+public interface MemberAdapter {
 
     // auth api
     // login request (id, password) 를 보내고 토큰을 받음
