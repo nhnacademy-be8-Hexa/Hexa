@@ -20,45 +20,19 @@
 <div class="container">
     <!-- 헤더 포함 -->
     <div th:replace="fragments/header :: header"></div>
+
     <!-- 베스트셀러 도서 목록 -->
     <section>
         <h2 class="section-title">베스트셀러</h2>
         <div class="book-list">
-            <!-- 책 1 -->
-            <div class="book-item" onclick="goToBookPage(1)">
-                <img src="book1.jpg" alt="책 1">
-                <div class="book-title">책 제목 1</div>
+
+            <div class="book-item"
+                 th:each="book : ${best_seller_books}"
+                 th:onclick="|goToBookPage(${book.bookId})|">
+                <img src="book-placeholder.jpg" alt="책 이미지">
+                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
             </div>
 
-            <!-- 책 2 -->
-            <div class="book-item" onclick="goToBookPage(2)">
-                <img src="book2.jpg" alt="책 2">
-                <div class="book-title">책 제목 2</div>
-            </div>
-
-            <!-- 책 3 -->
-            <div class="book-item" onclick="goToBookPage(3)">
-                <img src="book3.jpg" alt="책 3">
-                <div class="book-title">책 제목 3</div>
-            </div>
-
-            <!-- 책 4 -->
-            <div class="book-item" onclick="goToBookPage(4)">
-                <img src="book4.jpg" alt="책 4">
-                <div class="book-title">책 제목 4</div>
-            </div>
-
-            <!-- 책 5 -->
-            <div class="book-item" onclick="goToBookPage(5)">
-                <img src="book5.jpg" alt="책 5">
-                <div class="book-title">책 제목 5</div>
-            </div>
-
-            <!-- 책 6 -->
-            <div class="book-item" onclick="goToBookPage(6)">
-                <img src="book6.jpg" alt="책 6">
-                <div class="book-title">책 제목 6</div>
-            </div>
         </div>
     </section>
 
@@ -66,82 +40,28 @@
     <section>
         <h2 class="section-title">가장 많이 클릭한 책</h2>
         <div class="book-list">
-            <!-- 책 7 -->
-            <div class="book-item" onclick="goToBookPage(7)">
-                <img src="book7.jpg" alt="책 7">
-                <div class="book-title">책 제목 7</div>
+
+            <div class="book-item"
+                 th:each="book : ${most_viewed_books}"
+                 th:onclick="|goToBookPage(${book.bookId})|">
+                <img src="book-placeholder.jpg" alt="책 이미지">
+                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
             </div>
 
-            <!-- 책 8 -->
-            <div class="book-item" onclick="goToBookPage(8)">
-                <img src="book8.jpg" alt="책 8">
-                <div class="book-title">책 제목 8</div>
-            </div>
-
-            <!-- 책 9 -->
-            <div class="book-item" onclick="goToBookPage(9)">
-                <img src="book9.jpg" alt="책 9">
-                <div class="book-title">책 제목 9</div>
-            </div>
-
-            <!-- 책 10 -->
-            <div class="book-item" onclick="goToBookPage(10)">
-                <img src="book10.jpg" alt="책 10">
-                <div class="book-title">책 제목 10</div>
-            </div>
-
-            <!-- 책 11 -->
-            <div class="book-item" onclick="goToBookPage(11)">
-                <img src="book11.jpg" alt="책 11">
-                <div class="book-title">책 제목 11</div>
-            </div>
-
-            <!-- 책 12 -->
-            <div class="book-item" onclick="goToBookPage(12)">
-                <img src="book12.jpg" alt="책 12">
-                <div class="book-title">책 제목 12</div>
-            </div>
         </div>
     </section>
 
     <section>
         <h2 class="section-title">좋아요가 가장 많은 책</h2>
         <div class="book-list">
-            <!-- 책 7 -->
-            <div class="book-item" onclick="goToBookPage(7)">
-                <img src="book7.jpg" alt="책 7">
-                <div class="book-title">책 제목 7</div>
+
+            <div class="book-item"
+                 th:each="book : ${most_liked_books}"
+                 th:onclick="|goToBookPage(${book.bookId})|">
+                <img src="book-placeholder.jpg" alt="책 이미지">
+                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
             </div>
 
-            <!-- 책 8 -->
-            <div class="book-item" onclick="goToBookPage(8)">
-                <img src="book8.jpg" alt="책 8">
-                <div class="book-title">책 제목 8</div>
-            </div>
-
-            <!-- 책 9 -->
-            <div class="book-item" onclick="goToBookPage(9)">
-                <img src="book9.jpg" alt="책 9">
-                <div class="book-title">책 제목 9</div>
-            </div>
-
-            <!-- 책 10 -->
-            <div class="book-item" onclick="goToBookPage(10)">
-                <img src="book10.jpg" alt="책 10">
-                <div class="book-title">책 제목 10</div>
-            </div>
-
-            <!-- 책 11 -->
-            <div class="book-item" onclick="goToBookPage(11)">
-                <img src="book11.jpg" alt="책 11">
-                <div class="book-title">책 제목 11</div>
-            </div>
-
-            <!-- 책 12 -->
-            <div class="book-item" onclick="goToBookPage(12)">
-                <img src="book12.jpg" alt="책 12">
-                <div class="book-title">책 제목 12</div>
-            </div>
         </div>
     </section>
 
