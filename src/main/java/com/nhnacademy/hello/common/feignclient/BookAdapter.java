@@ -1,6 +1,9 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -67,7 +70,7 @@ public interface BookAdapter {
 
     // 도서 작가 목록 조회
     @GetMapping("/{bookId}/authors")
-    public List<Author> getAuthors(@PathVariable Long bookId);
+    public List<AuthorDTO> getAuthors(@PathVariable Long bookId);
 
     // 책 수량 증가
     @GetMapping("/{bookId}/amount-increase")
