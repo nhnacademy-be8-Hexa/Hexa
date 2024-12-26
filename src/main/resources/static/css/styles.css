@@ -392,4 +392,62 @@ main {
     text-align: center; /* 텍스트 중앙 정렬 */
 }
 
+/*관리자 페이지 - 멤버 관리*/
+/* 테이블 스타일 */
+.table-container {
+    border: 1px solid rgba(185, 185, 185, 1.00);
+    border-radius: 4px;
+    background-color: white;
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.06);
+    font-weight: bold;
+    text-align: center;
+}
+
+.table-header > div {
+    flex: 1;
+    padding: 12px;
+    border-right: 1px solid rgba(185, 185, 185, 1.00);
+}
+
+.table-header > div:last-child {
+    border-right: none;
+}
+
+.table-row {
+    display: flex;
+    text-align: center;
+}
+
+.table-row > div {
+    flex: 1;
+    padding: 12px;
+    border-right: 1px solid rgba(185, 185, 185, 1.00);
+    border-top: 1px solid rgba(185, 185, 185, 1.00);
+}
+
+.table-row > div:last-child {
+    border-right: none;
+}
+.edit-button, .delete-button {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button {
+    background-color: #4CAF50; /* 초록색 */
+    color: white;
+}
+
+.delete-button {
+    background-color: #f44336; /* 빨간색 */
+    color: white;
+}
 
