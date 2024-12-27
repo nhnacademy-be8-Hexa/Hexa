@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Update</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container mt-5">
+
+    <div th:replace="fragments/header :: header"></div>
+
+    <h2 class="text-center mb-4" style="color: #9E8DBF;">Member Update</h2>
+
+    <form action="/admin/members/update" method="post" id="memberUpdateForm">
+        <!-- Member ID (Read-Only) -->
+        <div class="mb-3">
+            <label for="memberId" class="form-label">Member ID</label>
+            <input type="text" class="form-control" id="memberId" name="memberId" th:value="${member.memberId}" readonly>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+            <label for="memberPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="memberPassword" name="memberPassword" required minlength="8" maxlength="60">
+            <div class="form-text">Password must be between 8 and 20 characters.</div>
+        </div>
+
+        <!-- Member Name -->
+        <div class="mb-3">
+            <label for="memberName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="memberName" name="memberName" th:value="${member.memberName}" required minlength="2" maxlength="20">
+            <div class="form-text">Name must be between 2 and 20 characters.</div>
+        </div>
+
+        <!-- Member Number -->
+        <div class="mb-3">
+            <label for="memberNumber" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="memberNumber" name="memberNumber" th:value="${member.memberNumber}" required minlength="10" maxlength="11" pattern="\d*">
+            <div class="form-text">Phone number must be 10 to 11 digits.</div>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label for="memberEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="memberEmail" name="memberEmail" th:value="${member.memberEmail}" maxlength="320">
+            <div class="form-text">Email address (optional, max 320 characters).</div>
+        </div>
+
+        <!-- Birth Date -->
+        <div class="mb-3">
+            <label for="memberBirthAt" class="form-label">Birth Date</label>
+            <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt" th:value="${member.memberBirthAt}">
+        </div>
+
+        <!-- Member Created At (Read-Only) -->
+        <div class="mb-3">
+            <label for="memberCreatedAt" class="form-label">Member Created At</label>
+            <input type="text" class="form-control" id="memberCreatedAt" name="memberCreatedAt" th:value="${member.memberCreatedAt}" readonly>
+        </div>
+
+        <!-- Last Login At (Read-Only) -->
+        <div class="mb-3">
+            <label for="memberLastLoginAt" class="form-label">Last Login At</label>
+            <input type="text" class="form-control" id="memberLastLoginAt" name="memberLastLoginAt" th:value="${member.memberLastLoginAt}" readonly>
+        </div>
+
+        <!-- Member Status -->
+        <div class="mb-3">
+            <label for="memberStatus" class="form-label">Member Status</label>
+            <select class="form-select" id="memberStatus" name="memberStatus" required>
+                <option th:selected="${member.memberStatus == 'ACTIVE'}" value="ACTIVE">Active</option>
+                <option th:selected="${member.memberStatus == 'DORMANT'}" value="DORMANT">Dormant</option>
+                <option th:selected="${member.memberStatus == 'WITHDRAWN'}" value="WITHDRAWN">Withdrawn</option>
+            </select>
+        </div>
+
+        <!-- Rating -->
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating</label>
+            <select class="form-select" id="rating" name="rating" required>
+                <option th:selected="${member.rating == 'NORMAL'}" value="NORMAL">Normal</option>
+                <option th:selected="${member.rating == 'ROYAL'}" value="ROYAL">Royal</option>
+                <option th:selected="${member.rating == 'GOLD'}" value="GOLD">Gold</option>
+                <option th:selected="${member.rating == 'PLATINUM'}" value="PLATINUM">Platinum</option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/admin/members" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

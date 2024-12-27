@@ -33,57 +33,90 @@
                 </li>
             </ul>
         </div>
+        <!-- Main Content -->
         <div class="main-content">
+            <!-- Search Bar -->
+            <form class="search-bar" id="searchForm" method="get" action="/api/admin/memberManage">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search" name="search" placeholder="아이디로 검색" aria-label="Search by ID">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                </div>
+            </form>
+
+            <!-- Header -->
             <header class="header">
                 <h1>회원 목록</h1>
             </header>
+
+            <!-- Table -->
             <div class="table-container">
-                <div class="table-header">
-                    <div>회원 아이디</div>
-                    <div>회원 이름</div>
-                    <div>회원 연락처</div>
-                    <div>이메일</div>
-                    <div>생일</div>
-                    <div>권한</div>
-                    <div>등급</div>
-                    <div>수정</div>
-                    <div>삭제</div>
-                </div>
-                <div class="table-row">
-                    <div>1</div>
-                    <div>user1</div>
-                    <div>010-1111-1111</div>
-                    <div>user1@naver.com</div>
-                    <div>2001.01.01</div>
-                    <div>member</div>
-                    <div>일반</div>
-                    <div>
-                        <button class="edit-button">수정</button>
-                    </div>
-                    <div>
-                        <button class="delete-button">삭제</button>
-                    </div>
-                </div>
-                <div class="table-row">
-                    <div>2</div>
-                    <div>user2</div>
-                    <div>010-2222-2222</div>
-                    <div>user2@naver.com</div>
-                    <div>1999.12.31</div>
-                    <div>admin</div>
-                    <div>관리자</div>
-                    <div>
-                        <button class="edit-button">수정</button>
-                    </div>
-                    <div>
-                        <button class="delete-button">삭제</button>
-                    </div>
-                </div>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>회원 아이디</th>
+                        <th>회원 이름</th>
+                        <th>회원 연락처</th>
+                        <th>이메일</th>
+                        <th>생일</th>
+                        <th>권한</th>
+                        <th>등급</th>
+                        <th>수정</th>
+                        <th>삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="member : ${member}">
+                        <td th:text="${member.memberId}"></td>
+                        <td th:text="${member.memberName}"></td>
+                        <td th:text="${member.memberNumber}"></td>
+                        <td th:text="${member.memberEmail}"></td>
+                        <td th:text="${member.memberBirthAt}"></td>
+                        <td th:text="${member.memberRole}"></td>
+                        <td th:text="${member.rating}"></td>
+                        <td>
+                            <a th:href="@{'/api/admin/memberManage/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
+                        </td>
+                        <td>
+                            <button
+                                    class="btn btn-danger btn-sm delete-button"
+                                    th:data-member-id="${member.memberId}">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        </div>
     </div>
-    <div th:replace="fragments/footer :: footer"></div>
-</div>
+
+    <!-- Optional: Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 삭제 버튼 클릭 이벤트
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const memberId = this.dataset.memberId;
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    fetch(`/api/members/${memberId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ memberStatus: 'WITHDRAWN' }),
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('회원 상태가 탈퇴로 변경되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            } else {
+                                alert('삭제 실패. 다시 시도해주세요.');
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+    </div>
 </body>
 </html>

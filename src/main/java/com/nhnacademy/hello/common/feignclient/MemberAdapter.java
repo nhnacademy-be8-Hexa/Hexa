@@ -5,6 +5,7 @@ import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,9 @@ public interface MemberAdapter {
 
     @PutMapping("/api/members/{memberId}/login")
     public ResponseEntity<Void> loginMember(@PathVariable String memberId);
+
+    @GetMapping("/api/members")
+    public List<MemberDTO> getMembers(
+            @RequestParam(defaultValue  = "0") int page, @RequestParam(required = false) String search);
 
 }
