@@ -10,16 +10,28 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminPageController {
+public class CouponController {
     private final MemberAdapter memberAdapter;
 
-    @GetMapping("/admin")
+    @GetMapping("/admin/coupon")
     public String adminPage(Model model){
+
+        // 로그인 검사
+        if(!AuthInfoUtils.isLogin()){
+            return "redirect:/login";
+        }
 
         // 현재 로그인된 사용자 정보 조회
         MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
+
+        // 관리자인지 검사
+        if(!"ADMIN".equals(memberDTO.memberRole())){
+            return "redirect:/index"; //
+        }
+
         model.addAttribute("member",memberDTO);
 
-        return "admin/adminPage";
+        return "admin/coupon";
     }
 }
+
