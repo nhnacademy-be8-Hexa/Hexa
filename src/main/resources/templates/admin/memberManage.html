@@ -47,7 +47,7 @@
             </header>
 
             <!-- Table -->
-            <div class="table-container">
+            <div class="table">
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -57,7 +57,7 @@
                         <th>이메일</th>
                         <th>생일</th>
                         <th>권한</th>
-                        <th>등급</th>여기
+                        <th>등급</th>
                         <th>수정</th>
                         <th>삭제</th>
                     </tr>
@@ -116,6 +116,8 @@
             });
         });
     </script>
+    <!-- 풋터 -->
+    <div th:replace="fragments/footer :: footer"></div>
     </div>
 </body>
 </html>
