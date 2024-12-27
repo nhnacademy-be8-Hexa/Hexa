@@ -32,6 +32,7 @@
                  th:value="${cart.getCartId()}" />
           <label th:for="'check' + ${cart.getCartId()}" th:text="${cart.getBook().getBookTitle()}">도서 제목</label>
         </div>
+
         <div class="cart-item">
           <img th:onclick="'goToBookPage(' + ${cart.getCartId()} + ')'" style="cursor: pointer;" alt="도서 이미지" />
           <div class="cart-book-info">
@@ -40,26 +41,35 @@
             <div class="book-quantity" th:text="'수량: ' + ${cart.getCartAmount()}">수량</div>
           </div>
 
+          <div class="delete-form">
+            <form th:action="@{/cart/delete}" method="post">
+              <input type="hidden" name="cartId" th:value="${cart.getCartId()}" />
+              <button type="submit" class="cart-button">삭제</button>
+            </form>
+          </div>
+
         </div>
       </div>
     </div>
+    <!-- 개별 삭제 버튼 (별도의 폼으로 분리) -->
+
 
 
     <button type="submit" class="cart-button">구매하기</button>
   </form>
-  <!-- 개별 삭제 버튼을 별도의 폼으로 배치 -->
-  <div th:each="cart : ${carts}" class="cart-item">
-    <div class="checkbox-and-title"></div>
-    <div class="cart-book-info">
-      <div class="book-details"></div>
-    </div>
-    <div class="delete-form">
-      <form th:action="@{/cart/delete}" method="post">
-        <input type="hidden" name="cartId" th:value="${cart.getCartId()}" />
-        <button type="submit" class="cart-button">삭제</button>
-      </form>
-    </div>
-  </div>
+<!--  &lt;!&ndash; 개별 삭제 버튼을 별도의 폼으로 배치 &ndash;&gt;-->
+<!--  <div th:each="cart : ${carts}" class="cart-item">-->
+<!--    <div class="checkbox-and-title"></div>-->
+<!--    <div class="cart-book-info">-->
+<!--      <div class="book-details"></div>-->
+<!--    </div>-->
+<!--    <div class="delete-form">-->
+<!--      <form th:action="@{/cart/delete}" method="post">-->
+<!--        <input type="hidden" name="cartId" th:value="${cart.getCartId()}" />-->
+<!--        <button type="submit" class="cart-button">삭제</button>-->
+<!--      </form>-->
+<!--    </div>-->
+<!--  </div>-->
 
   <div class="cart-footer">
     <div class="book-title">배송비: <span th:text="${deliveryFee} + '원'"></span></div>
