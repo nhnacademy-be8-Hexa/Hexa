@@ -1,10 +1,12 @@
 package com.nhnacademy.hello.controller.login;
 
 import com.nhnacademy.hello.common.properties.JwtProperties;
+import com.nhnacademy.hello.dto.cart.CartDTO;
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,6 +62,7 @@ public class LoginController {
 
         // 로그인 시간 업데이트 요청을 보낸다
         memberAdapter.loginMember(loginRequest.id());
+
 
         // 로그인 후 홈페이지로 이동
         return "redirect:/";
