@@ -20,7 +20,7 @@ public class MemberManageController {
 
     // 멤버 전체 조회
     @GetMapping
-    public String memberManage(@RequestParam(defaultValue = "0") int page,
+    public String getMembers(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(required = false) String search,
                                Model model) {
         // 멤버 목록을 가져와서 모델에 추가
