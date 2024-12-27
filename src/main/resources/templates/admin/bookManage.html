@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원 관리</title>
+    <title>도서 관리</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -43,7 +43,7 @@
 
             <!-- Header -->
             <header class="header">
-                <h1>회원 목록</h1>
+                <h1>도서 목록</h1>
             </header>
 
             <!-- Table -->
@@ -51,15 +51,15 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>회원 아이디</th>
-                        <th>회원 이름</th>
-                        <th>회원 연락처</th>
-                        <th>이메일</th>
-                        <th>생일</th>
-                        <th>권한</th>
-                        <th>등급</th>여기
-                        <th>수정</th>
-                        <th>삭제</th>
+                        <th>도서 아이디</th>
+                        <th>제목</th>
+                        <th>출간일</th>
+                        <th>ISBN</th>
+                        <th></th>
+                        <th>판매가</th>
+                        <th>포장 가능 여부</th>
+                        <th>재고</th>
+                        <th>판매량</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -74,13 +74,6 @@
                         <td>
                             <a th:href="@{'/admin/members/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
                         </td>
-                        <td>
-                            <button
-                                    class="btn btn-danger btn-sm delete-button"
-                                    th:data-member-id="${member.memberId}">
-                                삭제
-                            </button>
-                        </td>
                     </tr>
                     </tbody>
 
@@ -91,31 +84,6 @@
 
     <!-- Optional: Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // 삭제 버튼 클릭 이벤트
-        document.querySelectorAll('.delete-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const memberId = this.dataset.memberId;
-                if (confirm('정말 삭제하시겠습니까?')) {
-                    fetch(`/api/members/${memberId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ memberStatus: 'WITHDRAWN' }),
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                alert('회원 상태가 탈퇴로 변경되었습니다.');
-                                location.reload(); // 페이지 새로고침
-                            } else {
-                                alert('삭제 실패. 다시 시도해주세요.');
-                            }
-                        });
-                }
-            });
-        });
-    </script>
-    </div>
+</div>
 </body>
 </html>
