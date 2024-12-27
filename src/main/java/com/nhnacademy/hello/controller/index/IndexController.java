@@ -1,7 +1,6 @@
 package com.nhnacademy.hello.controller.index;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

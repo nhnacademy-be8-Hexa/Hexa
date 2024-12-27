@@ -30,7 +30,7 @@
                  th:each="book : ${best_seller_books}"
                  th:onclick="|goToBookPage(${book.bookId})|">
                 <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
             </div>
 
         </div>
@@ -45,7 +45,7 @@
                  th:each="book : ${most_viewed_books}"
                  th:onclick="|goToBookPage(${book.bookId})|">
                 <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
             </div>
 
         </div>
@@ -59,7 +59,7 @@
                  th:each="book : ${most_liked_books}"
                  th:onclick="|goToBookPage(${book.bookId})|">
                 <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${book.bookTitle}">책 제목</div>
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
             </div>
 
         </div>
