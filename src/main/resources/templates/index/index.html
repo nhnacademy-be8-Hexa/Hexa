@@ -73,16 +73,16 @@
 
 <script>
     window.onload = function() {
-        // URL에서 loginSuccess 파라미터가 있는지 확인
+        // URL에서 clearLocalCart 파라미터가 있는지 확인
         const urlParams = new URLSearchParams(window.location.search);
-        const loginSuccess = urlParams.get('loginSuccess');
+        const clearLocalCart = urlParams.get('clearLocalCart');
 
         // 로그인 성공 시 로컬 스토리지에서 cart 삭제
-        if (loginSuccess === 'true') {
+        if (clearLocalCart === 'true') {
             localStorage.removeItem("cart");
         }
 
-        // URL에서 loginSuccess 파라미터 제거
+        // URL에서 clearLocalCart 파라미터 제거
         history.replaceState(null, null, window.location.pathname);  // URL에서 파라미터 제거
 
     };

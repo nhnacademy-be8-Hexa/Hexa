@@ -61,7 +61,7 @@ public class LoginController {
 
 
         // 로그인 후 홈페이지로 이동
-        return "redirect:/?loginSuccess=true";
+        return "redirect:/?clearLocalCart=true";
     }
 
 
