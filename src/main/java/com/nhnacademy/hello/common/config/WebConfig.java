@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.common.config;
 
+import com.nhnacademy.hello.common.interceptor.AdminAuthInterceptor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
+        // 관리자 인증 인터셉터
+        registry.addInterceptor(new AdminAuthInterceptor())
+                .addPathPatterns("/admin/**");
     }
 }
 
