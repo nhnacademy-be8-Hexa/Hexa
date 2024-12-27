@@ -395,44 +395,39 @@ main {
 /*관리자 페이지 - 멤버 관리*/
 /* 테이블 스타일 */
 .table-container {
-    border: 1px solid rgba(185, 185, 185, 1.00);
-    border-radius: 4px;
-    background-color: white;
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #fff; /* 배경색 */
     overflow: hidden;
+    margin-top: 20px; /* 간격 추가 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
 }
 
-.table-header {
-    display: flex;
-    background-color: rgba(0, 0, 0, 0.06);
-    font-weight: bold;
-    text-align: center;
+.table {
+    width: 100%;
+    border-collapse: collapse; /* 테이블 선이 겹치지 않도록 */
 }
 
-.table-header > div {
-    flex: 1;
-    padding: 12px;
-    border-right: 1px solid rgba(185, 185, 185, 1.00);
+.table th, .table td {
+    border: 1px solid #ddd; /* 셀 간의 선 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    padding: 12px; /* 여백 추가 */
 }
 
-.table-header > div:last-child {
-    border-right: none;
+.table th {
+    background-color: rgba(158, 141, 191, 0.15); /* 연한 보라색 배경 */
+    font-weight: bold; /* 굵게 표시 */
+    color: #333; /* 텍스트 색상 */
 }
 
-.table-row {
-    display: flex;
-    text-align: center;
+.table tr:nth-child(even) {
+    background-color: #f9f9f9; /* 짝수 행 배경 */
 }
 
-.table-row > div {
-    flex: 1;
-    padding: 12px;
-    border-right: 1px solid rgba(185, 185, 185, 1.00);
-    border-top: 1px solid rgba(185, 185, 185, 1.00);
+.table tr:hover {
+    background-color: rgba(158, 141, 191, 0.2); /* 호버 시 연한 보라색 */
 }
 
-.table-row > div:last-child {
-    border-right: none;
-}
 .edit-button, .delete-button {
     padding: 5px 10px;
     margin: 2px;
