@@ -466,6 +466,7 @@ main {
 }
 
 .cart-book-info {
+    flex: 2;
     display: flex;                /* 내부를 플렉스로 */
     flex-direction: column;       /* 세로 방향으로 쌓이도록 */
     align-items: flex-start;      /* (옵션) 왼쪽 정렬 / 필요에 따라 center 등으로 변경 가능 */
@@ -491,6 +492,7 @@ main {
 }
 
 .checkbox-and-title {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 5px;

@@ -23,9 +23,16 @@ public class CartController {
         if(carts == null) {
             carts = new ArrayList<>();
         }
+        int totalQuantity = carts.stream().mapToInt(CartDTO::getCartAmount).sum();
+        int totalPrice = carts.stream().mapToInt(cart -> cart.getCartAmount() * cart.getBook().getBookPrice()).sum();
+        int deliveryFee = (totalPrice >= 30000) ? 0 : 3000;
+
 
         model.addAttribute("carts", carts);
-        return "cart/cart2";
+        model.addAttribute("totalQuantity", totalQuantity);
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("deliveryFee", deliveryFee);
+        return "cart/cart";
     }
 
     @PostMapping("/cart/delete")
@@ -49,6 +56,16 @@ public class CartController {
         return "redirect:/cart";
 
     }
+
+    @GetMapping("/purchase")
+    public String purchaseCartItem(
+            @RequestParam List<Long> cartIds,
+            Model model) {
+
+        model.addAttribute("carts", cartIds);
+        return "purchase/purchase";
+    }
+
 
 
 
