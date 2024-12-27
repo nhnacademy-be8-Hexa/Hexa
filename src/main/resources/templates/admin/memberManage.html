@@ -12,9 +12,18 @@
 <div class="container">
     <!-- 헤더 -->
     <div th:replace="fragments/header :: header"></div>
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h1 class="page-title">회원 목록</h1>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 전체 레이아웃 -->
-    <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <div class="row g-4">
         <!-- 사이드 메뉴 -->
         <div class="col-auto bg-light border rounded p-3" style="width: 250px;">
             <h4 class="text-center">메뉴</h4>
@@ -49,9 +58,6 @@
 
             <!-- 회원 목록 -->
             <div class="table-container">
-                <header class="mb-3">
-                    <h1>회원 목록</h1>
-                </header>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -121,5 +127,6 @@
 
 <!-- 풋터 -->
 <div th:replace="fragments/footer :: footer"></div>
+
 </body>
 </html>
