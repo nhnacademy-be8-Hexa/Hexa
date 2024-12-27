@@ -393,39 +393,32 @@ main {
 }
 
 /*관리자 페이지 - 멤버 관리*/
-/* 테이블 스타일 */
+/* 테이블 */
 .table-container {
-    border: 1px solid #ddd; /* 테두리 */
-    border-radius: 4px; /* 모서리 둥글게 */
-    background-color: #fff; /* 배경색 */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
     overflow: hidden;
-    margin-top: 20px; /* 간격 추가 */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse; /* 테이블 선이 겹치지 않도록 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .table th, .table td {
-    border: 1px solid #ddd; /* 셀 간의 선 */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    padding: 12px; /* 여백 추가 */
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 12px;
 }
 
 .table th {
-    background-color: rgba(158, 141, 191, 0.15); /* 연한 보라색 배경 */
-    font-weight: bold; /* 굵게 표시 */
-    color: #333; /* 텍스트 색상 */
+    background-color: rgba(158, 141, 191, 0.15);
+    font-weight: bold;
 }
 
 .table tr:nth-child(even) {
-    background-color: #f9f9f9; /* 짝수 행 배경 */
+    background-color: #f9f9f9;
 }
 
 .table tr:hover {
-    background-color: rgba(158, 141, 191, 0.2); /* 호버 시 연한 보라색 */
+    background-color: rgba(158, 141, 191, 0.2);
 }
 
 .edit-button, .delete-button {
