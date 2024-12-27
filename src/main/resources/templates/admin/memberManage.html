@@ -65,7 +65,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="member : ${member}">
+                    <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
                         <td th:text="${member.memberName}"></td>
                         <td th:text="${member.memberNumber}"></td>
@@ -74,7 +74,7 @@
                         <td th:text="${member.memberRole}"></td>
                         <td th:text="${member.rating}"></td>
                         <td>
-                            <a th:href="@{'/api/admin/memberManage/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
+                            <a th:href="@{'/admin/members/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
                         </td>
                         <td>
                             <button
@@ -85,6 +85,7 @@
                         </td>
                     </tr>
                     </tbody>
+
                 </table>
             </div>
         </div>
