@@ -14,11 +14,12 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/admin/members")
 public class MemberManageController {
     private final MemberAdapter memberAdapter;
 
     // 멤버 전체 조회
-    @GetMapping("/api/members")
+    @GetMapping()
     public String getMembers(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(required = false) String search,
                                Model model) {
@@ -29,7 +30,7 @@ public class MemberManageController {
     }
 
     // 특정 회원 상세 조회
-    @GetMapping("/api/members/{memberId}")
+    @GetMapping("/{memberId}")
     public String getMember(@PathVariable String memberId, Model model) {
         // 특정 멤버 정보를 가져와서 모델에 추가
         MemberDTO member = memberAdapter.getMember(memberId);
@@ -38,7 +39,7 @@ public class MemberManageController {
     }
 
     // 멤버 정보 수정 (상태 변경 포함)
-    @PostMapping("/api/members{memberId}")
+    @PostMapping("/{memberId}")
     public String updateMember(@PathVariable String memberId,
                                @ModelAttribute @Valid MemberUpdateDTO memberUpdateDTO) {
         // 멤버 정보를 수정
