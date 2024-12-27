@@ -77,4 +77,15 @@ public interface BookAdapter {
     public ResponseEntity<Void> incrementBookAmountIncrease(
             @PathVariable Long bookId, @RequestParam int quantity);
 
+    // 좋아요 추가
+    @PostMapping("/api/likes")
+    public ResponseEntity<Void> createLike(
+            @RequestParam Long bookId,
+            @RequestParam String memberId);
+
+    // 좋아요 수 조회
+    @GetMapping("/api/books/{bookId}/likes")
+    public ResponseEntity<Long> getLikeCount(
+            @PathVariable Long bookId);
+
 }
