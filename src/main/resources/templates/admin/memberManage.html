@@ -9,7 +9,8 @@
 <body>
 <div class="container">
     <div th:replace="fragments/header :: header"></div>
-    <div class="layout">
+    <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+        <!-- 사이드 메뉴 바 -->
         <div class="bg-light border rounded p-3" style="width: 250px;">
             <h4 class="text-center">메뉴</h4>
             <ul class="nav flex-column">
@@ -17,10 +18,7 @@
                     <a class="nav-link" href="/admin/memberManage">회원 관리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/bookRegister">도서 등록</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/bookModify">도서 수정</a>
+                    <a class="nav-link" href="/admin/bookManage">도서 관리</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
@@ -59,7 +57,7 @@
                         <th>이메일</th>
                         <th>생일</th>
                         <th>권한</th>
-                        <th>등급</th>
+                        <th>등급</th>여기
                         <th>수정</th>
                         <th>삭제</th>
                     </tr>
