@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway", contextId = "memberAdapter", configuration = FeignConfig.class)
+@FeignClient(name = "hexa-gateway", contextId = "memberAdapter")
 public interface MemberAdapter {
 
     // auth api
