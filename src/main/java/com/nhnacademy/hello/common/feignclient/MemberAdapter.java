@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.common.config.FeignConfig;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.dto.member.MemberDTO;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway", contextId = "memberAdapter")
+@FeignClient(name = "hexa-gateway", contextId = "memberAdapter", configuration = FeignConfig.class)
 public interface MemberAdapter {
 
     // auth api
