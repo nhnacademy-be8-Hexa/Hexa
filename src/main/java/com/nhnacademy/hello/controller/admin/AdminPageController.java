@@ -15,11 +15,10 @@ public class AdminPageController {
 
     @GetMapping("/admin")
     public String adminPage(Model model){
-
         // 현재 로그인된 사용자 정보 조회
         MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
-        model.addAttribute("member",memberDTO);
+        model.addAttribute("member", memberDTO);
 
-        return "admin/adminPage";
+        return "admin/adminPage"; // 템플릿 파일 경로
     }
 }
