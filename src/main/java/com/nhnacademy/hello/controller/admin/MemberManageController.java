@@ -19,7 +19,7 @@ public class MemberManageController {
     private final MemberAdapter memberAdapter;
 
     // 멤버 전체 조회
-    @GetMapping()
+    @GetMapping
     public String getMembers(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(required = false) String search,
                                Model model) {
