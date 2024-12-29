@@ -14,67 +14,23 @@
 
   <div th:replace="fragments/header :: header"></div>
 
-  <form th:action="@{/cart/deleteAll}" method="post">
-    <input type="hidden" name="cartId" th:value="${cart != null ? cart.getCartId() : ''}" />
-    <button type="submit" class="cart-button">전체 삭제</button>
-  </form>
-
+  <button id="deleteAllButton" class="cart-button">전체 삭제</button>
 
   <hr>
 
-  <form th:action="@{/purchase}" method="get" id="cartForm">
-    <div class="cart-list">
+  <form id="cartForm">
+    <div class="cart-list" id="cartList">
       <!-- 도서 목록 반복 렌더링 -->
-      <div th:each="cart : ${carts}">
-        <div class="checkbox-and-title">
-          <input type="checkbox" name="cartIds" class="cart-checkbox"
-                 th:id="'check' + ${cart.getCartId()}"
-                 th:value="${cart.getCartId()}" />
-          <label th:for="'check' + ${cart.getCartId()}" th:text="${cart.getBook().getBookTitle()}">도서 제목</label>
-        </div>
-
-        <div class="cart-item">
-          <img th:onclick="'goToBookPage(' + ${cart.getCartId()} + ')'" style="cursor: pointer;" alt="도서 이미지" />
-          <div class="cart-book-info">
-            <div class="book-title" th:text="${cart.getBook().getBookTitle()}" th:onclick="'goToBookPage(' + ${cart.getCartId()} + ')'" style="cursor: pointer;">도서 제목</div>
-            <div class="book-price" th:text="${cart.getBook().getBookPrice()} + '원'">가격</div>
-            <div class="book-quantity" th:text="'수량: ' + ${cart.getCartAmount()}">수량</div>
-          </div>
-
-          <div class="delete-form">
-            <form th:action="@{/cart/delete}" method="post">
-              <input type="hidden" name="cartId" th:value="${cart.getCartId()}" />
-              <button type="submit" class="cart-button">삭제</button>
-            </form>
-          </div>
-
-        </div>
-      </div>
     </div>
-    <!-- 개별 삭제 버튼 (별도의 폼으로 분리) -->
-
-
-
-    <button type="submit" class="cart-button">구매하기</button>
+    <button type="button" id="purchaseButton" class="cart-button">구매하기</button>
   </form>
-<!--  &lt;!&ndash; 개별 삭제 버튼을 별도의 폼으로 배치 &ndash;&gt;-->
-<!--  <div th:each="cart : ${carts}" class="cart-item">-->
-<!--    <div class="checkbox-and-title"></div>-->
-<!--    <div class="cart-book-info">-->
-<!--      <div class="book-details"></div>-->
-<!--    </div>-->
-<!--    <div class="delete-form">-->
-<!--      <form th:action="@{/cart/delete}" method="post">-->
-<!--        <input type="hidden" name="cartId" th:value="${cart.getCartId()}" />-->
-<!--        <button type="submit" class="cart-button">삭제</button>-->
-<!--      </form>-->
-<!--    </div>-->
-<!--  </div>-->
+
+  <hr>
 
   <div class="cart-footer">
-    <div class="book-title">배송비: <span th:text="${deliveryFee} + '원'"></span></div>
-    <div class="book-price">총 갯수: <span th:text="${totalQuantity}"></span></div>
-    <div class="book-quantity">총 가격: <span th:text="${totalPrice} + '원'"></span></div>
+    <div>배송비: <span id="deliveryFee">0원</span></div>
+    <div>총 갯수: <span id="totalQuantity">0</span></div>
+    <div>총 가격: <span id="totalPrice">0원</span></div>
   </div>
 
 
@@ -84,11 +40,139 @@
 </div>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 장바구니 JavaScript (HTML 내에 직접 삽입) -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // 장바구니 초기화
+    renderCart();
+
+    // 전체 삭제 버튼 이벤트 리스너
+    document.getElementById('deleteAllButton').addEventListener('click', () => {
+      if (confirm('정말로 모든 항목을 삭제하시겠습니까?')) {
+        localStorage.removeItem('cart');
+        renderCart();
+      }
+    });
+
+    // 구매 버튼 이벤트 리스너
+    document.getElementById('purchaseButton').addEventListener('click', () => {
+      const selectedCartIds = getSelectedCartIds();
+      if (selectedCartIds.length === 0) {
+        alert('구매할 항목을 선택해주세요.');
+        return;
+      }
+
+      // 선택된 항목만 필터링
+      const cart = getCart().filter(item => selectedCartIds.includes(item.cartId));
+
+      // 구매 로직 예제
+      fetch('/purchase', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ carts: cart })
+      })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert('구매가 완료되었습니다!');
+                  removeSelectedItems(selectedCartIds);
+                  renderCart();
+                } else {
+                  alert('구매에 실패했습니다. 다시 시도해주세요.');
+                }
+              })
+              .catch(error => {
+                console.error('오류:', error);
+                alert('구매 중 오류가 발생했습니다.');
+              });
+    });
+  });
+
+
+
+  // 로컬 스토리지에서 장바구니 가져오기
+  function getCart() {
+    return JSON.parse(localStorage.getItem('cart')) || [];
+  }
+
+  // 장바구니 렌더링 함수
+  function renderCart() {
+    const cartList = document.getElementById('cartList');
+    const cart = getCart();
+    cartList.innerHTML = ''; // 기존 항목 비우기
+
+    let totalQuantity = 0;
+    let totalPrice = 0;
+    const deliveryFee = cart.length > 0 ? 3000 : 0; // 장바구니가 비어있지 않으면 배송비 3,000원
+
+    cart.forEach(item => {
+      totalQuantity += item.quantity;
+      totalPrice += item.bookPrice * item.quantity;
+
+      // 장바구니 항목 요소 생성
+      const cartItem = document.createElement('div');
+      cartItem.className = 'card mb-3 cart-item';
+      cartItem.innerHTML = `
+                <div class="row g-0">
+                <div class="col-md-1 d-flex align-items-center justify-content-center">
+                    <input type="checkbox" class="form-check-input select-item" value="${item.cartId}">
+            </div>
+                    <div class="col-md-2">
+                        <img src="/images/books/${item.bookId}.jpg" class="img-fluid rounded-start" alt="${item.bookTitle}" style="cursor: pointer;" onclick="goToBookPage('${item.bookId}')">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title" style="cursor: pointer;" onclick="goToBookPage('${item.bookId}')">${item.bookTitle}</h5>
+                            <p class="card-text">가격: ${item.bookPrice.toLocaleString()}원</p>
+                            <p class="card-text">수량: ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                        <button class="cart-button" onclick="deleteCartItem('${item.bookId}')">삭제</button>
+                    </div>
+                </div>
+            `;
+      cartList.appendChild(cartItem);
+    });
+
+    // 하단 정보 업데이트
+    document.getElementById('deliveryFee').innerText = `${deliveryFee.toLocaleString()}원`;
+    document.getElementById('totalQuantity').innerText = totalQuantity;
+    document.getElementById('totalPrice').innerText = `${(totalPrice + deliveryFee).toLocaleString()}원`;
+  }
+
+  // 특정 장바구니 항목 삭제 함수
+  function deleteCartItem(bookId) {
+    let cart = getCart();
+    cart = cart.filter(item => item.bookId !== bookId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    renderCart();
+  }
+
+  // 도서 상세 페이지로 이동하는 함수
+  function goToBookPage(bookId) {
+    window.location.href = `/book/${bookId}`; // 라우팅 설정에 맞게 URL 조정
+  }
+
+  // 선택된 장바구니 ID 가져오기
+  function getSelectedCartIds() {
+    const checkboxes = document.querySelectorAll('.select-item:checked');
+    const selectedIds = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
+    return selectedIds;
+  }
+
+  // 선택된 항목 삭제
+  function removeSelectedItems(selectedIds) {
+    let cart = getCart();
+    cart = cart.filter(item => !selectedIds.includes(item.cartId));
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+</script>
 </body>
 
 
 </html>
-
-
-
-
