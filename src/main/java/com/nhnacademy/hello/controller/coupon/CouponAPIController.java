@@ -4,18 +4,17 @@ import com.nhnacademy.hello.common.feignclient.CouponAdapter;
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.coupon.CouponRequestDTO;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/coupons")
-public class CouponController {
+public class CouponAPIController {
 
     private final CouponAdapter couponAdapter;
 
-    public CouponController(CouponAdapter couponAdapter) {
+    public CouponAPIController(CouponAdapter couponAdapter) {
         this.couponAdapter = couponAdapter;
     }
 
