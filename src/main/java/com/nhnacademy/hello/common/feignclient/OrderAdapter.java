@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -19,16 +20,16 @@ public interface OrderAdapter {
             @RequestParam(required = false) Long couponId);
 
     @GetMapping("/api/orders")
-    public ResponseEntity<List<OrderProjection>> getAllOrders(
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
             @RequestParam(defaultValue = "0") int page);
 
     @GetMapping("/api/members/{memberId}/orders")
-    public ResponseEntity<List<OrderProjection>> getOrdersByMemberId(
+    public ResponseEntity<List<OrderDTO>> getOrdersByMemberId(
             @Valid @RequestParam(defaultValue = "0") int page,
             @PathVariable String memberId);
 
     @GetMapping("/api/orders/{orderId}")
-    public ResponseEntity<OrderProjection> getOrderById(
+    public ResponseEntity<OrderDTO> getOrderById(
             @PathVariable Long orderId);
 
     @PutMapping("/api/orders/{orderId}")
