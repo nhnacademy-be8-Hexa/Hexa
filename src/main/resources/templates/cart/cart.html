@@ -22,16 +22,12 @@
     <div class="cart-list" id="cartList">
       <!-- 도서 목록 반복 렌더링 -->
     </div>
-    <button type="button" id="purchaseButton" class="cart-button">구매하기</button>
+    <button type="button" class="cart-button" onclick = "goToPurchasePage()">구매하기</button>
   </form>
 
   <hr>
 
-  <div class="cart-footer">
-    <div>배송비: <span id="deliveryFee">0원</span></div>
-    <div>총 갯수: <span id="totalQuantity">0</span></div>
-    <div>총 가격: <span id="totalPrice">0원</span></div>
-  </div>
+
 
 
   <!-- 풋터 -->
@@ -56,42 +52,8 @@
       }
     });
 
-    // 구매 버튼 이벤트 리스너
-    document.getElementById('purchaseButton').addEventListener('click', () => {
-      const selectedCartIds = getSelectedCartIds();
-      if (selectedCartIds.length === 0) {
-        alert('구매할 항목을 선택해주세요.');
-        return;
-      }
 
-      // 선택된 항목만 필터링
-      const cart = getCart().filter(item => selectedCartIds.includes(item.cartId));
-
-      // 구매 로직 예제
-      fetch('/purchase', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ carts: cart })
-      })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                  alert('구매가 완료되었습니다!');
-                  removeSelectedItems(selectedCartIds);
-                  renderCart();
-                } else {
-                  alert('구매에 실패했습니다. 다시 시도해주세요.');
-                }
-              })
-              .catch(error => {
-                console.error('오류:', error);
-                alert('구매 중 오류가 발생했습니다.');
-              });
-    });
   });
-
 
 
   // 로컬 스토리지에서 장바구니 가져오기
@@ -117,10 +79,11 @@
       const cartItem = document.createElement('div');
       cartItem.className = 'card mb-3 cart-item';
       cartItem.innerHTML = `
+
                 <div class="row g-0">
                 <div class="col-md-1 d-flex align-items-center justify-content-center">
-                    <input type="checkbox" class="form-check-input select-item" value="${item.cartId}">
-            </div>
+                <input type="checkbox" class="form-check-input select-item" value="101">
+                </div>
                     <div class="col-md-2">
                         <img src="/images/books/${item.bookId}.jpg" class="img-fluid rounded-start" alt="${item.bookTitle}" style="cursor: pointer;" onclick="goToBookPage('${item.bookId}')">
                     </div>
@@ -139,10 +102,10 @@
       cartList.appendChild(cartItem);
     });
 
-    // 하단 정보 업데이트
-    document.getElementById('deliveryFee').innerText = `${deliveryFee.toLocaleString()}원`;
-    document.getElementById('totalQuantity').innerText = totalQuantity;
-    document.getElementById('totalPrice').innerText = `${(totalPrice + deliveryFee).toLocaleString()}원`;
+    const checkboxes = document.querySelectorAll('.select-item:checked');
+    console.log(checkboxes);
+
+
   }
 
   // 특정 장바구니 항목 삭제 함수
@@ -161,16 +124,26 @@
   // 선택된 장바구니 ID 가져오기
   function getSelectedCartIds() {
     const checkboxes = document.querySelectorAll('.select-item:checked');
-    const selectedIds = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
-    return selectedIds;
+    return Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
   }
 
-  // 선택된 항목 삭제
-  function removeSelectedItems(selectedIds) {
-    let cart = getCart();
-    cart = cart.filter(item => !selectedIds.includes(item.cartId));
-    localStorage.setItem('cart', JSON.stringify(cart));
+  // 구매 버튼 클릭 시 호출
+  function goToPurchasePage() {
+    const selectedCartIds = getSelectedCartIds();
+    console.log("선택된 ID:", selectedCartIds); // 선택된 ID 출력
+    if (selectedCartIds.length === 0) {
+      alert("선택된 항목이 없습니다!");
+      return;
+    }
+
+    // 선택된 ID를 쿼리 파라미터로 추가하여 이동
+    const queryString = selectedCartIds.map(id => `bookIds=${id}`).join('&');
+    console.log("쿼리 문자열:", queryString);
+
+    window.location.href = `/purchase?${queryString}`;
   }
+
+
 </script>
 </body>
 

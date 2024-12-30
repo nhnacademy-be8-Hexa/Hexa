@@ -23,10 +23,15 @@ public class CartController {
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
-            @RequestParam List<Long> cartIds,
+            @RequestParam List<Long> bookIds,
             Model model) {
 
-        model.addAttribute("carts", cartIds);
+        if (bookIds == null || bookIds.isEmpty()) {
+            throw new IllegalArgumentException("cartIds가 전달되지 않았습니다.");
+        }
+
+        System.out.println("선택된 Cart IDs: " + bookIds);
+        model.addAttribute("carts", bookIds);
         return "purchase/purchase";
     }
 
