@@ -1,5 +1,7 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.order.GuestOrderDTO;
+import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import jakarta.validation.Valid;
@@ -42,5 +44,24 @@ public interface OrderAdapter {
     public ResponseEntity<Long> getOrderAmount(
             @PathVariable Long orderId,
             @PathVariable Long bookId);
+
+
+    // 게스트 ------------------------------------------------
+    @PostMapping
+    public ResponseEntity<GuestOrderDTO> createGuestOrder(
+            @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTO);
+
+    @GetMapping
+    public List<GuestOrderDTO> getAllGuestOrders(
+            @RequestParam(defaultValue = "0") int page);
+
+    @GetMapping("/{orderId}")
+    public GuestOrderDTO getGuestOrder(
+            @PathVariable Long orderId);
+
+    @PutMapping
+    public ResponseEntity<GuestOrderDTO> updateGuestOrder(
+            @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTOs);
+
 
 }
