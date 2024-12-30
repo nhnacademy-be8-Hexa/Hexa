@@ -1,5 +1,7 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.returns.ReturnsDTO;
+import com.nhnacademy.hello.dto.returns.ReturnsRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
