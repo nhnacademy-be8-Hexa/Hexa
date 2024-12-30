@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -47,4 +48,51 @@ public class BookController {
         return "book/bookDetail";
     }
 
+//    @GetMapping("/book")
+//    public String bookList(
+//            // 검색 파라미터
+//            @RequestParam(value = "search", required = false) String search,
+//
+//            // 페이징 파라미터
+//            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+//            @RequestParam(value = "size", required = false, defaultValue = "9") Integer size,
+//
+//            // 정렬 파라미터
+//            @RequestParam(value = "sort", required = false, defaultValue = "title") String sort,
+//
+//            // 추가적인 검색 및 정렬 파라미터
+//            @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+//            @RequestParam(value = "publisherName", required = false) String publisherName,
+//            @RequestParam(value = "authorName", required = false) String authorName,
+//            @RequestParam(value = "sortByView", required = false, defaultValue = "false") Boolean sortByView,
+//            @RequestParam(value = "sortBySellCount", required = false, defaultValue = "false") Boolean sortBySellCount,
+//            @RequestParam(value = "sortByLikeCount", required = false, defaultValue = "false") Boolean sortByLikeCount,
+//            @RequestParam(value = "latest", required = false, defaultValue = "false") Boolean latest,
+//
+//            Model model
+//    ) {
+//        // 페이지 번호 조정 (0 기반 인덱스 사용 시)
+//        int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
+//
+//        // bookAdapter.getBooks 메서드 호출 시 모든 파라미터 전달
+//        List<BookDTO> books = bookAdapter.getBooks(
+//                adjustedPage,
+//                size,
+//                sort,
+//                search,
+//                categoryIds,
+//                publisherName,
+//                authorName,
+//                sortByView,
+//                sortBySellCount,
+//                sortByLikeCount,
+//                latest
+//        );
+//
+//        // 모델에 데이터 추가
+//        model.addAttribute("books", books);
+//
+//        // 뷰 이름 반환 (예: "bookList")
+//        return "book/books";
+//    }
 }

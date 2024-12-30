@@ -88,4 +88,8 @@ public interface BookAdapter {
     public ResponseEntity<Long> getLikeCount(
             @PathVariable Long bookId);
 
+    // 도서 총계 조회(페이징용)
+    @GetMapping("/api/books/total")
+    public ResponseEntity<Long> getTotalBooks();
+
 }
