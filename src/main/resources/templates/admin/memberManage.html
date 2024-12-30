@@ -110,6 +110,7 @@
                                th:href="@{'/admin/members'(page=${i}, search=${search})}">1</a>
                         </li>
 
+
                         <!-- 다음 페이지 버튼 -->
                         <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                             <a class="page-link" th:href="@{'/admin/members'(page=${currentPage + 1}, search=${search})}" aria-label="Next">
