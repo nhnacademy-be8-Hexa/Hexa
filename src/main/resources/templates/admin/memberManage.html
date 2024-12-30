@@ -5,17 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 관리</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+
 </head>
 <body>
 <div class="container">
+    <!-- 헤더 -->
     <div th:replace="fragments/header :: header"></div>
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h1 class="page-title">회원 목록</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- 전체 레이아웃 -->
     <div class="container-fluid d-flex gap-4 p-4 align-items-start">
-        <!-- 사이드 메뉴 바 -->
+        <!-- 사이드 메뉴 -->
         <div class="bg-light border rounded p-3" style="width: 250px;">
             <h4 class="text-center">메뉴</h4>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/memberManage">회원 관리</a>
+                    <a class="nav-link" href="/admin/members">회원 관리</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/bookManage">도서 관리</a>
@@ -31,22 +45,18 @@
                 </li>
             </ul>
         </div>
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Search Bar -->
-            <form class="search-bar" id="searchForm" method="get" action="/api/admin/memberManage">
-                <div class="input-group">
+
+        <!-- 메인 컨텐츠 -->
+        <div class="col">
+            <!-- 검색창 -->
+            <div class="mb-4">
+                <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members">
                     <input type="text" class="form-control" id="search" name="search" placeholder="아이디로 검색" aria-label="Search by ID">
-                    <button class="btn btn-primary" type="submit">검색</button>
-                </div>
-            </form>
+                    <button class="btn btn-primary ms-2" type="submit">검색</button>
+                </form>
+            </div>
 
-            <!-- Header -->
-            <header class="header">
-                <h1>회원 목록</h1>
-            </header>
-
-            <!-- Table -->
+            <!-- 회원 목록 -->
             <div class="table-container">
                 <table class="table table-bordered">
                     <thead>
@@ -57,7 +67,7 @@
                         <th>이메일</th>
                         <th>생일</th>
                         <th>권한</th>
-                        <th>등급</th>여기
+                        <th>등급</th>
                         <th>수정</th>
                         <th>삭제</th>
                     </tr>
@@ -72,50 +82,51 @@
                         <td th:text="${member.memberRole}"></td>
                         <td th:text="${member.rating}"></td>
                         <td>
-                            <a th:href="@{'/admin/members/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
+                            <a th:href="@{'/admin/members/update/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
                         </td>
                         <td>
-                            <button
-                                    class="btn btn-danger btn-sm delete-button"
-                                    th:data-member-id="${member.memberId}">
+                            <button class="btn btn-danger btn-sm delete-button" th:data-member-id="${member.memberId}">
                                 삭제
                             </button>
                         </td>
                     </tr>
                     </tbody>
-
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Optional: Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // 삭제 버튼 클릭 이벤트
-        document.querySelectorAll('.delete-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const memberId = this.dataset.memberId;
-                if (confirm('정말 삭제하시겠습니까?')) {
-                    fetch(`/api/members/${memberId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ memberStatus: 'WITHDRAWN' }),
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                alert('회원 상태가 탈퇴로 변경되었습니다.');
-                                location.reload(); // 페이지 새로고침
-                            } else {
-                                alert('삭제 실패. 다시 시도해주세요.');
-                            }
-                        });
-                }
-            });
+
+        <!-- Optional: Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 삭제 버튼 클릭 이벤트
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const memberId = this.dataset.memberId;
+            if (confirm('정말 삭제하시겠습니까?')) {
+                fetch(`/api/members/${memberId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({memberStatus: '탈퇴'}),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('회원 상태가 탈퇴로 변경되었습니다.');
+                            location.reload(); // 페이지 새로고침
+                        } else {
+                            alert('삭제 실패. 다시 시도해주세요.');
+                        }
+                    });
+            }
         });
-    </script>
-    </div>
+    });
+</script>
+
+<!-- 풋터 -->
+<div th:replace="fragments/footer :: footer"></div>
+</div>
 </body>
 </html>
