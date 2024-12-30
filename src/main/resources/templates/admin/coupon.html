@@ -120,9 +120,9 @@
                         <!-- 쿠폰 리스트를 테이블에 출력 -->
                         <tr th:each="coupon, iterStat : ${coupons}">
                             <td th:text="${iterStat.index + 1}"></td>
-                            <td th:text="${coupons.name}"></td>
-                            <td th:text="${coupons.couponPolicyId.name}"></td>
-                            <td th:text="${coupons.validity}"></td>
+                            <td th:text="${coupon.couponName}"></td>
+                            <td th:text="${coupon.couponPolicy.couponPolicyName}"></td>
+                            <td th:text="${coupon.couponDeadline}"></td>
                             <td>
                                 <button class="btn btn-danger btn-sm" th:onclick="'deleteCoupon(' + ${coupon.name} + ')'" >삭제</button>
                                 <button class="btn btn-secondary btn-sm" th:onclick="'openEditModal(' + ${coupon.name} + ')'" >수정</button>
@@ -166,7 +166,7 @@
         //                 <td>${index + 1}</td>
         //                 <td><a href="#" onclick="openDetailModal('${coupon.name}')">${coupon.name}</a></td>
         //                 <td>${coupon.couponPolicyId.name}%</td>
-        //                 <td>${coupon.validity}</td>
+        //                 <td>${coupon.couponDeadline}</td>
         //                 <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.name}')">삭제</button></td>
         //                 <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.name}')">수정</button></td>
         //             `;
