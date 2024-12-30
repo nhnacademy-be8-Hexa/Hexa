@@ -124,8 +124,8 @@
                             <td th:text="${coupon.couponPolicy.couponPolicyName}"></td>
                             <td th:text="${coupon.couponDeadline}"></td>
                             <td>
-                                <button class="btn btn-danger btn-sm" th:onclick="'deleteCoupon(' + ${coupon.name} + ')'" >삭제</button>
-                                <button class="btn btn-secondary btn-sm" th:onclick="'openEditModal(' + ${coupon.name} + ')'" >수정</button>
+                                <button class="btn btn-danger btn-sm" th:onclick="'deleteCoupon(' + ${coupon.couponName} + ')'" >삭제</button>
+                                <button class="btn btn-secondary btn-sm" th:onclick="'openEditModal(' + ${coupon.couponName} + ')'" >수정</button>
                             </td>
                         </tr>
                         </tbody>
