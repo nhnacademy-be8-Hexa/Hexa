@@ -49,7 +49,7 @@ public class SecurityConfig {
                 logout ->
                         logout.logoutUrl("/logout")
                                 // 로그아웃 시 홈페이지로 이동
-                                .logoutSuccessUrl("/")
+                                .logoutSuccessUrl("/?clearLocalCart=true")
                                 .deleteCookies("token")
         );
 
