@@ -6,6 +6,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* PAYCO 로그인 버튼 스타일 */
+        .payco-login-btn {
+            background-color: #FF4040; /* PAYCO의 빨간색 */
+            color: white; /* 텍스트 색상 */
+            font-weight: bold; /* 텍스트 굵기 */
+            border: none; /* 테두리 제거 */
+            border-radius: 4px; /* 둥근 모서리 */
+            padding: 12px 16px; /* 여백 */
+            font-size: 1.2rem; /* 글자 크기 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .payco-login-btn::before {
+            content: 'P'; /* PAYCO 아이콘 */
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            background-color: #D90000; /* 아이콘 배경 */
+            border-radius: 50%; /* 원형 아이콘 */
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px; /* 텍스트와 아이콘 간격 */
+        }
+
+        .naver-login-btn {
+            background-color: #03C75A; /* 네이버 초록색 */
+            color: white; /* 텍스트 색상 */
+            font-weight: bold; /* 텍스트 굵기 */
+            border: none; /* 테두리 제거 */
+            border-radius: 4px; /* 둥근 모서리 */
+            padding: 12px 16px; /* 여백 */
+            font-size: 1.2rem; /* 글자 크기 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .naver-login-btn::before {
+            content: ''; /* 네이버 로고 이미지 */
+            background-image: url('https://static.nid.naver.com/oauth/naver_login_green.png'); /* 네이버 제공 로고 */
+            background-size: contain;
+            background-repeat: no-repeat;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            margin-right: 10px; /* 텍스트와 아이콘 간격 */
+        }
+
+
+    </style>
+
 </head>
 <body>
 <div class="container">
@@ -38,8 +97,11 @@
 
                 <!-- 페이코 로그인 버튼 -->
 <!--        btn-danger 빨간색으로 하려고 이렇게 함        -->
-                <button class="w-100 btn-lg btn btn-danger mt-3" type="button" onclick="window.location.href='/payco-login'">
-                    페이코로 로그인
+                <button class="payco-login-btn w-100 btn-lg btn mt-3" type="button" onclick="window.location.href='/oauth2/authorization/payco?clientRegistrationId=payco'">
+                    Payco로 로그인
+                </button>
+                <button class="naver-login-btn w-100 btn-lg btn mt-3" type="button" onclick="window.location.href='/oauth2/authorization/naver'">
+                    Naver로 로그인
                 </button>
             </form>
 
