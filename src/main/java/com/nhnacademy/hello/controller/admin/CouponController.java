@@ -29,12 +29,10 @@ public class CouponController {
 
         // 관리자인지 검사
         if(!"ADMIN".equals(memberDTO.memberRole())){
-            return "redirect:/index"; //
+            return "redirect:/index";
         }
 
         model.addAttribute("member",memberDTO);
-
-        model.addAttribute("coupons", couponAdapter.getCouponsByActive(null, true));
 
         return "admin/coupon";
     }

@@ -27,7 +27,7 @@ public class CouponAPIController {
     // 모든 쿠폰 조회
     @GetMapping
     public List<CouponDTO> getCouponsByActive(
-            @RequestBody(required = false) List<Long> couponIds,
+            @RequestParam(required = false) List<Long> couponIds,
             @RequestParam(name = "active", required = false, defaultValue = "true") Boolean active) {
         return couponAdapter.getCouponsByActive(couponIds, active);
     }
