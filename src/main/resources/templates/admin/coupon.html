@@ -153,7 +153,6 @@
                         <td>${coupon.couponPolicy.couponPolicyName}</td>
                         <td>${coupon.couponDeadline}</td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.couponId}')">삭제</button></td>
-                        <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.couponId}')">수정</button></td>
                     `;
                         tableBody.appendChild(newRow);
                     });
@@ -205,56 +204,6 @@
                 .catch(error => {
                     console.error('Error creating coupon:', error);
                     alert('쿠폰 생성 중 오류가 발생했습니다.');
-                });
-        }
-
-        function openEditModal(coupon) {
-            const modal = document.getElementById('createCouponModal');
-            modal.style.display = 'block';
-
-            // 수정 데이터를 입력폼에 채우기
-            document.getElementById('couponPolicyId').value = coupon.couponPolicyId || '';
-            document.getElementById('couponName').value = coupon.name || '';
-            document.getElementById('couponTarget').value = coupon.target || '';
-            document.getElementById('couponTargetId').value = coupon.targetId || '';
-            document.getElementById('couponDeadline').value = coupon.validity || '';
-
-            // 저장 버튼을 수정용으로 설정
-            const saveButton = document.querySelector('#createCouponModal .btn-primary');
-            saveButton.textContent = '수정 저장';
-            saveButton.onclick = () => submitEditCoupon(coupon.id);
-        }
-
-        function submitEditCoupon(couponId) {
-            const updatedCoupon = {
-                couponPolicyId: document.getElementById('couponPolicyId').value,
-                name: document.getElementById('couponName').value,
-                target: document.getElementById('couponTarget').value,
-                targetId: document.getElementById('couponTargetId').value,
-                validity: document.getElementById('couponDeadline').value,
-            };
-
-            fetch(`/coupons/${couponId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedCoupon)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('쿠폰 수정 실패');
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    alert('쿠폰이 성공적으로 수정되었습니다.');
-                    toggleCreateCouponModal();
-                    loadCouponList(); // 쿠폰 리스트 갱신
-                })
-                .catch(error => {
-                    console.error('Error updating coupon:', error);
-                    alert('쿠폰 수정 중 오류가 발생했습니다.');
                 });
         }
 
