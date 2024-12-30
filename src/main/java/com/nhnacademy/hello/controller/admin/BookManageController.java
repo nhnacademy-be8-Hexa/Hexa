@@ -45,8 +45,13 @@ public class BookManageController {
         // 페이지 번호 조정 (1 기반을 0 기반으로 변환)
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
-        // 도서 총계 가져오기
-        Long totalBooks = bookAdapter.getTotalBooks().getBody();
+        // 도서 총계 가져오기 (필터링 조건을 반영)
+        Long totalBooks = bookAdapter.getTotalBooks(
+                search,
+                categoryIds,
+                publisherName,
+                authorName
+        ).getBody();
 
         // 전체 페이지 수 계산 (size가 9인 것을 전제로 함)
         int totalPages = (int) Math.ceil((double) totalBooks / size);

@@ -42,7 +42,7 @@
         <div class="col">
             <!-- 검색창 -->
             <div class="mb-4">
-                <form class="search-bar d-flex" id="searchForm" method="get" action="/bookManage/books">
+                <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/bookManage">
                     <input type="text" class="form-control" id="search" name="search" placeholder="책 제목으로 검색" aria-label="Search by Title" th:value="${search}">
                     <!-- 필터링 파라미터를 유지하기 위해 히든 필드 추가 -->
                     <input type="hidden" name="sort" th:value="${sort}">
