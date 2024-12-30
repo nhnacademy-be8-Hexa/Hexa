@@ -8,6 +8,7 @@
     <!-- CSS files -->
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <script src="/css/dist/demo-theme.min.js?1692870487"></script>
 
     <style>
@@ -27,6 +28,7 @@
         }
     </style>
 </head>
+<body>
     <div class="container">
         <!-- 헤더 포함 -->
         <div th:replace="fragments/header :: header"></div>
@@ -72,44 +74,46 @@
                     <button class="btn btn-primary mb-3" id="createCouponButton" onclick="toggleCreateCouponModal()">쿠폰 생성</button>
 
                     <div id="createCouponModal" class="modal">
-                        <h5 class="modal-title">쿠폰 생성</h5>
-                        <form id="createCouponForm">
-                            <div class="mb-3">
-                                <label for="couponName" class="form-label">쿠폰 이름</label>
-                                <input type="text" class="form-control" id="couponName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="discountRate" class="form-label">할인율</label>
-                                <input type="number" class="form-control" id="discountRate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="validity" class="form-label">유효기간</label>
-                                <input type="date" class="form-control" id="validity" required>
-                            </div>
-                            <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
-                            <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
-                        </form>
-                    </div>
+                    <h5 class="modal-title">쿠폰 생성</h5>
+                    <form id="createCouponForm">
+                        <div class="mb-3">
+                            <label for="couponPolicyId" class="form-label">쿠폰 정책 ID</label>
+                            <input type="number" class="form-control" id="couponPolicyId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponName" class="form-label">쿠폰 이름</label>
+                            <input type="text" class="form-control" id="couponName" maxlength="50" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponTarget" class="form-label">쿠폰 대상</label>
+                            <input type="text" class="form-control" id="couponTarget" maxlength="20" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponTargetId" class="form-label">쿠폰 대상 ID</label>
+                            <input type="number" class="form-control" id="couponTargetId">
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponDeadline" class="form-label">쿠폰 유효 기간</label>
+                            <input type="datetime-local" class="form-control" id="couponDeadline" required>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
+                    </form>
+                </div>
+
 
                     <table class="table">
                         <thead>
                         <tr>
                             <th>번호</th>
                             <th>쿠폰 이름</th>
-                            <th>할인율</th>
+                            <th>쿠폰 정책</th>
                             <th>유효기간</th>
-                            <th>삭제</th>
+                            <th>작업</th>
                         </tr>
                         </thead>
                         <tbody id="couponTableBody">
-                        <tr>
-                            <td>1</td>
-                            <td><a href="#" onclick="openDetailModal('쿠폰 이름 1')">쿠폰 이름 1</a></td>
-                            <td>10%</td>
-                            <td>2024-12-31</td>
-                            <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '쿠폰 이름 1')">삭제</button></td>
-                        </tr>
-                        <!-- 다른 쿠폰들 추가 -->
+
                         </tbody>
                     </table>
                 </div>
@@ -123,54 +127,186 @@
                 <button type="button" class="btn btn-secondary" onclick="closeModal('detailModal')">닫기</button>
             </div>
 
-            <script>
-                function toggleCreateCouponModal() {
-                    const modal = document.getElementById('createCouponModal');
-                    const button = document.getElementById('createCouponButton');
-                    if (modal.style.display === 'none' || modal.style.display === '') {
-                        modal.style.display = 'block';
-                        modal.style.top = `${button.offsetTop + button.offsetHeight + 5}px`;
-                        modal.style.left = `${button.offsetLeft}px`;
-                    } else {
-                        modal.style.display = 'none';
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 페이지 로드 시 쿠폰 리스트 불러오기
+            loadCouponList();
+        });
+
+        function loadCouponList() {
+            fetch('/coupons') // 쿠폰 리스트 API 호출
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('쿠폰 데이터를 불러오는 데 실패했습니다.');
                     }
-                }
-
-                function openDetailModal(couponName) {
-                    document.getElementById('detailContent').innerText = `${couponName}의 상세 내용입니다.`;
-                    document.getElementById('detailModal').style.display = 'block';
-                }
-
-                function closeModal(modalId) {
-                    document.getElementById(modalId).style.display = 'none';
-                }
-
-                function submitCreateCoupon() {
-                    const name = document.getElementById('couponName').value;
-                    const discount = document.getElementById('discountRate').value;
-                    const validity = document.getElementById('validity').value;
-
+                    return response.json();
+                })
+                .then(coupons => {
                     const tableBody = document.getElementById('couponTableBody');
-                    const newRow = document.createElement('tr');
-                    newRow.innerHTML = `
-            <td>${tableBody.children.length + 1}</td>
-            <td><a href="#" onclick="openDetailModal('${name}')">${name}</a></td>
-            <td>${discount}%</td>
-            <td>${validity}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${name}')">삭제</button></td>
-        `;
-                    tableBody.appendChild(newRow);
+                    tableBody.innerHTML = ''; // 기존 데이터를 비웁니다.
 
-                    alert(`쿠폰 생성 완료: ${name}, 할인율: ${discount}%, 유효기간: ${validity}`);
-                    toggleCreateCouponModal();
-                }
+                    coupons.forEach((coupon, index) => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><a href="#" onclick="openDetailModal('${coupon.name}')">${coupon.name}</a></td>
+                        <td>${coupon.couponPolicyId.name}%</td>
+                        <td>${coupon.validity}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.name}')">삭제</button></td>
+                        <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.name}')">수정</button></td>
+                    `;
+                        tableBody.appendChild(newRow);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading coupons:', error);
+                    alert('쿠폰 리스트를 불러오는 중 오류가 발생했습니다.');
+                });
+        }
 
-                function deleteCoupon(button, couponName) {
-                    if (confirm(`${couponName}을(를) 삭제하시겠습니까?`)) {
-                        const row = button.closest('tr');
-                        row.remove();
+        function toggleCreateCouponModal() {
+            const modal = document.getElementById('createCouponModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function submitCreateCoupon() {
+            const couponPolicyId = document.getElementById('couponPolicyId').value;
+            const couponName = document.getElementById('couponName').value;
+            const couponTarget = document.getElementById('couponTarget').value;
+            const couponTargetId = document.getElementById('couponTargetId').value;
+            const couponDeadline = document.getElementById('couponDeadline').value;
+
+            const newCoupon = {
+                couponPolicyId: parseInt(couponPolicyId, 10),
+                couponName,
+                couponTarget,
+                couponTargetId: couponTargetId ? parseInt(couponTargetId, 10) : null,
+                couponDeadline
+            };
+
+            fetch('/coupons', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newCoupon)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('쿠폰 생성 실패');
                     }
-                }
-            </script>
-            </body>
+                    return response.json();
+                })
+                .then(() => {
+                    alert('쿠폰이 성공적으로 생성되었습니다.');
+                    toggleCreateCouponModal();
+                    loadCouponList(); // 쿠폰 리스트 갱신
+                })
+                .catch(error => {
+                    console.error('Error creating coupon:', error);
+                    alert('쿠폰 생성 중 오류가 발생했습니다.');
+                });
+        }
+
+        function openEditModal(coupon) {
+            const modal = document.getElementById('createCouponModal');
+            modal.style.display = 'block';
+
+            // 수정 데이터를 입력폼에 채우기
+            document.getElementById('couponPolicyId').value = coupon.couponPolicyId || '';
+            document.getElementById('couponName').value = coupon.name || '';
+            document.getElementById('couponTarget').value = coupon.target || '';
+            document.getElementById('couponTargetId').value = coupon.targetId || '';
+            document.getElementById('couponDeadline').value = coupon.validity || '';
+
+            // 저장 버튼을 수정용으로 설정
+            const saveButton = document.querySelector('#createCouponModal .btn-primary');
+            saveButton.textContent = '수정 저장';
+            saveButton.onclick = () => submitEditCoupon(coupon.id);
+        }
+
+        function submitEditCoupon(couponId) {
+            const updatedCoupon = {
+                couponPolicyId: document.getElementById('couponPolicyId').value,
+                name: document.getElementById('couponName').value,
+                target: document.getElementById('couponTarget').value,
+                targetId: document.getElementById('couponTargetId').value,
+                validity: document.getElementById('couponDeadline').value,
+            };
+
+            fetch(`/coupons/${couponId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedCoupon)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('쿠폰 수정 실패');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    alert('쿠폰이 성공적으로 수정되었습니다.');
+                    toggleCreateCouponModal();
+                    loadCouponList(); // 쿠폰 리스트 갱신
+                })
+                .catch(error => {
+                    console.error('Error updating coupon:', error);
+                    alert('쿠폰 수정 중 오류가 발생했습니다.');
+                });
+        }
+
+        function deleteCoupon(button, couponId) {
+            if (confirm(`${couponId.name}을(를) 삭제하시겠습니까?`)) {
+                fetch(`/coupons/${couponId}`, { method: 'DELETE' }) // DELETE 요청
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('쿠폰 삭제 실패');
+                        }
+                        alert(`${couponId.name}이(가) 삭제되었습니다.`);
+                        loadCouponList(); // 쿠폰 리스트 갱신
+                    })
+                    .catch(error => {
+                        console.error('Error deleting coupon:', error);
+                        alert('쿠폰 삭제 중 오류가 발생했습니다.');
+                    });
+            }
+        }
+
+        function openDetailModal(couponId) {
+            fetch(`/coupons/${couponId}`) // 쿠폰 상세 정보 API 호출
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('쿠폰 상세 정보를 불러오는 데 실패했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(coupon => {
+                    const detailContent = document.getElementById('detailContent');
+                    detailContent.innerHTML = `
+                    <p><strong>쿠폰 이름:</strong> ${coupon.name}</p>
+                    <p><strong>정책 ID:</strong> ${coupon.couponPolicyId}</p>
+                    <p><strong>유효 기간:</strong> ${coupon.validity}</p>
+                    <p><strong>대상:</strong> ${coupon.target}</p>
+                    <p><strong>대상 ID:</strong> ${coupon.targetId}</p>
+                    <p><strong>생성 시간 :</strong> ${coupon.c}</p>
+                `;
+                    const detailModal = document.getElementById('detailModal');
+                    detailModal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading coupon details:', error);
+                    alert('쿠폰 상세 정보를 불러오는 중 오류가 발생했습니다.');
+                });
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+    </script>
+
+</body>
 </html>

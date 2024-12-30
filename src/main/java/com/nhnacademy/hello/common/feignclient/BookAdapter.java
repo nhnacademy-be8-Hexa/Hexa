@@ -4,7 +4,6 @@ import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
