@@ -1,5 +1,7 @@
 package com.nhnacademy.hello.dto.book;
 
+import lombok.Getter;
+
 import java.time.LocalDate;
 
 public record BookDTO(

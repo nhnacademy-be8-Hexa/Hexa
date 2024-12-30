@@ -1,13 +1,17 @@
 package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
+import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
+import com.nhnacademy.hello.dto.book.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +20,8 @@ import java.util.List;
 @RequestMapping("/admin/bookManage")
 public class BookManageController {
     private final BookAdapter bookAdapter;
+    private final PublisherAdapter publisherAdapter;
+    private final BookStatusAdapter bookStatusAdapter;
 
     @GetMapping
     public String bookList(
@@ -94,5 +100,90 @@ public class BookManageController {
 
         // 뷰 이름 반환 (예: "admin/bookManage")
         return "admin/bookManage";
+    }
+
+    // 도서 등록 폼
+    @GetMapping("/new")
+    public String showCreateBookForm(Model model) {
+        BookRequestDTO bookRequestDTO = new BookRequestDTO(
+                "", "", null, null, 0, 0, false, "", ""
+        );
+        model.addAttribute("bookRequestDTO", bookRequestDTO);
+        model.addAttribute("isEdit", false);
+
+        // 출판사 목록 추가 (선택 사항)
+        List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
+        model.addAttribute("publishers", publishers);
+
+        return "admin/bookCreateForm"; // 도서 등록 폼 템플릿
+    }
+
+    // 도서 등록 처리
+    @PostMapping("/new")
+    public String createBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO,
+                             BindingResult bindingResult,
+                             Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("isEdit", false);
+            List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
+            model.addAttribute("publishers", publishers);
+            return "admin/bookCreateForm";
+        }
+
+        // 도서 생성 로직
+        bookAdapter.createBook(bookRequestDTO);
+        return "redirect:/admin/bookManage/books";
+    }
+
+    // 도서 수정 폼
+    @GetMapping("/edit/{bookId}")
+    public String showEditBookForm(@PathVariable Long bookId, Model model) {
+        BookDTO book = bookAdapter.getBook(bookId);
+        if (book == null) {
+            // 도서가 존재하지 않을 경우 처리 (예: 에러 페이지로 이동)
+            return "redirect:/admin/bookManage/books";
+        }
+
+        // BookDTO를 BookUpdateRequestDTO로 매핑
+        BookUpdateRequestDTO bookUpdateRequestDTO = new BookUpdateRequestDTO(
+                book.bookTitle(),
+                book.bookDescription(),
+                book.bookPrice(),
+                book.bookWrappable(),
+                book.bookStatus().bookStatusId().toString()
+        );
+        List<BookStatusRequestDTO> bookStatuses = bookStatusAdapter.getBookStatus(bookId.toString());
+
+        model.addAttribute("bookUpdateRequestDTO", bookUpdateRequestDTO);
+        model.addAttribute("isEdit", true);
+        model.addAttribute("bookId", bookId);
+        model.addAttribute("bookStatuses", bookStatuses);
+
+        // 출판사 목록 추가 (선택 사항)
+        List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
+        model.addAttribute("publishers", publishers);
+
+        return "admin/bookEditForm"; // 도서 수정 폼 템플릿
+    }
+
+    @PostMapping("/edit/{bookId}")
+    public String updateBook(@PathVariable Long bookId,
+                             @Valid @ModelAttribute("bookUpdateRequestDTO") BookUpdateRequestDTO bookUpdateRequestDTO,
+                             BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("isEdit", true);
+            model.addAttribute("bookId", bookId);
+
+            List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
+            model.addAttribute("publishers", publishers);
+
+            List<BookStatusRequestDTO> bookStatuses = bookStatusAdapter.getBookStatus(bookId.toString());
+            model.addAttribute("bookStatuses", bookStatuses);
+
+            return "admin/bookEditForm";
+        }
+
+        bookAdapter.updateBook(bookId, bookUpdateRequestDTO);
+        return "redirect:/admin/bookManage";
     }
 }
