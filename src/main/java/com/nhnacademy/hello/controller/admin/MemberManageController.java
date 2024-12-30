@@ -23,9 +23,15 @@ public class MemberManageController {
     public String getMembers(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(required = false) String search,
                                Model model) {
-        // 멤버 목록을 가져와서 모델에 추가
-        List<MemberDTO> members = memberAdapter.getMembers(page, search);
-        model.addAttribute("members", members);
+        List<MemberDTO> members;
+
+        if (search != null && !search.trim().isEmpty()) {
+            // 특정 아이디로 검색
+            members = memberAdapter.getMembers(page, search);
+        } else {
+            // 전체 회원 조회
+            members = memberAdapter.getMembers(page, null);
+        }        model.addAttribute("members", members);
         return "admin/memberManage"; // 멤버 관리 페이지
     }
 
