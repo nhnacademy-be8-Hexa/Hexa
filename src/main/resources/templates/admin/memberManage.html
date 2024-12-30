@@ -58,7 +58,7 @@
 
             <!-- 회원 목록 -->
             <div class="table-container">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered">
                     <thead>
                     <tr>
                         <th>회원 아이디</th>
@@ -92,6 +92,31 @@
                     </tr>
                     </tbody>
                 </table>
+                <!-- 페이징 네비게이션 -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <!-- 이전 페이지 버튼 -->
+                        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/admin/bookManage'(page=${currentPage - 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 번호 -->
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            th:classappend="${i} == ${currentPage} ? 'active'">
+                            <a class="page-link" th:text="${i}"
+                               th:href="@{'/admin/bookManage'(page=${i}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}">1</a>
+                        </li>
+
+                        <!-- 다음 페이지 버튼 -->
+                        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/admin/bookManage'(page=${currentPage + 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
