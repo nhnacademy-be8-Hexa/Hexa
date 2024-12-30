@@ -9,13 +9,15 @@
 .table {
     width: 100%;
     border-collapse: collapse; /* 테두리가 겹치지 않도록 */
-    table-layout: auto; /* 자동 너비 조정 */
+    table-layout: fixed; /* 열 크기를 균등하게 */
 }
 
 .table th, .table td {
     text-align: center;
     padding: 10px;
     border: 1px solid #dee2e6; /* 세로 및 가로 선 추가 */
+    word-wrap: break-word; /* 내용이 길면 단어 단위로 줄바꿈 */
+    white-space: normal; /* 셀 내용은 줄바꿈 허용 */
 }
 
 .table th {
@@ -31,14 +33,14 @@
     text-align: center;
     padding: 10px;
     border-bottom: 1px solid #dee2e6; /* 행 구분선 */
-    word-wrap: break-word; /* 내용이 길면 단어 단위로 줄바꿈 */
-    white-space: normal; /* 셀 내용은 줄바꿈 허용 */
+    min-width: 80px; /* 최소 너비를 설정하여 버튼 보이기 */
 }
 
 .table tr:hover {
     background-color: #f1f3f5; /* 행에 마우스 올렸을 때 강조 */
 }
 
+/* 버튼 컨테이너 스타일 */
 .button-container {
     display: flex;
     justify-content: center; /* 버튼이 가운데 정렬되도록 */
@@ -50,6 +52,7 @@
     font-size: 12px; /* 버튼 글자 크기 */
     border-radius: 4px; /* 둥근 테두리 */
     border: none;
+    min-width: 60px; /* 버튼 최소 너비 설정 */
 }
 
 /* 수정 버튼 스타일 */
@@ -116,19 +119,19 @@
 /* 검색창 스타일 */
 .search-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* 왼쪽 정렬 */
     margin-bottom: 20px;
+    gap: 10px; /* 검색창과 버튼 사이 간격 */
 }
 
 .search-bar .form-control {
-    flex-grow: 1;
+    flex-grow: 1; /* 너비 확장 */
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ced4da;
 }
 
 .search-bar .btn {
-    margin-left: 10px;
     padding: 10px 20px;
     border-radius: 5px;
     background-color: #007bff;
@@ -139,12 +142,12 @@
 .search-bar .btn:hover {
     background-color: #0056b3;
     color: #fff;
-}
+} /* <- 여기에 중괄호 추가 */
 
 /* 공통 세로 메뉴 스타일 */
 .bg-light {
     background-color: #f8f9fa !important;
-    height: 100%;
+    height: auto; /* 세로 메뉴 높이 자동 */
     width: 250px; /* 세로 메뉴 너비 설정 */
     padding: 10px;
     border: 1px solid #ddd;
@@ -182,11 +185,12 @@
 /* 메인 콘텐츠가 세로 메뉴 옆에 나란히 배치되도록 설정 */
 .container-fluid {
     display: flex;
-    gap: 20px;
+    gap: 20px; /* 사이드 메뉴와 콘텐츠 사이 간격 */
     padding: 20px;
 }
 
 .col {
     flex-grow: 1;
-    max-width: calc(100% - 250px); /* 세로 메뉴 너비를 제외한 너비 */
+    max-width: calc(100% - 270px); /* 세로 메뉴 너비를 제외한 너비 */
+    overflow-x: auto; /* 콘텐츠 가로 스크롤 허용 */
 }
