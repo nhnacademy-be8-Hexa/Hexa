@@ -149,11 +149,11 @@
                         const newRow = document.createElement('tr');
                         newRow.innerHTML = `
                         <td>${index + 1}</td>
-                        <td><a href="#" onclick="openDetailModal('${coupon.couponName}')">${coupon.couponName}</a></td>
+                        <td><a href="#" onclick="openDetailModal('${coupon.couponId}')">${coupon.couponName}</a></td>
                         <td>${coupon.couponPolicy.couponPolicyName}</td>
                         <td>${coupon.couponDeadline}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.couponName}')">삭제</button></td>
-                        <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.couponName}')">수정</button></td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.couponId}')">삭제</button></td>
+                        <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.couponId}')">수정</button></td>
                     `;
                         tableBody.appendChild(newRow);
                     });
@@ -286,12 +286,14 @@
                 .then(coupon => {
                     const detailContent = document.getElementById('detailContent');
                     detailContent.innerHTML = `
-                    <p><strong>쿠폰 이름:</strong> ${coupon.name}</p>
-                    <p><strong>정책 ID:</strong> ${coupon.couponPolicyId}</p>
-                    <p><strong>유효 기간:</strong> ${coupon.validity}</p>
-                    <p><strong>대상:</strong> ${coupon.target}</p>
-                    <p><strong>대상 ID:</strong> ${coupon.targetId}</p>
-                    <p><strong>생성 시간 :</strong> ${coupon.c}</p>
+                    <p><strong>쿠폰 이름:</strong> ${coupon.couponName}</p>
+                    <p><strong>쿠폰 정책:</strong> ${coupon.couponPolicy.couponPolicyName}</p>
+                    <p><strong>유효 기간:</strong> ${coupon.couponDeadline}</p>
+                    <p><strong>대상:</strong> ${coupon.couponTarget}</p>
+                    <p><strong>대상 ID:</strong> ${coupon.couponTargetId}</p>
+                    <p><strong>생성 시간:</strong> ${coupon.couponCreatedAt}</p>
+                    <p><strong>활성화 여부:</strong> ${coupon.couponIsActive}</p>
+                    <p><strong>유저가 사용한 시간:</strong> ${coupon.couponUsedAt}</p>
                 `;
                     const detailModal = document.getElementById('detailModal');
                     detailModal.style.display = 'block';
