@@ -152,3 +152,19 @@
     text-align: center;
 }
 
+
+.nav-link {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
