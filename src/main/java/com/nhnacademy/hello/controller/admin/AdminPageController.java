@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminPageController {
+public class  AdminPageController {
     private final MemberAdapter memberAdapter;
 
     @GetMapping("/admin")

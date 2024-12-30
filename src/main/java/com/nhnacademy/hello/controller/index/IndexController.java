@@ -1,8 +1,11 @@
 package com.nhnacademy.hello.controller.index;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.category.CategoryDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,8 @@ import java.util.List;
 public class IndexController {
 
     private final BookAdapter bookAdapter;
+
+    private final CategoryAdapter categoryAdapter;
 
     @GetMapping(value = {"/index.html","/"})
     public String index(
@@ -70,7 +75,15 @@ public class IndexController {
         );
 
         model.addAttribute("most_liked_books", most_liked_books);
-
+        // 카테고리 목록 조회
+        ResponseEntity<List<CategoryDTO>> categoryResponse = categoryAdapter.getCategories();
+        if (categoryResponse.getStatusCode().is2xxSuccessful()) {
+            List<CategoryDTO> categories = categoryResponse.getBody();
+            model.addAttribute("categories", categories);
+        } else {
+            // 에러 처리 로직 (예: 빈 리스트 또는 예외 던지기)
+            model.addAttribute("categories", List.of());
+        }
 
         return "index/index";
     }
