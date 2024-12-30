@@ -30,7 +30,7 @@ public class CartController {
             throw new IllegalArgumentException("cartIds가 전달되지 않았습니다.");
         }
 
-        System.out.println("선택된 Cart IDs: " + bookIds);
+        System.out.println("선택된 IDs: " + bookIds);
         model.addAttribute("carts", bookIds);
         return "purchase/purchase";
     }
