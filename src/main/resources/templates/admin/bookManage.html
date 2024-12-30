@@ -84,7 +84,7 @@
                         <td th:text="${book.bookAmount}"></td>
                         <td th:text="${book.bookSellCount}"></td>
                         <td>
-                            <a th:href="@{'/admin/books/' + ${book.bookId}}" class="btn btn-primary btn-sm">수정</a>
+                            <a th:href="@{'/admin/bookManage/edit/' + ${book.bookId}}" class="btn btn-primary btn-sm">수정</a>
                         </td>
                     </tr>
                     </tbody>
