@@ -8,6 +8,7 @@
     <!-- CSS files -->
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <script src="/css/dist/demo-theme.min.js?1692870487"></script>
 
     <style>
@@ -72,7 +73,7 @@
                     <h2>쿠폰 관리</h2>
                     <button class="btn btn-primary mb-3" id="createCouponButton" onclick="toggleCreateCouponModal()">쿠폰 생성</button>
 
-                    <<div id="createCouponModal" class="modal">
+                    <div id="createCouponModal" class="modal">
                     <h5 class="modal-title">쿠폰 생성</h5>
                     <form id="createCouponForm">
                         <div class="mb-3">
@@ -106,7 +107,7 @@
                         <tr>
                             <th>번호</th>
                             <th>쿠폰 이름</th>
-                            <th>할인율</th>
+                            <th>쿠폰 정책</th>
                             <th>유효기간</th>
                             <th>작업</th>
                         </tr>
@@ -133,7 +134,7 @@
         });
 
         function loadCouponList() {
-            fetch('/api/coupons') // 쿠폰 리스트 API 호출
+            fetch('/coupons') // 쿠폰 리스트 API 호출
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('쿠폰 데이터를 불러오는 데 실패했습니다.');
@@ -149,7 +150,7 @@
                         newRow.innerHTML = `
                         <td>${index + 1}</td>
                         <td><a href="#" onclick="openDetailModal('${coupon.name}')">${coupon.name}</a></td>
-                        <td>${coupon.discountRate}%</td>
+                        <td>${coupon.couponPolicyId.name}%</td>
                         <td>${coupon.validity}</td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${coupon.name}')">삭제</button></td>
                         <td><button class="btn btn-secondary btn-sm" onclick="openEditModal('${coupon.name}')">수정</button></td>
@@ -183,7 +184,7 @@
                 couponDeadline
             };
 
-            fetch('/api/coupons', {
+            fetch('/coupons', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -233,7 +234,7 @@
                 validity: document.getElementById('couponDeadline').value,
             };
 
-            fetch(`/api/coupons/${couponId}`, {
+            fetch(`/coupons/${couponId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -257,14 +258,14 @@
                 });
         }
 
-        function deleteCoupon(button, couponName) {
-            if (confirm(`${couponName}을(를) 삭제하시겠습니까?`)) {
-                fetch(`/api/coupons/${couponName}`, { method: 'DELETE' }) // DELETE 요청
+        function deleteCoupon(button, couponId) {
+            if (confirm(`${couponId.name}을(를) 삭제하시겠습니까?`)) {
+                fetch(`/coupons/${couponId}`, { method: 'DELETE' }) // DELETE 요청
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('쿠폰 삭제 실패');
                         }
-                        alert(`${couponName}이(가) 삭제되었습니다.`);
+                        alert(`${couponId.name}이(가) 삭제되었습니다.`);
                         loadCouponList(); // 쿠폰 리스트 갱신
                     })
                     .catch(error => {
@@ -274,8 +275,8 @@
             }
         }
 
-        function openDetailModal(couponName) {
-            fetch(`/api/coupons/${couponName}`) // 쿠폰 상세 정보 API 호출
+        function openDetailModal(couponId) {
+            fetch(`/coupons/${couponId}`) // 쿠폰 상세 정보 API 호출
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('쿠폰 상세 정보를 불러오는 데 실패했습니다.');
@@ -289,6 +290,8 @@
                     <p><strong>정책 ID:</strong> ${coupon.couponPolicyId}</p>
                     <p><strong>유효 기간:</strong> ${coupon.validity}</p>
                     <p><strong>대상:</strong> ${coupon.target}</p>
+                    <p><strong>대상 ID:</strong> ${coupon.targetId}</p>
+                    <p><strong>생성 시간 :</strong> ${coupon.c}</p>
                 `;
                     const detailModal = document.getElementById('detailModal');
                     detailModal.style.display = 'block';
