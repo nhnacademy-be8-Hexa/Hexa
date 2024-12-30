@@ -17,7 +17,7 @@
 
     <h2 class="text-center mb-4" style="color: #9E8DBF;">Member Update</h2>
 
-    <form action="/admin/members/update" method="post" id="memberUpdateForm">
+    <form th:action="@{'/admin/members/' + ${member.memberId}}" method="post" id="memberUpdateForm">
         <!-- Member ID (Read-Only) -->
         <div class="mb-3">
             <label for="memberId" class="form-label">Member ID</label>

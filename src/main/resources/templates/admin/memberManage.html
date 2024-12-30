@@ -82,7 +82,7 @@
                         <td th:text="${member.memberRole}"></td>
                         <td th:text="${member.rating}"></td>
                         <td>
-                            <a th:href="@{'/admin/members/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
+                            <a th:href="@{'/admin/members/update/' + ${member.memberId}}" class="btn btn-primary btn-sm">수정</a>
                         </td>
                         <td>
                             <button class="btn btn-danger btn-sm delete-button" th:data-member-id="${member.memberId}">

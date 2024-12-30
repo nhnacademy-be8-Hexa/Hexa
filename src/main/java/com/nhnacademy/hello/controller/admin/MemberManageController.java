@@ -38,6 +38,14 @@ public class MemberManageController {
         return "admin/memberDetail"; // 상세 정보 페이지
     }
 
+    // 특정 회원 수정 페이지
+    @GetMapping("/update/{memberId}")
+    public String getUpdateForm(@PathVariable String memberId, Model model){
+        MemberDTO member = memberAdapter.getMember(memberId);
+        model.addAttribute("member",member);
+        return "admin/memberUpdateForm";
+    }
+
     // 멤버 정보 수정 (상태 변경 포함)
     @PostMapping("/{memberId}")
     public String updateMember(@PathVariable String memberId,
