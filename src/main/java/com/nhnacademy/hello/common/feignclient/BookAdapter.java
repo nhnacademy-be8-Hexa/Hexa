@@ -87,4 +87,13 @@ public interface BookAdapter {
     public ResponseEntity<Long> getLikeCount(
             @PathVariable Long bookId);
 
+    // 도서 총계 조회(페이징용) - 필터링 조건을 반영하도록 수정
+    @GetMapping("/api/books/total")
+    public ResponseEntity<Long> getTotalBooks(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+            @RequestParam(value = "publisherName", required = false) String publisherName,
+            @RequestParam(value = "authorName", required = false) String authorName
+    );
+
 }
