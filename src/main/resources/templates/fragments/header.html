@@ -53,33 +53,22 @@
                 <a href="/bestsellers" class="category-item">베스트셀러</a>
                 <a href="/newarrivals" class="category-item">신작</a>
 
+
                 <!-- 드롭다운 카테고리 -->
                 <div class="dropdown">
                     <a href="#" class="category-item">카테고리</a>
                     <div class="dropdown-menu">
-                        <!-- 1차 카테고리 -->
-                        <div class="dropdown-item">
-                            <a href="/fiction">소설</a>
-                            <!-- 2차 카테고리 -->
-                            <div class="sub-dropdown-menu">
-                                <a href="/fiction/romance">로맨스</a>
-                                <a href="/fiction/thriller">스릴러</a>
-                            </div>
-                        </div>
-                        <div class="dropdown-item">
-                            <a href="/selfhelp">자기계발서</a>
-                            <!-- 2차 카테고리 -->
-                            <div class="sub-dropdown-menu">
-                                <a href="/selfhelp/motivation">동기부여</a>
-                                <a href="/selfhelp/business">비즈니스</a>
-                            </div>
-                        </div>
-                        <div class="dropdown-item">
-                            <a href="/children">아동도서</a>
-                            <!-- 2차 카테고리 -->
-                            <div class="sub-dropdown-menu">
-                                <a href="/children/story">동화</a>
-                                <a href="/children/education">교육</a>
+                        <!-- 1차 카테고리 동적 렌더링 -->
+                        <div th:each="category : ${categories}" class="dropdown-item">
+                            <a th:href="@{'/categories/' + ${category.categoryId} + '/books'}"
+                               class="category-link"
+                               th:text="${category.categoryName}">카테고리명</a>
+                            <!-- 2차 카테고리가 있는 경우만 렌더링 -->
+                            <div th:if="${category.subCategories != null and !category.subCategories.isEmpty()}"
+                                 class="sub-dropdown-menu">
+                                <a th:each="subCategory : ${category.subCategories}"
+                                   th:href="@{'/categories/' + ${subCategory.categoryId} + '/books'}"
+                                   th:text="${subCategory.categoryName}" class="sub-category-link">서브카테고리명</a>
                             </div>
                         </div>
                     </div>
@@ -87,5 +76,4 @@
             </div>
         </nav>
     </header>
-
-</div>
+ </div>
