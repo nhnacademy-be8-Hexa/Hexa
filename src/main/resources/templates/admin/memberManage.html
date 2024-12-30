@@ -22,34 +22,32 @@
         </div>
     </div>
 
+    <!-- 전체 레이아웃 -->
     <div class="container-fluid d-flex gap-4 p-4 align-items-start">
         <!-- 사이드 메뉴 -->
         <div class="bg-light border rounded p-3" style="width: 250px;">
             <h4 class="text-center">메뉴</h4>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link text-center" href="/admin/members">회원 관리</a>
+                    <a class="nav-link" href="/admin/members">회원 관리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-center" href="/admin/bookManage">도서 관리</a>
+                    <a class="nav-link" href="/admin/bookManage">도서 관리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-center" href="/admin/reviewManage">리뷰 관리</a>
+                    <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-center" href="/admin/coupon">쿠폰 발행</a>
+                    <a class="nav-link" href="/admin/coupon">쿠폰 발행</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-center" href="/admin/point">포인트 관리</a>
+                    <a class="nav-link" href="/admin/point">포인트 관리</a>
                 </li>
             </ul>
         </div>
 
         <!-- 메인 컨텐츠 -->
         <div class="col">
-            <div class="mb-4">
-                <h1 class="page-title">회원 목록</h1>
-            </div>
             <!-- 검색창 -->
             <div class="mb-4">
                 <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members">
@@ -57,6 +55,7 @@
                     <button class="btn btn-primary ms-2" type="submit">검색</button>
                 </form>
             </div>
+
             <!-- 회원 목록 -->
             <div class="table-container">
                 <table class="table table-bordered">
@@ -98,37 +97,36 @@
     </div>
 
 
-
-        <!-- Optional: Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // 삭제 버튼 클릭 이벤트
-    document.querySelectorAll('.delete-button').forEach(button => {
-        button.addEventListener('click', function () {
-            const memberId = this.dataset.memberId;
-            if (confirm('정말 삭제하시겠습니까?')) {
-                fetch(`/api/members/${memberId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({memberStatus: '탈퇴'}),
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            alert('회원 상태가 탈퇴로 변경되었습니다.');
-                            location.reload(); // 페이지 새로고침
-                        } else {
-                            alert('삭제 실패. 다시 시도해주세요.');
-                        }
-                    });
-            }
+    <!-- Optional: Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 삭제 버튼 클릭 이벤트
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const memberId = this.dataset.memberId;
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    fetch(`/api/members/${memberId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({memberStatus: '탈퇴'}),
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('회원 상태가 탈퇴로 변경되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            } else {
+                                alert('삭제 실패. 다시 시도해주세요.');
+                            }
+                        });
+                }
+            });
         });
-    });
-</script>
+    </script>
 
-<!-- 풋터 -->
-<div th:replace="fragments/footer :: footer"></div>
+    <!-- 풋터 -->
+    <div th:replace="fragments/footer :: footer"></div>
 </div>
 </body>
 </html>
