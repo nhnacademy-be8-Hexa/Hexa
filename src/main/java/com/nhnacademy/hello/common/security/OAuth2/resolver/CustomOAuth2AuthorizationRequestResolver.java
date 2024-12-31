@@ -1,6 +1,7 @@
 package com.nhnacademy.hello.common.security.OAuth2.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
@@ -9,7 +10,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
+@Slf4j
 @Component
 public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 
@@ -28,6 +29,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         OAuth2AuthorizationRequest authorizationRequest = defaultResolver.resolve(request);
 
         if (authorizationRequest == null) {
+            log.error("authorizationRequest == null");
             return null;
         }
 
@@ -50,7 +52,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
             customAuthorizationUri = UriComponentsBuilder.fromUriString(clientRegistration.getProviderDetails().getAuthorizationUri())
                    .build().toUriString();
        }
-
+        log.error("customAuthorizationUri: {}", customAuthorizationUri);
         return OAuth2AuthorizationRequest
                 .authorizationCode()
                 .clientId(clientRegistration.getClientId())
@@ -66,6 +68,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+        log.error("OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) error");
         return null;
     }
 
