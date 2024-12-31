@@ -51,7 +51,7 @@ public class CouponPolicyController {
     }
 
     // 쿠폰 정책 수정
-    @PatchMapping("/{policyId}")
+    @PutMapping("/{policyId}")
     public CouponPolicyDTO updatePolicy(
             @PathVariable(name = "policyId") Long policyId,
             @RequestBody @Valid CouponPolicyRequestDTO updatedPolicy
