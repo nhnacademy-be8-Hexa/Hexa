@@ -1,11 +1,48 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 관리</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* 모달 스타일 예제 */
+        .modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5); /* 반투명 배경 */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -75,8 +112,8 @@
                     <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
                         <td>
-                            <a href="#" th:onclick="'showMemberDetail(' + \'' + ${member.memberId} + '\'' + ')'"
-                               th:text="${member.memberName}"></a>
+                            <a href="#" th:data-member-id="${member.memberId}"
+                               class="member-detail-link" th:text="${member.memberName}"></a>
                         </td>
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
@@ -114,7 +151,6 @@
                                th:href="@{'/admin/members'(page=${i}, search=${search})}">1</a>
                         </li>
 
-
                         <!-- 다음 페이지 버튼 -->
                         <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                             <a class="page-link" th:href="@{'/admin/members'(page=${currentPage + 1}, search=${search})}" aria-label="Next">
@@ -123,7 +159,7 @@
                         </li>
                     </ul>
                 </nav>
-                <div id="memberDetailModal" class="modal" style="display: none;">
+                <div id="memberDetailModal" class="modal">
                     <div class="modal-content">
                         <span class="close" onclick="closeModal()">&times;</span>
                         <h2>회원 상세 정보</h2>
@@ -153,7 +189,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({memberStatus: '탈퇴'}),
+                        body: JSON.stringify({ memberStatus: '탈퇴' }),
                     })
                         .then(response => {
                             if (response.ok) {
@@ -162,8 +198,21 @@
                             } else {
                                 alert('삭제 실패. 다시 시도해주세요.');
                             }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('삭제 중 오류가 발생했습니다.');
                         });
                 }
+            });
+        });
+
+        // 회원 상세 정보 링크 클릭 이벤트
+        document.querySelectorAll('.member-detail-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // 기본 링크 동작 방지
+                const memberId = this.dataset.memberId;
+                showMemberDetail(memberId);
             });
         });
 
