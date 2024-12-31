@@ -74,16 +74,18 @@
                     <tbody>
                     <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
-                        <td th:text="${member.memberName}"></td>
+                        <td>
+                            <a href="#" onclick="showMemberDetail('${member.memberId}')">
+                                <span th:text="${member.memberName}"></span>
+                            </a>
+                        </td>
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
                         <td th:text="${member.memberBirthAt}"></td>
                         <td th:text="${member.memberRole}"></td>
                         <td th:text="${member.rating?.ratingName}"></td>
                         <td>
-                            <form th:action="@{'/admin/members/update/' + ${member.memberId}}" method="get" style="display: inline;">
-                                <button type="submit" class="btn btn-primary btn-sm">수정</button>
-                            </form>
+                            <button type="submit" class="btn btn-primary btn-sm">수정</button>
                         </td>
                         <td>
                             <button class="btn btn-danger btn-sm delete-button" th:data-member-id="${member.memberId}">
@@ -119,6 +121,15 @@
                         </li>
                     </ul>
                 </nav>
+                <div id="memberDetailModal" class="modal">
+                    <div class="modal-content">
+                        <h5 class="modal-title">회원 상세보기</h5>
+                        <div id="memberDetailContent">
+                            <!-- 상세 정보가 동적으로 추가됩니다 -->
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">닫기</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -149,6 +160,43 @@
                 }
             });
         });
+
+        function showMemberDetail(memberId) {
+            // API 호출로 회원 상세 정보를 가져옵니다.
+            fetch(`/api/members/${memberId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('회원 정보를 불러오는 데 실패했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(member => {
+                    // 모달에 데이터를 렌더링합니다.
+                    const modalContent = document.getElementById('memberDetailContent');
+                    modalContent.innerHTML = `
+                <p><strong>회원 아이디:</strong> ${member.memberId}</p>
+                <p><strong>회원 이름:</strong> ${member.memberName}</p>
+                <p><strong>회원 연락처:</strong> ${member.memberNumber}</p>
+                <p><strong>이메일:</strong> ${member.memberEmail}</p>
+                <p><strong>생일:</strong> ${member.memberBirthAt}</p>
+                <p><strong>권한:</strong> ${member.memberRole}</p>
+                <p><strong>등급:</strong> ${member.rating?.ratingName}</p>
+            `;
+
+                    // 모달 표시
+                    const modal = document.getElementById('memberDetailModal');
+                    modal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching member details:', error);
+                    alert('회원 정보를 불러오는 중 오류가 발생했습니다.');
+                });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('memberDetailModal');
+            modal.style.display = 'none';
+        }
     </script>
 
     <!-- 풋터 -->
