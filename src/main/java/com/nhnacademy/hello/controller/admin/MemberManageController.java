@@ -39,11 +39,9 @@ public class MemberManageController {
 
     // 특정 회원 상세 조회
     @GetMapping("/{memberId}")
-    public String getMember(@PathVariable String memberId, Model model) {
-        // 특정 멤버 정보를 가져와서 모델에 추가
-        MemberDTO member = memberAdapter.getMember(memberId);
-        model.addAttribute("member", member);
-        return "admin/memberDetail"; // 상세 정보 페이지
+    @ResponseBody
+    public MemberDTO getMember(@PathVariable String memberId) {
+        return memberAdapter.getMember(memberId);
     }
 
     // 특정 회원 수정 페이지

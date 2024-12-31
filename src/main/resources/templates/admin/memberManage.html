@@ -75,9 +75,8 @@
                     <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
                         <td>
-                            <a href="#" onclick="showMemberDetail('${member.memberId}')">
-                                <span th:text="${member.memberName}"></span>
-                            </a>
+                            <a href="#" th:onclick="'showMemberDetail(' + \'' + ${member.memberId} + '\'' + ')'"
+                               th:text="${member.memberName}"></a>
                         </td>
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
@@ -85,7 +84,9 @@
                         <td th:text="${member.memberRole}"></td>
                         <td th:text="${member.rating?.ratingName}"></td>
                         <td>
-                            <button type="submit" class="btn btn-primary btn-sm">수정</button>
+                            <form th:action="@{'/admin/members/update/' + ${member.memberId}}" method="get" style="display: inline;">
+                                <button type="submit" class="btn btn-primary btn-sm">수정</button>
+                            </form>
                         </td>
                         <td>
                             <button class="btn btn-danger btn-sm delete-button" th:data-member-id="${member.memberId}">
@@ -94,6 +95,7 @@
                         </td>
                     </tr>
                     </tbody>
+
                 </table>
                 <!-- 페이징 네비게이션 -->
                 <nav aria-label="Page navigation example" class="mt-4">
@@ -121,13 +123,17 @@
                         </li>
                     </ul>
                 </nav>
-                <div id="memberDetailModal" class="modal">
+                <div id="memberDetailModal" class="modal" style="display: none;">
                     <div class="modal-content">
-                        <h5 class="modal-title">회원 상세보기</h5>
-                        <div id="memberDetailContent">
-                            <!-- 상세 정보가 동적으로 추가됩니다 -->
-                        </div>
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">닫기</button>
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <h2>회원 상세 정보</h2>
+                        <p><strong>아이디:</strong> <span id="detailMemberId"></span></p>
+                        <p><strong>이름:</strong> <span id="detailMemberName"></span></p>
+                        <p><strong>연락처:</strong> <span id="detailMemberNumber"></span></p>
+                        <p><strong>이메일:</strong> <span id="detailMemberEmail"></span></p>
+                        <p><strong>생일:</strong> <span id="detailMemberBirthAt"></span></p>
+                        <p><strong>권한:</strong> <span id="detailMemberRole"></span></p>
+                        <p><strong>등급:</strong> <span id="detailMemberRating"></span></p>
                     </div>
                 </div>
             </div>
@@ -162,40 +168,34 @@
         });
 
         function showMemberDetail(memberId) {
-            // API 호출로 회원 상세 정보를 가져옵니다.
-            fetch(`/api/members/${memberId}`)
+            fetch(`/admin/members/${memberId}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('회원 정보를 불러오는 데 실패했습니다.');
+                        throw new Error('Failed to fetch member details');
                     }
                     return response.json();
                 })
                 .then(member => {
-                    // 모달에 데이터를 렌더링합니다.
-                    const modalContent = document.getElementById('memberDetailContent');
-                    modalContent.innerHTML = `
-                <p><strong>회원 아이디:</strong> ${member.memberId}</p>
-                <p><strong>회원 이름:</strong> ${member.memberName}</p>
-                <p><strong>회원 연락처:</strong> ${member.memberNumber}</p>
-                <p><strong>이메일:</strong> ${member.memberEmail}</p>
-                <p><strong>생일:</strong> ${member.memberBirthAt}</p>
-                <p><strong>권한:</strong> ${member.memberRole}</p>
-                <p><strong>등급:</strong> ${member.rating?.ratingName}</p>
-            `;
+                    // 모달에 데이터 삽입
+                    document.getElementById('detailMemberId').innerText = member.memberId;
+                    document.getElementById('detailMemberName').innerText = member.memberName;
+                    document.getElementById('detailMemberNumber').innerText = member.memberNumber;
+                    document.getElementById('detailMemberEmail').innerText = member.memberEmail;
+                    document.getElementById('detailMemberBirthAt').innerText = member.memberBirthAt;
+                    document.getElementById('detailMemberRole').innerText = member.memberRole;
+                    document.getElementById('detailMemberRating').innerText = member.rating?.ratingName || 'N/A';
 
                     // 모달 표시
-                    const modal = document.getElementById('memberDetailModal');
-                    modal.style.display = 'block';
+                    document.getElementById('memberDetailModal').style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Error fetching member details:', error);
-                    alert('회원 정보를 불러오는 중 오류가 발생했습니다.');
+                    alert('회원 상세 정보를 가져오는 중 오류가 발생했습니다.');
                 });
         }
 
         function closeModal() {
-            const modal = document.getElementById('memberDetailModal');
-            modal.style.display = 'none';
+            document.getElementById('memberDetailModal').style.display = 'none';
         }
     </script>
 
