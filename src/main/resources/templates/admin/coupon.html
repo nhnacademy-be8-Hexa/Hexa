@@ -82,11 +82,15 @@
                         </div>
                         <div class="mb-3">
                             <label for="couponTargetId" class="form-label">쿠폰 대상 ID</label>
-                            <input type="number" class="form-control" id="couponTargetId">
+                            <input type="text" class="form-control" id="couponTargetId">
                         </div>
                         <div class="mb-3">
                             <label for="couponDeadline" class="form-label">쿠폰 유효 기간</label>
                             <input type="datetime-local" class="form-control" id="couponDeadline" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponDeadline" class="form-label">생성 갯수</label>
+                            <input type="text" class="form-control" id="couponCount" required>
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
                         <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
@@ -196,6 +200,7 @@
         const couponTarget = document.getElementById('couponTarget').value;
         const couponTargetId = document.getElementById('couponTargetId').value;
         const couponDeadline = new Date(document.getElementById('couponDeadline').value);
+        const couponCount = document.getElementById('couponCount').value;
 
         console.log(couponDeadline);
 
@@ -207,7 +212,7 @@
             couponDeadline
         };
 
-        fetch('/coupons', {
+        fetch(`/coupons?count=${couponCount}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
