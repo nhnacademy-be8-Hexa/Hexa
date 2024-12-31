@@ -91,7 +91,7 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     paycoUserService.revokeOfferAgreement(clientId, accessToken);
 
                     authorizedClientService.removeAuthorizedClient(clientRegistrationId, oauthToken.getName());
-
+                    request.getSession().invalidate();
 
                     // 다시 로그인 페이지로 리다이렉트 시키기
 
