@@ -19,26 +19,4 @@ public class CartController {
         return "cart/cart";
     }
 
-
-
-    @GetMapping("/purchase")
-    public String purchaseCartItem(
-            @RequestParam List<Long> bookIds,
-            Model model) {
-
-        if (bookIds == null || bookIds.isEmpty()) {
-            throw new IllegalArgumentException("cartIds가 전달되지 않았습니다.");
-        }
-
-        System.out.println("선택된 IDs: " + bookIds);
-        model.addAttribute("carts", bookIds);
-        return "purchase/purchase";
-    }
-
-
-
-
-
-
-
 }
