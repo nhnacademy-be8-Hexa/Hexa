@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,8 +31,13 @@ public class LoginController {
     @Value("${jwt_token_cookie_secure}")
     private String secure;
 
+//    @GetMapping("/login")
+//    public String login() {
+//        return "login";
+//    }
     @GetMapping("/login")
-    public String login() {
+    public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
+        model.addAttribute("errorMessage", error);
         return "login";
     }
 

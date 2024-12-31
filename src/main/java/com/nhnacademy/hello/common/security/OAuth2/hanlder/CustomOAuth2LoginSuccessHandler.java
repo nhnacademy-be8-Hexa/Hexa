@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,11 +95,12 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     request.getSession().invalidate();
 
                     // 다시 로그인 페이지로 리다이렉트 시키기
-
-                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 가입이 진행됩니다");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/login");
-                    dispatcher.forward(request, response);
-                    return;
+                    request.getSession().setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 합니다");
+                    response.sendRedirect("/login");
+//                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 가입이 진행됩니다");
+//                    RequestDispatcher dispatcher = request.getRequestDispatcher("/login");
+//                    dispatcher.forward(request, response);
+//                    return;
 
                 }
 
