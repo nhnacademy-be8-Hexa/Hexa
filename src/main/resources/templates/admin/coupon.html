@@ -143,6 +143,7 @@
 </body>
 </html>
 <script>
+
     document.addEventListener("DOMContentLoaded", function() {
         // 페이지 로드 시 쿠폰 리스트 불러오기
         loadCouponList();
@@ -188,7 +189,9 @@
         const couponName = document.getElementById('couponName').value;
         const couponTarget = document.getElementById('couponTarget').value;
         const couponTargetId = document.getElementById('couponTargetId').value;
-        const couponDeadline = document.getElementById('couponDeadline').value;
+        const couponDeadline = new Date(document.getElementById('couponDeadline').value);
+
+        console.log(couponDeadline);
 
         const newCoupon = {
             couponPolicyId: parseInt(couponPolicyId, 10),
