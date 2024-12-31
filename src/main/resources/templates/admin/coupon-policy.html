@@ -147,7 +147,7 @@
                     const newRow = document.createElement('tr');
                     newRow.innerHTML = `
                         <td>${index + 1}</td>
-                        <td><a href="#" onclick="openDetailModal('${policies.couponPolicyName}')">${policies.couponPolicyName}</a></td>
+                        <td><a href="#" onclick="openDetailModal('${policies.couponPolicyId}')">${policies.couponPolicyName}</a></td>
                         <td>${policies.discountType}</td>
                         <td>${policies.discountValue}</td>
                         <td>${policies.eventType}</td>
@@ -223,34 +223,34 @@
     //     }
     // }
     //
-    // function openDetailModal(couponId) {
-    //     fetch(`/coupons/${couponId}`) // 쿠폰 상세 정보 API 호출
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('쿠폰 상세 정보를 불러오는 데 실패했습니다.');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(coupon => {
-    //             const detailContent = document.getElementById('detailContent');
-    //             detailContent.innerHTML = `
-    //                 <p><strong>쿠폰 이름:</strong> ${coupon.couponName}</p>
-    //                 <p><strong>쿠폰 정책:</strong> ${coupon.couponPolicy.couponPolicyName}</p>
-    //                 <p><strong>유효 기간:</strong> ${coupon.couponDeadline}</p>
-    //                 <p><strong>대상:</strong> ${coupon.couponTarget}</p>
-    //                 <p><strong>대상 ID:</strong> ${coupon.couponTargetId}</p>
-    //                 <p><strong>생성 시간:</strong> ${coupon.couponCreatedAt}</p>
-    //                 <p><strong>활성화 여부:</strong> ${coupon.couponIsActive}</p>
-    //                 <p><strong>유저가 사용한 시간:</strong> ${coupon.couponUsedAt}</p>
-    //             `;
-    //             const detailModal = document.getElementById('detailModal');
-    //             detailModal.style.display = 'block';
-    //         })
-    //         .catch(error => {
-    //             console.error('Error loading coupon details:', error);
-    //             alert('쿠폰 상세 정보를 불러오는 중 오류가 발생했습니다.');
-    //         });
-    // }
+    function openDetailModal(couponPolicyId) {
+        fetch(`/coupon-policies/${couponPolicyId}`) // 쿠폰 상세 정보 API 호출
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 상세 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(couponPolicy => {
+                const detailContent = document.getElementById('detailContent');
+                detailContent.innerHTML = `
+                    <p><strong>쿠폰 정책 이름:</strong> ${couponPolicy.couponPolicyName}</p>
+                    <p><strong>최소 할인 금액:</strong> ${couponPolicy.minPurchaseAmounte}</p>
+                    <p><strong>할인 타입:</strong> ${couponPolicy.discountType}</p>
+                    <p><strong>할인 량:</strong> ${couponPolicy.discountValue}</p>
+                    <p><strong>최대 할인 금액:</strong> ${couponPolicy.maxDiscountAmount}</p>
+                    <p><strong>삭제 여부:</strong> ${couponPolicy.isDeleted}</p>
+                    <p><strong>이벤트 타입:</strong> ${couponPolicy.eventType}</p>
+                    <p><strong>생성 시간:</strong> ${couponPolicy.createdAt}</p>
+                `;
+                const detailModal = document.getElementById('detailModal');
+                detailModal.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading coupon details:', error);
+                alert('쿠폰 정책 상세 정보를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
 
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
