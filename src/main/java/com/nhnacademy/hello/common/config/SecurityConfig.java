@@ -43,6 +43,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/","/oauth/**", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll()
         );
 
