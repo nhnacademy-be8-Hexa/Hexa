@@ -17,6 +17,7 @@ public record BookDTO(
         int bookAmount,
         Long bookSellCount,
         PublisherRequestDTO publisher,
-        BookStatusRequestDTO bookStatus
+        BookStatusRequestDTO bookStatus,
+        String imagePath
 ) {
 }
