@@ -61,7 +61,7 @@
                 <h2>쿠폰 정책 관리</h2>
                 <button class="btn btn-primary mb-3" id="createCouponButton" onclick="toggleCreateCouponPolicyModal()">쿠폰 정책 생성</button>
 
-                <div id="createCouponModal" class="modal">
+                <div id="createCouponPolicyModal" class="modal">
                     <h5 class="modal-title">쿠폰 정책 생성</h5>
                     <form id="createCouponForm">
                         <div class="mb-3">
@@ -70,23 +70,29 @@
                         </div>
                         <div class="mb-3">
                             <label for="minPurchaseAmount" class="form-label">최소 구매 금액</label>
-                            <input type="text" class="form-control" id="minPurchaseAmount" maxlength="20" required>
+                            <input type="number" class="form-control" id="minPurchaseAmount" required>
                         </div>
                         <div class="mb-3">
                             <label for="discountType" class="form-label">할인 타입</label>
-                            <input type="text" class="form-control" id="discountType">
+                            <select class="form-control" id="discountType" required>
+                                <option value="AMOUNT">AMOUNT</option>
+                                <option value="PERCENT">PERCENT</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="discountValue" class="form-label">할인 량</label>
-                            <input type="text" class="form-control" id="discountValue" required>
+                            <input type="number" class="form-control" id="discountValue" required>
                         </div>
                         <div class="mb-3">
                             <label for="maxDiscountAmount" class="form-label">최대 할인 금액</label>
-                            <input type="text" class="form-control" id="maxDiscountAmount" required>
+                            <input type="number" class="form-control" id="maxDiscountAmount" required>
                         </div>
                         <div class="mb-3">
                             <label for="eventType" class="form-label">이벤트 타입</label>
-                            <input type="text" class="form-control" id="eventType">
+                            <select class="form-control" id="eventType" required>
+                                <option value="welcome">welcome</option>
+                                <option value="birthday">birthday</option>
+                            </select>
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponPolicyModal()">취소</button>
                         <button type="button" class="btn btn-primary" onclick="submitCreateCouponPolicy()">저장</button>
@@ -163,48 +169,51 @@
             });
     }
 
-    // function toggleCreateCouponPolicyModal() {
-    //     const modal = document.getElementById('createCouponPolicyModal');
-    //     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-    // }
-    //
-    // function submitCreateCouponPolicy() {
-    //     const couponPolicyName = document.getElementById('couponPolicyName').value;
-    //     const couponName = document.getElementById('couponName').value;
-    //     const couponTarget = document.getElementById('couponTarget').value;
-    //     const couponTargetId = document.getElementById('couponTargetId').value;
-    //     const couponDeadline = new Date(document.getElementById('couponDeadline').value);
-    //     const couponCount = document.getElementById('couponCount').value;
-    //
-    //     console.log(couponDeadline);
-    //
-    //     const newCouponPolicy = {
-    //
-    //     };
-    //
-    //     fetch(`/coupons?count=${couponCount}`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify(newCoupon)
-    //     })
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('쿠폰 생성 실패');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(() => {
-    //             alert('쿠폰이 성공적으로 생성되었습니다.');
-    //             toggleCreateCouponPolicyModal();
-    //             loadCouponList(); // 쿠폰 리스트 갱신
-    //         })
-    //         .catch(error => {
-    //             console.error('Error creating coupon:', error);
-    //             alert('쿠폰 생성 중 오류가 발생했습니다.');
-    //         });
-    // }
+    function toggleCreateCouponPolicyModal() {
+        const modal = document.getElementById('createCouponPolicyModal');
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function submitCreateCouponPolicy() {
+        const couponPolicyName = document.getElementById('couponPolicyName').value;
+        const minPurchaseAmount = document.getElementById('minPurchaseAmount').value;
+        const discountType = document.getElementById('discountType').value;
+        const discountValue = document.getElementById('discountValue').value;
+        const maxDiscountAmount = new Date(document.getElementById('maxDiscountAmount').value);
+        const eventType = document.getElementById('eventType').value;
+
+        const newCouponPolicy = {
+            couponPolicyName,
+            minPurchaseAmount,
+            discountType,
+            discountValue,
+            maxDiscountAmount,
+            eventType
+        };
+
+        fetch(`/coupon-policies`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCouponPolicy)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 생성 실패');
+                }
+                return response.json();
+            })
+            .then(() => {
+                alert('쿠폰 정책이 성공적으로 생성되었습니다.');
+                toggleCreateCouponPolicyModal();
+                loadCouponPolicyList(); // 쿠폰 정책 리스트 갱신
+            })
+            .catch(error => {
+                console.error('Error creating coupon:', error);
+                alert('쿠폰 정책 생성 중 오류가 발생했습니다.');
+            });
+    }
     //
     // function deleteCoupon(button, couponId, couponName) {
     //     if (confirm(`${couponName}을(를) 삭제하시겠습니까?`)) {
