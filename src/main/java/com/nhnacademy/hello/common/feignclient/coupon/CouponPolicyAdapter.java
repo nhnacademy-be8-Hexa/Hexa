@@ -33,7 +33,7 @@ public interface CouponPolicyAdapter {
     CouponPolicyDTO createPolicy(@RequestBody CouponPolicyRequestDTO couponPolicy);
 
     // 쿠폰 정책 수정
-    @PatchMapping("/api/policies/{policyId}")
+    @PutMapping("/api/policies/{policyId}")
     CouponPolicyDTO updatePolicy(
             @PathVariable(name = "policyId") Long policyId,
             @RequestBody CouponPolicyRequestDTO updatedPolicy
