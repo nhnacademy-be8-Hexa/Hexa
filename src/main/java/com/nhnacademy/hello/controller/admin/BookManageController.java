@@ -4,24 +4,35 @@ import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
 import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
 import com.nhnacademy.hello.dto.book.*;
+import com.nhnacademy.hello.image.ImageStore;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Controller
 @RequestMapping("/admin/bookManage")
 public class BookManageController {
     private final BookAdapter bookAdapter;
     private final PublisherAdapter publisherAdapter;
     private final BookStatusAdapter bookStatusAdapter;
+    private final ImageStore imageStore;
+
+    @Autowired
+    public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter, BookStatusAdapter bookStatusAdapter, ImageStore imageStore) {
+        this.bookAdapter = bookAdapter;
+        this.publisherAdapter = publisherAdapter;
+        this.bookStatusAdapter = bookStatusAdapter;
+        this.imageStore = imageStore;
+    }
 
     @GetMapping
     public String bookList(
@@ -185,5 +196,59 @@ public class BookManageController {
 
         bookAdapter.updateBook(bookId, bookUpdateRequestDTO);
         return "redirect:/admin/bookManage";
+    }
+
+    /**
+     * 도서 썸네일 업로드 폼을 표시하는 GET 메서드
+     *
+     * @param bookId 도서 ID
+     * @param model  모델
+     * @return 썸네일 업로드 템플릿
+     */
+    @GetMapping("/thumbnail/{bookId}")
+    public String showThumbnailUploadForm(@PathVariable Long bookId, Model model) {
+        model.addAttribute("bookId", bookId);
+        return "admin/thumbnailUpload"; // thumbnailUpload.html 템플릿
+    }
+
+    /**
+     * 도서 썸네일 업로드를 처리하는 POST 메서드
+     *
+     * @param bookId    도서 ID
+     * @param thumbnail 업로드할 이미지 파일
+     * @param model     모델
+     * @return 리다이렉트 URL 또는 다시 업로드 폼
+     */
+    @PostMapping("/thumbnail/{bookId}")
+    public String uploadThumbnail(@PathVariable Long bookId,
+                                  @RequestParam("thumbnail") MultipartFile thumbnail,
+                                  Model model) {
+        try {
+            // 파일 이름 생성 (도서 ID를 포함하여 유니크하게)
+            String fileName = "bookThumbnail_" + bookId;
+
+            // 이미지 저장
+            boolean success = imageStore.saveImages(List.of(thumbnail), fileName);
+            if (!success) {
+                model.addAttribute("error", "이미지 저장에 실패했습니다.");
+                model.addAttribute("bookId", bookId);
+                return "admin/thumbnailUpload";
+            }
+
+            // 저장된 이미지 URL 가져오기
+            List<String> imageUrls = imageStore.getImage(fileName);
+            if (imageUrls.isEmpty()) {
+                model.addAttribute("error", "이미지 URL을 가져오는 데 실패했습니다.");
+                model.addAttribute("bookId", bookId);
+                return "admin/thumbnailUpload";
+            }
+
+            // 성공 메시지와 함께 도서 수정 페이지로 리다이렉트
+            return "redirect:/admin/bookManage";
+        } catch (Exception e) {
+            model.addAttribute("error", "썸네일 업로드 중 오류가 발생했습니다: " + e.getMessage());
+            model.addAttribute("bookId", bookId);
+            return "admin/thumbnailUpload";
+        }
     }
 }

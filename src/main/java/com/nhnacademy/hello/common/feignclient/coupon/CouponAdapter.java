@@ -1,4 +1,4 @@
-package com.nhnacademy.hello.common.feignclient;
+package com.nhnacademy.hello.common.feignclient.coupon;
 
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.coupon.CouponRequestDTO;

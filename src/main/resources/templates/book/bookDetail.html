@@ -82,7 +82,7 @@
                 <!-- 버튼 -->
                 <div class="d-flex">
                     <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
-                    <a href="/purchase" class="btn btn-outline-danger">바로 구매</a>
+                    <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
                 </div>
 
             </div>
@@ -108,6 +108,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+
         // 장바구니 담기 버튼 클릭 이벤트
         document.getElementById("addToCartButton").addEventListener("click", function () {
             // 현재 책 정보 가져오기
@@ -139,6 +140,20 @@
 
             alert("장바구니에 추가되었습니다!");
         });
+
+        document.getElementById("buyNowButton").addEventListener("click", function(e) {
+            e.preventDefault();  // 기본 링크 동작을 막음
+
+            const bookId = document.getElementById("bookId").innerText;
+            const quantity = document.getElementById("quantity").value;
+
+            // 구매 URL을 생성
+            const purchaseUrl = `/purchase?bookIds=${bookId}&quantity=${quantity}`;
+
+            // 바로 구매 페이지로 이동
+            window.location.href = purchaseUrl;
+        });
+
     </script>
 
 
