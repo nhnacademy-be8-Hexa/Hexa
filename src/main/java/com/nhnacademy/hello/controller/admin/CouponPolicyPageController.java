@@ -1,7 +1,7 @@
 package com.nhnacademy.hello.controller.admin;
 
-import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class CouponPageController {
+public class CouponPolicyPageController {
 
     private final MemberAdapter memberAdapter;
 
-    @GetMapping("/admin/coupon")
+    @GetMapping("/admin/coupon-policy")
     public String adminPage(Model model){
 
         // 로그인 검사
@@ -33,7 +33,7 @@ public class CouponPageController {
 
         model.addAttribute("member",memberDTO);
 
-        return "admin/coupon";
+        return "admin/coupon-policy";
     }
-}
 
+}

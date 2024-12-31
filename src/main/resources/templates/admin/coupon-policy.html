@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>쿠폰 발행</title>
+    <!-- CSS files -->
+    <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .main-content {
+            margin-left: 260px;
+        }
+        .modal {
+            position: absolute;
+            z-index: 1050;
+            display: none;
+            top: 50%; /* 화면 세로 중앙 */
+            left: 50%; /* 화면 가로 중앙 */
+            transform: translate(-50%, -50%); /* 중앙 정렬 */
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%; /* 기본 너비 */
+            max-width: 500px; /* 최대 너비 제한 */
+            max-height: 80vh; /* 최대 높이 제한 (뷰포트 기준) */
+            overflow-y: auto; /* 내용이 많으면 스크롤 */
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .modal {
+                width: 90%; /* 모바일 화면에서는 더 좁게 */
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h1 class="page-title">ADMIN PAGE</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+        <div th:replace="~{fragments/admin :: admin}"></div>
+
+        <div class="main-content">
+            <div class="container-xl py-4">
+                <h2>쿠폰 정책 관리</h2>
+                <button class="btn btn-primary mb-3" id="createCouponButton" onclick="toggleCreateCouponPolicyModal()">쿠폰 정책 생성</button>
+
+                <div id="createCouponPolicyModal" class="modal">
+                    <h5 class="modal-title">쿠폰 정책 생성</h5>
+                    <form id="createCouponForm">
+                        <div class="mb-3">
+                            <label for="couponPolicyName" class="form-label">쿠폰 정책 이름</label>
+                            <input type="text" class="form-control" id="couponPolicyName" maxlength="50" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="minPurchaseAmount" class="form-label">최소 구매 금액</label>
+                            <input type="number" class="form-control" id="minPurchaseAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="discountType" class="form-label">할인 타입</label>
+                            <select class="form-control" id="discountType" required>
+                                <option value="AMOUNT">AMOUNT</option>
+                                <option value="PERCENT">PERCENT</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="discountValue" class="form-label">할인 량</label>
+                            <input type="number" class="form-control" id="discountValue" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maxDiscountAmount" class="form-label">최대 할인 금액</label>
+                            <input type="number" class="form-control" id="maxDiscountAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventType" class="form-label">이벤트 타입</label>
+                            <select class="form-control" id="eventType" required>
+                                <option value="welcome">welcome</option>
+                                <option value="birthday">birthday</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponPolicyModal()">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="submitCreateCouponPolicy()">저장</button>
+                    </form>
+                </div>
+
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>쿠폰 정책 이름</th>
+                        <th>할인 타입</th>
+                        <th>할인 량</th>
+                        <th>이벤트 타입</th>
+                        <th>수정</th>
+                        <th>삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody id="couponTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 풋터 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</div>
+
+<div id="detailModal" class="modal">
+    <h5 class="modal-title">쿠폰 정책 상세보기</h5>
+    <p id="detailContent">쿠폰 정책 상세 내용이 여기에 표시됩니다.</p>
+    <button type="button" class="btn btn-secondary" onclick="closeModal('detailModal')">닫기</button>
+</div>
+
+</body>
+</html>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        loadCouponPolicyList();
+    });
+
+    function loadCouponPolicyList() {
+        fetch('/coupon-policies')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 데이터를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(policies => {
+                const tableBody = document.getElementById('couponTableBody');
+                tableBody.innerHTML = ''; // 기존 데이터를 비웁니다.
+
+                policies.forEach((policies, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><a href="#" onclick="openDetailModal('${policies.couponPolicyId}')">${policies.couponPolicyName}</a></td>
+                        <td>${policies.discountType}</td>
+                        <td>${policies.discountValue}</td>
+                        <td>${policies.eventType}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="CouponPolicyUpdate(this, '${policies.couponPolicyId}')">수정</button></td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteCoupon(this, '${policies.couponPolicyId}', '${policies.couponPolicyName}')">삭제</button></td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading coupons:', error);
+                alert('쿠폰 정책 리스트를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    function toggleCreateCouponPolicyModal() {
+        const modal = document.getElementById('createCouponPolicyModal');
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function submitCreateCouponPolicy() {
+        const couponPolicyName = document.getElementById('couponPolicyName').value;
+        const minPurchaseAmount = document.getElementById('minPurchaseAmount').value;
+        const discountType = document.getElementById('discountType').value;
+        const discountValue = document.getElementById('discountValue').value;
+        const maxDiscountAmount = new Date(document.getElementById('maxDiscountAmount').value);
+        const eventType = document.getElementById('eventType').value;
+
+        const newCouponPolicy = {
+            couponPolicyName,
+            minPurchaseAmount,
+            discountType,
+            discountValue,
+            maxDiscountAmount,
+            eventType
+        };
+
+        fetch(`/coupon-policies`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCouponPolicy)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 생성 실패');
+                }
+                return response.json();
+            })
+            .then(() => {
+                alert('쿠폰 정책이 성공적으로 생성되었습니다.');
+                toggleCreateCouponPolicyModal();
+                loadCouponPolicyList(); // 쿠폰 정책 리스트 갱신
+            })
+            .catch(error => {
+                console.error('Error creating coupon:', error);
+                alert('쿠폰 정책 생성 중 오류가 발생했습니다.');
+            });
+    }
+
+    function deleteCoupon(button, couponPolicyId, couponPolicyName) {
+        if (confirm(`${couponPolicyName}을(를) 삭제하시겠습니까?`)) {
+            fetch(`/coupon-policies/${couponPolicyId}`, { method: 'DELETE' }) // DELETE 요청
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('쿠폰 정책 삭제 실패');
+                    }
+                    alert(`${couponPolicyName}이(가) 삭제되었습니다.`);
+                    loadCouponPolicyList(); // 쿠폰 정책 리스트 갱신
+                })
+                .catch(error => {
+                    console.error('Error deleting coupon:', error);
+                    alert('쿠폰 정책 삭제 중 오류가 발생했습니다.');
+                });
+        }
+    }
+
+    function openDetailModal(couponPolicyId) {
+        fetch(`/coupon-policies/${couponPolicyId}`) // 쿠폰 상세 정보 API 호출
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 상세 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(couponPolicy => {
+                const detailContent = document.getElementById('detailContent');
+                detailContent.innerHTML = `
+                    <p><strong>쿠폰 정책 이름:</strong> ${couponPolicy.couponPolicyName}</p>
+                    <p><strong>최소 할인 금액:</strong> ${couponPolicy.minPurchaseAmounte}</p>
+                    <p><strong>할인 타입:</strong> ${couponPolicy.discountType}</p>
+                    <p><strong>할인 량:</strong> ${couponPolicy.discountValue}</p>
+                    <p><strong>최대 할인 금액:</strong> ${couponPolicy.maxDiscountAmount}</p>
+                    <p><strong>삭제 여부:</strong> ${couponPolicy.isDeleted}</p>
+                    <p><strong>이벤트 타입:</strong> ${couponPolicy.eventType}</p>
+                    <p><strong>생성 시간:</strong> ${couponPolicy.createdAt}</p>
+                `;
+                const detailModal = document.getElementById('detailModal');
+                detailModal.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading coupon details:', error);
+                alert('쿠폰 정책 상세 정보를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'none';
+    }
+</script>
