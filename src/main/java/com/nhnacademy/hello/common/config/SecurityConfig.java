@@ -1,7 +1,7 @@
 package com.nhnacademy.hello.common.config;
 
 import com.nhnacademy.hello.common.security.OAuth2.hanlder.CustomOAuth2LoginSuccessHandler;
-import com.nhnacademy.hello.common.security.OAuth2.resolver.CustomOAuth2AuthorizationRequestResolver;
+//import com.nhnacademy.hello.common.security.OAuth2.resolver.CustomOAuth2AuthorizationRequestResolver;
 import com.nhnacademy.hello.common.security.OAuth2.service.CustomOAuth2UserService;
 import com.nhnacademy.hello.common.filter.JwtAuthenticationFilter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
@@ -64,9 +64,9 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfoEndpointConfig ->
                         userInfoEndpointConfig.userService(customOAuth2UserService)
                 )
-                .authorizationEndpoint(auth ->
-                        auth.authorizationRequestResolver(new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository))
-                )
+//                .authorizationEndpoint(auth ->
+//                        auth.authorizationRequestResolver(new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository))
+//                )
                 .successHandler(customOAuth2LoginSuccessHandler)
         );
 
