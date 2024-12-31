@@ -19,6 +19,7 @@ public class PurchaseController {
     @GetMapping("/purchase")
     public String purchaseCartItem(
             @RequestParam List<Long> bookIds,
+            @RequestParam(required = false) Integer quantity,
             Model model
     ) {
 
@@ -30,7 +31,10 @@ public class PurchaseController {
         List<BookDTO> bookList = bookAdapter.getBooksByIds(bookIds);
         model.addAttribute("bookList", bookList);
 
-
+        // 바로구매로 넘어올 시 quantity가 있음
+        if(quantity != null && quantity > 0) {
+            model.addAttribute("buynow_quantity", quantity);
+        }
 
         return "purchase/purchase";
     }
