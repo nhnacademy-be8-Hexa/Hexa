@@ -61,10 +61,11 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 
             // 유저 정보에서 등급 추출
             String role = oauth2User.getAuthorities().stream().findFirst().get().getAuthority();
+            log.error("role: {}", role);
             // 나머지 정보도 추출
             Map<String, Object> attributes = oauth2User.getAttributes();
 
-            log.info("service: {}", (((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId().equals("payco")));
+            log.error("service: {}", (((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId().equals("payco")));
             //페이코 이고
             if(((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId().equals("payco")) {
                 // 유저 정보가 빠진게 있으면
@@ -79,9 +80,11 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     );
 
                     String clientId = authorizedClient.getClientRegistration().getClientId();
+                    log.error("clientId: {}", clientId);
 
                     // 접근 토큰을 가져와서
                     String accessToken = authorizedClient.getAccessToken().getTokenValue();
+                    log.error("accessToken: {}", accessToken);
 
                     // 이 2개로 페이코 회원 가입한거 무효화 시키고
                     paycoUserService.revokeOfferAgreement(clientId, accessToken);
@@ -102,7 +105,7 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 
             // Oauth2의 아아디와 패스워드는 제공 서버의 이름과 그 제공서버의 아이디를 조합하여 지정
             String Oauth2IdAndPwd = attributes.get("provider")+"_"+attributes.get("providerId");
-            log.info("Oauth2IdAndPwd: {}", Oauth2IdAndPwd);
+            log.error("Oauth2IdAndPwd: {}", Oauth2IdAndPwd);
             token = memberAdapter.login(new LoginRequest(Oauth2IdAndPwd, Oauth2IdAndPwd));
 
             // 만약에 토큰이 없으면 (즉 회원이 없으면) 회원 가입 하고 다시 토큰 발급
@@ -123,7 +126,7 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     localDate = LocalDate.of(year, month , day);
                 }
 
-
+                log.error("localDate: {}", localDate);
                 MemberRequestDTO memberRequestDTO = new MemberRequestDTO(
                         Oauth2IdAndPwd,
                         passwordEncoder.encode(Oauth2IdAndPwd),
@@ -137,11 +140,11 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 
                 );
                 memberAdapter.createMember(memberRequestDTO);
-                log.info("memberCreate:{}", memberRequestDTO.toString());
+                log.error("memberCreate:{}", memberRequestDTO.toString());
                 token = memberAdapter.login(new LoginRequest(Oauth2IdAndPwd, Oauth2IdAndPwd));
             }
 
-            log.info("token: {}", token);
+            log.error("token: {}", token);
 
             // 토큰을 쿠키에 저장한다
             Cookie cookie = new Cookie("token", token);

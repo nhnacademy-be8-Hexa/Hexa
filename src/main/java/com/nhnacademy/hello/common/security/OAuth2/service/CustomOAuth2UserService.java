@@ -7,6 +7,7 @@ import com.nhnacademy.hello.common.security.OAuth2.dto.CustomOAuth2User;
 import com.nhnacademy.hello.common.security.OAuth2.dto.OAuth2Response;
 import com.nhnacademy.hello.common.security.OAuth2.dto.impl.NaverResponse;
 import com.nhnacademy.hello.common.security.OAuth2.dto.impl.PaycoResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
@@ -70,7 +72,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-
+        log.error("registrationId: {}", registrationId);
+        log.error("oAuth2User.getAttributes(): {}", oAuth2User.getAttributes());
 
         System.out.println(oAuth2User.getAttributes());
 
@@ -96,7 +99,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String username = oAuth2Response.getProvider()+"_"+oAuth2Response.getProviderId();
 
         String role = "ROLE_MEMBER";
-
 
         return new CustomOAuth2User(oAuth2Response , role );
 
