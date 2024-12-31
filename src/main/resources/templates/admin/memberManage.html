@@ -49,7 +49,7 @@
         <div class="col">
             <!-- 검색창 -->
             <div class="mb-4">
-                <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members" style="width: 100%;">
+                <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members">
                     <input type="text" class="form-control" id="search" name="search" placeholder="아이디로 검색" aria-label="Search by ID">
                     <button class="btn btn-primary ms-2" type="submit">검색</button>
                 </form>
@@ -79,7 +79,7 @@
                         <td th:text="${member.memberEmail}"></td>
                         <td th:text="${member.memberBirthAt}"></td>
                         <td th:text="${member.memberRole}"></td>
-                        <td th:text="${#strings.toUpperCase(member.rating)}"></td>
+                        <td th:text="${member.rating?.ratingName}"></td>
                         <td>
                             <form th:action="@{'/admin/members/update/' + ${member.memberId}}" method="get" style="display: inline;">
                                 <button type="submit" class="btn btn-primary btn-sm">수정</button>

@@ -147,7 +147,7 @@
 /* 공통 세로 메뉴 스타일 */
 .bg-light {
     background-color: #f8f9fa !important;
-    height: auto; /* 세로 메뉴 높이 자동 */
+    /*height: auto; !* 세로 메뉴 높이 자동 *!*/
     width: 250px; /* 세로 메뉴 너비 설정 */
     padding: 10px;
     border: 1px solid #ddd;
@@ -191,6 +191,6 @@
 
 .col {
     flex-grow: 1;
-    max-width: calc(100% - 270px); /* 세로 메뉴 너비를 제외한 너비 */
+    max-width: calc(100% - 200px); /* 세로 메뉴 너비를 제외한 너비 */
     overflow-x: auto; /* 콘텐츠 가로 스크롤 허용 */
 }
