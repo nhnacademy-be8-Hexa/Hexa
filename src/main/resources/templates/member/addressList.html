@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배송지 목록</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+        <!-- 사이드 메뉴 바 -->
+        <div class="bg-light border rounded p-3" style="width: 250px;">
+            <h4 class="text-center">메뉴</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/edit">사용자 정보 수정</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/points">포인트 내역</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/orders">주문 조회</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/mypage/address">배송지 관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/orders/cancel">취소 주문 내역</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/returns">반품/교환 내역</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mypage/reviews">내가 쓴 리뷰</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="flex-grow-1 bg-white border rounded p-3">
+            <h1 class="text-center mb-4">배송지 목록</h1>
+
+            <!-- 성공 메시지 -->
+            <div th:if="${successMessage != null}" class="alert alert-success">
+                <p th:text="${successMessage}">성공 메시지</p>
+            </div>
+
+            <!-- 에러 메시지 -->
+            <div th:if="${errorMessage != null}" class="alert alert-danger">
+                <p th:text="${errorMessage}">에러 메시지</p>
+            </div>
+
+            <!-- 주소 목록 표시 -->
+            <div th:if="${addresses != null}">
+                <p th:text="'총 ' + ${addresses.size()} + '개의 배송지가 등록되어 있습니다.'"></p>
+                <table class="table table-striped table-bordered">
+                    <thead class="table-light">
+                    <tr>
+                        <th>주소 이름</th>
+                        <th>우편번호</th>
+                        <th>주소</th>
+                        <th>상세주소</th>
+                        <th>삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="address : ${addresses}">
+                        <td th:text="${address.addressName}">주소 이름</td>
+                        <td th:text="${address.zoneCode}">우편번호</td>
+                        <td th:text="${address.address}">주소</td>
+                        <td th:text="${address.addressDetail}">상세주소</td>
+                        <td>
+                            <!-- 삭제 폼을 인라인으로 배치 -->
+                            <form th:action="@{/mypage/address/{addressId}/delete(addressId=${address.addressId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 주소가 없을 때 표시 -->
+            <div th:if="${addresses == null || addresses.size() == 0}">
+                <p>등록된 배송지가 없습니다.</p>
+            </div>
+
+            <!-- 신규 주소 추가 버튼 -->
+            <div class="mt-3">
+                <a th:href="@{/mypage/address/form}" class="btn btn-primary">새 배송지 추가</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 풋터 포함 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

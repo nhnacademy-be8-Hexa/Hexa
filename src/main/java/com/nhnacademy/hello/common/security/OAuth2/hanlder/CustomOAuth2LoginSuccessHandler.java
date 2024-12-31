@@ -86,8 +86,11 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     String accessToken = authorizedClient.getAccessToken().getTokenValue();
                     log.error("accessToken: {}", accessToken);
 
+
                     // 이 2개로 페이코 회원 가입한거 무효화 시키고
                     paycoUserService.revokeOfferAgreement(clientId, accessToken);
+
+                    authorizedClientService.removeAuthorizedClient(clientRegistrationId, oauthToken.getName());
 
 
                     // 다시 로그인 페이지로 리다이렉트 시키기
