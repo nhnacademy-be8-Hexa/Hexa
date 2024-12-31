@@ -42,7 +42,7 @@
 <body>
     <div class="container">
         <!-- 헤더 포함 -->
-        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="~{fragments/header :: header}"></div>
 
         <div class="page-header d-print-none">
             <div class="container-xl">
@@ -82,15 +82,15 @@
                         </div>
                         <div class="mb-3">
                             <label for="couponTargetId" class="form-label">쿠폰 대상 ID</label>
-                            <input type="text" class="form-control" id="couponTargetId">
+                            <input type="number" class="form-control" id="couponTargetId">
                         </div>
                         <div class="mb-3">
                             <label for="couponDeadline" class="form-label">쿠폰 유효 기간</label>
                             <input type="datetime-local" class="form-control" id="couponDeadline" required>
                         </div>
                         <div class="mb-3">
-                            <label for="couponDeadline" class="form-label">생성 갯수</label>
-                            <input type="text" class="form-control" id="couponCount" required>
+                            <label for="couponCount" class="form-label">생성 갯수</label>
+                            <input type="number" class="form-control" id="couponCount" required>
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
                         <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
@@ -115,7 +115,7 @@
         </div>
 
         <!-- 풋터 -->
-        <div th:replace="fragments/footer :: footer"></div>
+        <div th:replace="~{fragments/footer :: footer}"></div>
 
     </div>
 
