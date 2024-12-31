@@ -28,14 +28,20 @@
             <div class="col-md-8">
                 <h2 th:text="${book.bookTitle}">책 제목</h2>
 
-                <!-- 출판사 -->
-                <p class="text-muted mb-1" th:text="'출판사: ' + ${book.publisher.publisherName}">출판사 정보</p>
+                <!-- ISBN -->
+                <p class="text-muted mb-1" style="font-size: 0.9rem;" th:text="'ISBN: ' + ${book.bookIsbn}">ISBN 정보</p>
 
-                <!-- 작가 -->
+                <!-- 출판사 -->
+                <p class="mb-1" th:text="'출판사: ' + ${book.publisher.publisherName}">출판사 정보</p>
+
+                <!-- 저자 -->
                 <p class="mb-1" th:text="'저자: ' + ${#strings.arrayJoin(authors, ', ')}">저자1, 저자2...</p>
 
+                <!-- 출간일 -->
+                <p class="mb-1" th:text="'출간일: ' + ${book.bookPubDate}">출간일 정보</p>
+
                 <!-- 상태 -->
-                <p class="text-muted mb-1" th:text="'상태: ' + ${book.bookStatus.bookStatus}">책 상태</p>
+                <p class="text-muted mb-3" th:text="'상태: ' + ${book.bookStatus.bookStatus}" style="margin-top: 15px;">책 상태</p>
 
                 <!-- 가격 -->
                 <p class="mb-1">
@@ -45,7 +51,7 @@
 
                 <!-- 별점 및 리뷰 -->
                 <p>
-                    별점: ★★★☆☆ (리뷰 수: <span th:text="${book.bookView}">0</span>)
+                    별점: ★★★☆☆ (리뷰 수: <span th:text="${reviewCount}">0</span>)
                 </p>
 
 <!--                좋아요 갯수 및 버튼 -->
@@ -62,16 +68,33 @@
 
 
 
-                <!-- 수량 선택 -->
+                <!-- 도서 정보 -->
+                <span id="bookId" style="display: none;" th:text="${book.bookId}"></span>
+                <span id="bookTitle" style="display: none;" th:text="${book.bookTitle}"></span>
+                <span id="bookPrice" style="display: none;" th:text="${book.bookPrice}"></span>
+
+                <!-- 수량 입력 -->
                 <div class="mb-3">
                     <label for="quantity" class="form-label">수량:</label>
-                    <input type="number" id="quantity" name="quantity" class="form-control w-25" min="1" max="10" value="1">
+                    <input type="number" id="quantity" class="form-control w-25" min="1" max="10" value="1" required>
                 </div>
 
-                <!-- 버튼들 -->
+                <!-- 버튼 -->
                 <div class="d-flex">
-                    <button type="button" class="btn btn-outline-success me-2" >장바구니 담기</button>
-                    <button type="button" class="btn btn-outline-danger" >바로 구매</button>
+                    <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
+                    <a href="/purchase" class="btn btn-outline-danger">바로 구매</a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 책 설명 -->
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-8">
+                <div style="max-height: 400px; overflow-y: auto; padding: 15px; border: 1px solid #ddd; border-radius: 5px; text-align: center; margin: 0 auto;">
+                    <p th:utext="${book.bookDescription}" style="text-align: center;">
+                        책 설명이 여기에 표시됩니다.
+                    </p>
                 </div>
             </div>
         </div>
@@ -83,6 +106,40 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 장바구니 담기 버튼 클릭 이벤트
+        document.getElementById("addToCartButton").addEventListener("click", function () {
+            // 현재 책 정보 가져오기
+            const bookId = document.getElementById("bookId").innerText;
+            const bookTitle = document.getElementById("bookTitle").innerText;
+            const bookPrice = document.getElementById("bookPrice").innerText;
+            const quantity = document.getElementById("quantity").value;
+
+            // 로컬스토리지에서 기존 장바구니 가져오기
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // 이미 담긴 책인지 확인
+            const alreadyInCart = cart.some(item => item.bookId === bookId);
+            if (alreadyInCart) {
+                alert("이미 장바구니에 담긴 책입니다!");
+                return;
+            }
+
+            // 새 책 데이터를 추가
+            cart.push({
+                bookId: bookId,
+                bookTitle: bookTitle,
+                bookPrice: bookPrice,
+                quantity: quantity,
+            });
+
+            // 로컬스토리지에 저장
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            alert("장바구니에 추가되었습니다!");
+        });
+    </script>
 
 
 </body>

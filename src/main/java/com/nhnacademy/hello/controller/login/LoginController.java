@@ -6,7 +6,6 @@ import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,8 +63,71 @@ public class LoginController {
         memberAdapter.loginMember(loginRequest.id());
 
 
+//        List<CartDTO> carts = new ArrayList<>();
+//
+//        carts.add(
+//                new CartDTO(
+//                        1L,
+//                        new CartDTO.MemberProjection() {
+//                            @Override
+//                            public String getMemberId() {
+//                                return "member";
+//                            }
+//                        },
+//                        new CartDTO.BookProjection() {
+//                            @Override
+//                            public Long getBookId() {
+//                                return 1L;
+//                            }
+//
+//                            @Override
+//                            public String getBookTitle() {
+//                                return "book1";
+//                            }
+//
+//                            @Override
+//                            public Integer getBookPrice() {
+//                                return 10000;
+//                            }
+//                        },
+//                        1
+//                )
+//        );
+//
+//        carts.add(
+//                new CartDTO(
+//                        2L,
+//                        new CartDTO.MemberProjection() {
+//                            @Override
+//                            public String getMemberId() {
+//                                return "member";
+//                            }
+//                        },
+//                        new CartDTO.BookProjection() {
+//                            @Override
+//                            public Long getBookId() {
+//                                return 2L;
+//                            }
+//
+//                            @Override
+//                            public String getBookTitle() {
+//                                return "book2";
+//                            }
+//
+//                            @Override
+//                            public Integer getBookPrice() {
+//                                return 20000;
+//                            }
+//                        },
+//                        2
+//                )
+//        );
+//
+
+
         // 로그인 후 홈페이지로 이동
-        return "redirect:/";
+
+        return "redirect:/?clearLocalCart=true";
     }
 
 

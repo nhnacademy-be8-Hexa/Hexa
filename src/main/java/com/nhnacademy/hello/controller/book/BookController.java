@@ -1,6 +1,7 @@
 package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookRequestDTO;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BookController {
 
     private final BookAdapter bookAdapter;
+    private final ReviewAdapter reviewAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -42,12 +44,12 @@ public class BookController {
         model.addAttribute("likeCount", likeCount);
 
         // 리뷰의 평점 평균 (별 0.5 ~ 5.0)
-
+        // todo
 
         // 리뷰 갯수
-
-
-
+        // todo
+        int reviewCount = 0;
+        model.addAttribute("reviewCount", reviewCount);
 
         return "book/bookDetail";
     }
