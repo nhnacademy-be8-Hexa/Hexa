@@ -99,6 +99,44 @@
                     </form>
                 </div>
 
+                <div id="editCouponPolicyModal" class="modal">
+                    <h5 class="modal-title">쿠폰 정책 수정</h5>
+                    <form id="editCouponForm">
+                        <div class="mb-3">
+                            <label for="editCouponPolicyName" class="form-label">쿠폰 정책 이름</label>
+                            <input type="text" class="form-control" id="editCouponPolicyName" maxlength="50" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMinPurchaseAmount" class="form-label">최소 구매 금액</label>
+                            <input type="number" class="form-control" id="editMinPurchaseAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDiscountType" class="form-label">할인 타입</label>
+                            <select class="form-control" id="editDiscountType" required>
+                                <option value="AMOUNT">AMOUNT</option>
+                                <option value="PERCENT">PERCENT</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDiscountValue" class="form-label">할인 량</label>
+                            <input type="number" class="form-control" id="editDiscountValue" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMaxDiscountAmount" class="form-label">최대 할인 금액</label>
+                            <input type="number" class="form-control" id="editMaxDiscountAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEventType" class="form-label">이벤트 타입</label>
+                            <select class="form-control" id="editEventType" required>
+                                <option value="" disabled selected>선택하세요</option>
+                                <option value="welcome">welcome</option>
+                                <option value="birthday">birthday</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('editCouponPolicyModal')">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="submitEditCouponPolicy()">저장</button>
+                    </form>
+                </div>
 
                 <table class="table">
                     <thead>
@@ -212,6 +250,71 @@
             .catch(error => {
                 console.error('Error creating coupon:', error);
                 alert('쿠폰 정책 생성 중 오류가 발생했습니다.');
+            });
+    }
+
+    function CouponPolicyUpdate(button, couponPolicyId) {
+        fetch(`/coupon-policies/${couponPolicyId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(policy => {
+                document.getElementById('editCouponPolicyName').value = policy.couponPolicyName;
+                document.getElementById('editMinPurchaseAmount').value = policy.minPurchaseAmount;
+                document.getElementById('editDiscountType').value = policy.discountType;
+                document.getElementById('editDiscountValue').value = policy.discountValue;
+                document.getElementById('editMaxDiscountAmount').value = policy.maxDiscountAmount;
+                document.getElementById('editEventType').value = policy.eventType;
+
+                document.getElementById('editCouponPolicyModal').setAttribute('data-id', couponPolicyId);
+
+                document.getElementById('editCouponPolicyModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading coupon policy for edit:', error);
+                alert('쿠폰 정책 정보를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    function submitEditCouponPolicy() {
+        const couponPolicyId = document.getElementById('editCouponPolicyModal').getAttribute('data-id');
+        const couponPolicyName = document.getElementById('editCouponPolicyName').value;
+        const minPurchaseAmount = document.getElementById('editMinPurchaseAmount').value;
+        const discountType = document.getElementById('editDiscountType').value;
+        const discountValue = document.getElementById('editDiscountValue').value;
+        const maxDiscountAmount = document.getElementById('editMaxDiscountAmount').value;
+        const eventType = document.getElementById('editEventType').value;
+
+        const updatedCouponPolicy = {
+            couponPolicyName,
+            minPurchaseAmount,
+            discountType,
+            discountValue,
+            maxDiscountAmount,
+            eventType
+        };
+
+        fetch(`/coupon-policies/${couponPolicyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedCouponPolicy)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 정책 수정 실패');
+                }
+                alert('쿠폰 정책이 성공적으로 수정되었습니다.');
+                closeModal('editCouponPolicyModal');
+                loadCouponPolicyList(); // 리스트 갱신
+            })
+            .catch(error => {
+                console.error('Error updating coupon policy:', error);
+                alert('쿠폰 정책 수정 중 오류가 발생했습니다.');
             });
     }
 
