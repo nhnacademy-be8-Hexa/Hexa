@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class CouponPageController {
-    private final MemberAdapter memberAdapter;
 
-    private final CouponAdapter couponAdapter;
+    private final MemberAdapter memberAdapter;
 
     @GetMapping("/admin/coupon")
     public String adminPage(Model model){
