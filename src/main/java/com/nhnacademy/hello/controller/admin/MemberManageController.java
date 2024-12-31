@@ -21,8 +21,8 @@ public class MemberManageController {
     // 멤버 전체 조회
     @GetMapping
     public String getMembers(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(required = false) String search,
-                               Model model) {
+                             @RequestParam(required = false) String search,
+                             Model model) {
         List<MemberDTO> members;
 
         if (search != null && !search.trim().isEmpty()) {
@@ -31,7 +31,9 @@ public class MemberManageController {
         } else {
             // 전체 회원 조회
             members = memberAdapter.getMembers(page, null);
-        }        model.addAttribute("members", members);
+        }
+
+        model.addAttribute("members", members);
         return "admin/memberManage"; // 멤버 관리 페이지
     }
 
