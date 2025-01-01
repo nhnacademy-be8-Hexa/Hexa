@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -93,14 +94,12 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 
                     authorizedClientService.removeAuthorizedClient(clientRegistrationId, oauthToken.getName());
                     request.getSession().invalidate();
+                    SecurityContextHolder.clearContext();
 
-                    // 다시 로그인 페이지로 리다이렉트 시키기
-                    request.getSession().setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 합니다");
-                    response.sendRedirect("/login");
-//                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 가입이 진행됩니다");
-//                    RequestDispatcher dispatcher = request.getRequestDispatcher("/login");
-//                    dispatcher.forward(request, response);
-//                    return;
+                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 하고, 페이코도 인증이 된 상태여야 합니다.");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/login");
+                    dispatcher.forward(request, response);
+                    return;
 
                 }
 
