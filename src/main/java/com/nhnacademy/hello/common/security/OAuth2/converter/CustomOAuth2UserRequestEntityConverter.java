@@ -16,6 +16,7 @@ package com.nhnacademy.hello.common.security.OAuth2.converter;
  * limitations under the License.
  */
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,6 +43,7 @@ import java.util.Collections;
  * @see OAuth2UserRequest
  * @see RequestEntity
  */
+@Slf4j
 public class CustomOAuth2UserRequestEntityConverter implements Converter<OAuth2UserRequest, RequestEntity<?>> {
 
 
@@ -65,6 +67,7 @@ public class CustomOAuth2UserRequestEntityConverter implements Converter<OAuth2U
                 .fromUriString(clientRegistration.getProviderDetails().getUserInfoEndpoint().getUri())
                 .build()
                 .toUri();
+        log.error("UserInfo URI: {}", uri);
 
         RequestEntity<?> request;
         if (HttpMethod.POST.equals(httpMethod)) {
@@ -77,7 +80,7 @@ public class CustomOAuth2UserRequestEntityConverter implements Converter<OAuth2U
             headers.setBearerAuth(userRequest.getAccessToken().getTokenValue());
             request = new RequestEntity<>(headers, httpMethod, uri);
         }
-
+        log.error("UserInfo RequestEntity: {}", request);
         return request;
     }
 

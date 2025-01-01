@@ -45,6 +45,12 @@ public interface BookAdapter {
             @RequestParam(required = false) Boolean latest
     );
 
+    // 도서 아이디리스트를 이용한 도서 목록 조회
+    @GetMapping("/api/books/ids")
+    public List<BookDTO> getBooksByIds(
+            @RequestParam List<Long> bookIds
+    );
+
     // 도서 생성
     @PostMapping("/api/books")
     public ResponseEntity<BookDTO> createBook(

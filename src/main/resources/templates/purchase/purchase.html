@@ -1,34 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-5">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Purchase</title>
 
-    <h1>구매 페이지</h1>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/css/styles.css">
 
-    <div class="purchase-list">
-        <h3>구매할 품목:</h3>
-        <ul>
-            <li th:each="item : ${itemsToPurchase}">
-                <span th:text="${item.getBook().getBookTitle()}">도서 제목</span>
-                - <span th:text="${item.getBook().getBookPrice()} + '원'">가격</span>
-                - <span th:text="'수량: ' + ${item.getCartAmount()}">수량</span>
-            </li>
-        </ul>
-    </div>
+    </head>
+    <body>
 
-    <form th:action="@{/purchase/complete}" method="post">
-        <button type="submit" class="btn btn-primary">구매 완료</button>
-    </form>
+        <div class="container mt-5">
 
-    <a href="/cart" class="btn btn-secondary">장바구니로 돌아가기</a>
+            <div th:replace="fragments/header :: header"></div>
 
-</div>
-</body>
+            <h1>배송</h1>
+
+            <!-- 회원 배송 항목 -->
+            <div th:if="${isLoggedIn}" class="card p-3">
+                <!-- 이름 -->
+                <div class="mb-2">
+                    <strong>수령인 이름:</strong>
+                    <span id="recipientNameDisplay"></span>
+                </div>
+                <!-- 주소 -->
+                <div class="mb-2">
+                    <strong>배송지 주소:</strong>
+                    <span id="addressDisplay"></span>
+                </div>
+                <!-- 배송지 변경 버튼 -->
+                <button class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
+            </div>
+
+            <!-- 비회원 배송 항목 -->
+            <div th:unless="${isLoggedIn}" class="card p-3">
+
+                <!-- 배송지 추가 버튼 -->
+                <button id="addAddressButton" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
+            </div>
+
+
+
+            <hr>
+
+            <h1>주문</h1>
+
+            <!-- 장바구니 항목 테이블 -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>책 제목</th>
+                    <th>가격 (원)</th>
+                    <th>수량</th>
+                    <th>합계 (원)</th>
+                </tr>
+                </thead>
+                <tbody id="cart-items">
+                <!-- bookList 항목 렌더링 -->
+                <tr th:each="book : ${bookList}" th:data-book-id="${book.bookId}">
+                    <td>
+                        <a th:href="@{'/book/' + ${book.bookId}}" th:text="${book.bookTitle}"></a>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(book.bookPrice, 0, 0)}"></td>
+                    <td>
+                        <!-- 로컬스토리지의 수량을 JavaScript로 로드 -->
+                        <span class="quantity"></span>
+                    </td>
+                    <td th:data-price="${book.bookPrice}">
+                        <span class="total-price">0</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 총 가격 -->
+            <div class="text-end mt-4">
+                <h4>총 가격: <span id="total-price">0</span> 원</h4>
+            </div>
+
+            <!-- 결제 버튼 -->
+            <div class="text-center mt-4">
+                <button class="btn btn-primary btn-lg">결제하기</button>
+            </div>
+
+
+            <div th:replace="fragments/footer :: footer"></div>
+
+        </div>
+
+
+        <input type="hidden" id="buynow-quantity" th:value="${buynow_quantity != null ? buynow_quantity : ''}">
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+
+            // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
+            document.addEventListener("DOMContentLoaded", () => {
+                // 로컬스토리지에서 cart 데이터를 가져옴
+                const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+                let totalPrice = 0;
+
+                // 서버에서 전달된 buynow_quantity가 있는지 확인
+                const buynowQuantityElement = document.getElementById("buynow-quantity");
+                const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
+                    ? parseInt(buynowQuantityElement.value, 10) : null;
+
+                // 테이블의 각 행을 순회하며 데이터 업데이트
+                document.querySelectorAll("#cart-items tr").forEach(row => {
+                    const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
+                    const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
+                    const quantityElement = row.querySelector(".quantity");
+                    const totalPriceElement = row.querySelector(".total-price");
+
+                    // 수량 결정: buynow_quantity가 우선, 없으면 로컬스토리지 값
+                    let quantity;
+                    if (buynowQuantity !== null) {
+                        quantity = buynowQuantity; // 바로 구매일 경우
+                    } else {
+                        // 장바구니에서 수량을 가져옴
+                        const cartItem = cartItems.find(item => parseInt(item.bookId, 10) === bookId); // bookId를 숫자로 변환 후 비교
+                        quantity = cartItem ? parseInt(cartItem.quantity, 10) : 1; // 기본값 1
+                    }
+
+                    // 수량이 NaN인 경우 1로 설정
+                    if (isNaN(quantity)) {
+                        quantity = 1;
+                    }
+
+                    // 수량 및 합계 업데이트
+                    quantityElement.textContent = quantity;
+                    const total = price * quantity;
+                    totalPriceElement.textContent = total.toLocaleString();
+
+                    // 총 가격 계산
+                    totalPrice += total;
+                });
+
+                // 총 가격 업데이트
+                document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+            });
+
+            // 배송지 변경 페이지로 이동
+            function goToChangeAddress() {
+                window.location.href = "/change-address";
+            }
+
+            // 배송지 추가 페이지로 이동
+            function goToAddAddress() {
+                window.location.href = "/add-address";
+            }
+
+
+
+        </script>
+
+    </body>
 </html>

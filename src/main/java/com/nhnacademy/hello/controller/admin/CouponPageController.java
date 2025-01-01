@@ -1,6 +1,6 @@
 package com.nhnacademy.hello.controller.admin;
 
-import com.nhnacademy.hello.common.feignclient.CouponAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class CouponController {
-    private final MemberAdapter memberAdapter;
+public class CouponPageController {
 
-    private final CouponAdapter couponAdapter;
+    private final MemberAdapter memberAdapter;
 
     @GetMapping("/admin/coupon")
     public String adminPage(Model model){

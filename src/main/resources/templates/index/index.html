@@ -10,27 +10,27 @@
     <script>
         // 책을 클릭 시 상세 페이지로 이동
         function goToBookPage(bookId) {
-            // 예시로 bookId를 URL에 붙여서 이동
             window.location.href = '/book/' + bookId; // 실제 링크는 서버에서 처리
         }
     </script>
+
 </head>
 <body>
 
 <div class="container">
-    <!-- 헤더 포함 -->
-    <div th:replace="fragments/header :: header"></div>
+    <!-- 헤더 포함 (수정된 Fragment Syntax) -->
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <!-- 베스트셀러 도서 목록 -->
     <section>
         <h2 class="section-title">베스트셀러</h2>
         <div class="book-list">
 
-            <div class="book-item"
+            <div class="book-item clickable-book"
                  th:each="book : ${best_seller_books}"
-                 th:onclick="|goToBookPage(${book.bookId})|">
-                <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
+                 th:data-book-id="${book.bookId()}">
+                <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
             </div>
 
         </div>
@@ -41,50 +41,61 @@
         <h2 class="section-title">가장 많이 클릭한 책</h2>
         <div class="book-list">
 
-            <div class="book-item"
+            <div class="book-item clickable-book"
                  th:each="book : ${most_viewed_books}"
-                 th:onclick="|goToBookPage(${book.bookId})|">
-                <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
+                 th:data-book-id="${book.bookId()}">
+                <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
             </div>
 
         </div>
     </section>
 
+    <!-- 좋아요가 가장 많은 책 목록 -->
     <section>
         <h2 class="section-title">좋아요가 가장 많은 책</h2>
         <div class="book-list">
 
-            <div class="book-item"
+            <div class="book-item clickable-book"
                  th:each="book : ${most_liked_books}"
-                 th:onclick="|goToBookPage(${book.bookId})|">
-                <img src="book-placeholder.jpg" alt="책 이미지">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle, '-')}">책 제목</div>
+                 th:data-book-id="${book.bookId()}">
+                <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
+                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
             </div>
 
         </div>
     </section>
 
-
-    <!-- 풋터 -->
-    <div th:replace="fragments/footer :: footer"></div>
+    <!-- 풋터 포함 (수정된 Fragment Syntax) -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
-
 
 <script>
     window.onload = function () {
         // URL에서 clearLocalCart 파라미터가 있는지 확인
         const urlParams = new URLSearchParams(window.location.search);
         const clearLocalCart = urlParams.get('clearLocalCart');
+        const errorMessage = urlParams.get('error');
 
         // 로그인 성공 시 로컬 스토리지에서 cart 삭제
         if (clearLocalCart === 'true') {
             localStorage.removeItem("cart");
         }
 
+        if (errorMessage === 'access_denied') {
+            alert("접근 권한이 없습니다");
+        }
+
         // URL에서 clearLocalCart 파라미터 제거
         history.replaceState(null, null, window.location.pathname);  // URL에서 파라미터 제거
 
+        // 책 아이템 클릭 이벤트 핸들러
+        document.querySelectorAll('.clickable-book').forEach(bookItem => {
+            bookItem.addEventListener('click', function () {
+                const bookId = this.dataset.bookId;
+                goToBookPage(bookId);
+            });
+        });
     };
 </script>
 

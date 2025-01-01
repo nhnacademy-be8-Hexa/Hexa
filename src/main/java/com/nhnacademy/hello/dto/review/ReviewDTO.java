@@ -6,7 +6,8 @@ public record ReviewDTO(
         Long reviewId,
         String reviewContent,
         BigDecimal reviewRating,
-        MemberDTO member
+        MemberDTO member,
+        Boolean reviewIsBlocked
 ) {
     public record MemberDTO(String memberId) {}
 }

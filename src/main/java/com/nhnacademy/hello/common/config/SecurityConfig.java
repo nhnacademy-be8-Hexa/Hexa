@@ -1,7 +1,7 @@
 package com.nhnacademy.hello.common.config;
 
 import com.nhnacademy.hello.common.security.OAuth2.hanlder.CustomOAuth2LoginSuccessHandler;
-import com.nhnacademy.hello.common.security.OAuth2.resolver.CustomOAuth2AuthorizationRequestResolver;
+//import com.nhnacademy.hello.common.security.OAuth2.resolver.CustomOAuth2AuthorizationRequestResolver;
 import com.nhnacademy.hello.common.security.OAuth2.service.CustomOAuth2UserService;
 import com.nhnacademy.hello.common.filter.JwtAuthenticationFilter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
@@ -9,6 +9,8 @@ import com.nhnacademy.hello.common.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,6 +31,13 @@ public class SecurityConfig {
 
 
     @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MEMBER");
+        return roleHierarchy;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // CSRF 토큰 비활성화
@@ -43,13 +52,22 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/admin","/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/mypage","/mypage/**").hasRole("MEMBER")
+                                .requestMatchers("/purchase").hasRole("MEMBER") // 구매도 회원만 진행하게 제한 걸어놓음
+                                // 쿠폰이나 다른거 추가할려면 추가하는걸로
+                                .requestMatchers("/","/oauth/**", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll()
         );
 
-//        http.authorizeHttpRequests(auth -> auth
-//                .requestMatchers("/","/oauth/**", "/login/**", "/oauth2/**").permitAll() // Oauth2 URL 접근 허용
-//                .anyRequest().authenticated()  // 그 외 모든 요청 인증 필요
-//        );
+        http.exceptionHandling(
+                exceptionHandling ->
+                        exceptionHandling
+                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                            response.sendRedirect("/?error=access_denied");
+                                })
+
+        );
 
 
         // 로그인 설정
@@ -64,9 +82,9 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfoEndpointConfig ->
                         userInfoEndpointConfig.userService(customOAuth2UserService)
                 )
-                .authorizationEndpoint(auth ->
-                        auth.authorizationRequestResolver(new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository))
-                )
+//                .authorizationEndpoint(auth ->
+//                        auth.authorizationRequestResolver(new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository))
+//                )
                 .successHandler(customOAuth2LoginSuccessHandler)
         );
 
