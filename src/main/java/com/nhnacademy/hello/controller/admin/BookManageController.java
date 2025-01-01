@@ -3,17 +3,23 @@ package com.nhnacademy.hello.controller.admin;
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
 import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
-import com.nhnacademy.hello.dto.book.*;
+import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookRequestDTO;
+import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
+import com.nhnacademy.hello.dto.book.PublisherRequestDTO;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
 @Controller

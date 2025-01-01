@@ -5,11 +5,16 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "hexa-gateway", contextId = "bookAdapter")
 public interface BookAdapter {
@@ -21,7 +26,7 @@ public interface BookAdapter {
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort,
-
+            
             //도서 제목으로 검색
             @RequestParam(required = false) String search,
             //카테고리(아이디)로 검색

@@ -15,6 +15,7 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+
 /* 고정된 너비로 레이아웃 중앙 정렬 */
 .container {
     /*display: flex;*/
@@ -325,7 +326,7 @@ footer a:hover {
     color: white;
 }
 
-.register-btn{
+.register-btn {
     background-color: #8a7ca3;
     color: white;
 }
@@ -337,11 +338,6 @@ main {
     padding: 100px;
     margin: 0 auto; /* 중앙 정렬 */
 }
-
-
-
-
-
 
 
 .table-header > div:last-child {
@@ -363,6 +359,7 @@ main {
 .table-row > div:last-child {
     border-right: none;
 }
+
 .edit-button, .delete-button {
     padding: 5px 10px;
     margin: 2px;
@@ -423,10 +420,10 @@ main {
 
 .cart-book-info {
     flex: 2;
-    display: flex;                /* 내부를 플렉스로 */
-    flex-direction: column;       /* 세로 방향으로 쌓이도록 */
-    align-items: flex-start;      /* (옵션) 왼쪽 정렬 / 필요에 따라 center 등으로 변경 가능 */
-    gap: 5px;                     /* 제목-가격-갯수 간격 */
+    display: flex; /* 내부를 플렉스로 */
+    flex-direction: column; /* 세로 방향으로 쌓이도록 */
+    align-items: flex-start; /* (옵션) 왼쪽 정렬 / 필요에 따라 center 등으로 변경 가능 */
+    gap: 5px; /* 제목-가격-갯수 간격 */
     text-align: left;
     /* 폰트 크기, 폰트 굵기 등 추가 가능 */
 }
@@ -434,17 +431,17 @@ main {
 .cart-footer {
     display: flex;
     justify-content: flex-end; /* 오른쪽 정렬 */
-    align-items: center;       /* 세로 방향 중앙 정렬 (원하는 대로 조정 가능) */
-    gap: 20px;                 /* 요소 간 간격 (원하는 만큼 조정 가능) */
+    align-items: center; /* 세로 방향 중앙 정렬 (원하는 대로 조정 가능) */
+    gap: 20px; /* 요소 간 간격 (원하는 만큼 조정 가능) */
     /* 추가적인 스타일 작성 */
 }
 
 
 /* 체크박스를 원하는 크기로 조절 */
 .cart-checkbox {
-    width: 30px;            /* 체크박스 가로 크기 */
-    height: 30px;           /* 체크박스 세로 크기 */
-    cursor: pointer;        /* 마우스 올렸을 때 포인터 모양 */
+    width: 30px; /* 체크박스 가로 크기 */
+    height: 30px; /* 체크박스 세로 크기 */
+    cursor: pointer; /* 마우스 올렸을 때 포인터 모양 */
 }
 
 .checkbox-and-title {
@@ -453,3 +450,97 @@ main {
     align-items: center;
     gap: 5px;
 }
+
+/* 검색 페이지 */
+/* 책 리스트 스타일 */
+.book-list {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6개씩 한 줄에 배치 */
+    gap: 20px; /* 각 아이템 사이 간격 */
+}
+
+.book-item {
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.book-item img {
+    width: 100%;
+    height: auto;
+    max-width: 150px; /* 이미지 크기 조정 */
+    margin-bottom: 10px;
+}
+
+.book-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 반응형 디자인: 화면 크기가 작을 때 3개씩 배치 */
+@media (max-width: 768px) {
+    .book-list {
+        grid-template-columns: repeat(3, 1fr); /* 3개씩 한 줄에 배치 */
+    }
+}
+
+/* 반응형 디자인: 화면 크기가 더 작을 때 1개씩 배치 */
+@media (max-width: 480px) {
+    .book-list {
+        grid-template-columns: 1fr; /* 1개씩 한 줄에 배치 */
+    }
+}
+
+/* 페이징 전체 스타일 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px; /* 상단 여백 줄임 */
+}
+
+/* 각 페이지 버튼의 간격을 좁히기 */
+.page-item {
+    margin: 0 2px; /* 간격을 더 좁게 2px로 설정 */
+}
+
+/* 페이지 링크 기본 스타일 */
+.page-link {
+    padding: 8px 12px; /* 버튼 크기 줄임 */
+    font-size: 14px; /* 텍스트 크기 줄임 */
+    border: 1px solid #9E8DBF; /* 테두리 색을 통일 */
+    border-radius: 5px;
+    background-color: #f8f9fa; /* 배경색을 검색창과 동일하게 설정 */
+    color: #495057; /* 텍스트 색을 어두운 회색으로 설정 */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* 페이지 링크 호버 시 스타일 */
+.page-link:hover {
+    background-color: #9E8DBF; /* 버튼 색상 호버 시 */
+    color: #fff; /* 텍스트 색을 흰색으로 변경 */
+}
+
+/* 활성 페이지 버튼 스타일 */
+.page-item.active .page-link {
+    background-color: #9E8DBF; /* 활성화된 페이지는 버튼 색상 변경 */
+    color: #fff; /* 흰색 텍스트 */
+}
+
+/* 비활성화된 페이지 버튼 스타일 */
+.page-item.disabled .page-link {
+    color: #ddd; /* 비활성화된 버튼은 연한 회색 */
+    border-color: #ddd; /* 테두리도 연한 회색으로 변경 */
+    background-color: #f8f9fa; /* 배경색은 유지 */
+    pointer-events: none; /* 클릭 불가 */
+}
+
+/* 이전/다음 버튼의 화살표 스타일 */
+.page-link span {
+    font-size: 14px; /* 화살표 크기를 더 작게 설정 */
+}
+

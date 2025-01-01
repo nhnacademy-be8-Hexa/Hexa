@@ -4,18 +4,12 @@ import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.book.BookRequestDTO;
-import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
-import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +22,7 @@ public class BookController {
     public String bookDetail(
             @PathVariable("bookId") Long bookId,
             Model model
-    ){
+    ) {
         // 책 상세정보 페이지
         // 책 정보 전달
         BookDTO book = bookAdapter.getBook(bookId);
