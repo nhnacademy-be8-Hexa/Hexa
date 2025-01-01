@@ -31,15 +31,11 @@ public class LoginController {
     @Value("${jwt_token_cookie_secure}")
     private String secure;
 
-//    @GetMapping("/login")
-//    public String login() {
-//        return "login";
-//    }
     @GetMapping("/login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
-        model.addAttribute("errorMessage", error);
+    public String login() {
         return "login";
     }
+
 
     @PostMapping("/login/process")
     public String process(
