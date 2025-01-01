@@ -96,7 +96,7 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     request.getSession().invalidate();
                     SecurityContextHolder.clearContext();
 
-                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 하고, 페이코도 인증이 된 상태여야 합니다.");
+                    request.setAttribute("error", "페이코 로그인 시 개인정보를 모두 동의 해주셔야 하고, 페이코 계정에서도 회원의 정보가 기입이 된 상태여야 합니다.");
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/login");
                     dispatcher.forward(request, response);
                     return;
