@@ -13,6 +13,7 @@
             window.location.href = '/book/' + bookId; // 실제 링크는 서버에서 처리
         }
     </script>
+
 </head>
 <body>
 
@@ -74,10 +75,15 @@
         // URL에서 clearLocalCart 파라미터가 있는지 확인
         const urlParams = new URLSearchParams(window.location.search);
         const clearLocalCart = urlParams.get('clearLocalCart');
+        const errorMessage = urlParams.get('error');
 
         // 로그인 성공 시 로컬 스토리지에서 cart 삭제
         if (clearLocalCart === 'true') {
             localStorage.removeItem("cart");
+        }
+
+        if (errorMessage === 'access_denied') {
+            alert("접근 권한이 없습니다");
         }
 
         // URL에서 clearLocalCart 파라미터 제거
