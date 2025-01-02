@@ -34,8 +34,15 @@ public class ReviewManageController {
             }
 
             // 총 리뷰 수 가져오기
-            ResponseEntity<Long> totalResponse = reviewAdapter.getReviewsFromHighReportTotal();
-            long totalReportedReviews = (totalResponse.getBody() != null) ? totalResponse.getBody() : 0;
+            long totalReportedReviews = 0;
+            try {
+                ResponseEntity<Long> totalResponse = reviewAdapter.getReviewsFromHighReportTotal();
+                if (totalResponse != null && totalResponse.getBody() != null) {
+                    totalReportedReviews = totalResponse.getBody();
+                }
+            } catch (Exception e) {
+                System.err.println("Error fetching total reported reviews: " + e.getMessage());
+            }
 
             int totalPages = (int) Math.ceil((double) totalReportedReviews / size);
 
