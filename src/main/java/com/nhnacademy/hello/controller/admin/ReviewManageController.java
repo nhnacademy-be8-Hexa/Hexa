@@ -8,7 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -63,15 +65,16 @@ public class ReviewManageController {
     }
 
 
-
     // 특정 리뷰 상세 조회
     @GetMapping("/{reviewId}")
     public String getReviewDetail(@PathVariable Long reviewId, Model model) {
-        List<ReviewDTO> reviews = reviewAdapter.getReviewsFromAdmin(0, 1, "reviewId").getBody();
-        for (ReviewDTO review : reviews) {
-            if (review.reviewId().equals(reviewId)) {
-                model.addAttribute("review", review);
-                return "admin/reviewDetail";
+        Optional<List<ReviewDTO>> reviews = Optional.ofNullable(reviewAdapter.getReviewsFromAdmin(0, 1, "reviewId").getBody());
+        if (reviews.isPresent()) {
+            for (ReviewDTO review : reviews.get()) {
+                if (review.reviewId().equals(reviewId)) {
+                    model.addAttribute("review", review);
+                    return "admin/reviewDetail";
+                }
             }
         }
         throw new RuntimeException("리뷰를 찾을 수 없습니다.");
@@ -80,7 +83,7 @@ public class ReviewManageController {
     // 특정 리뷰 수정
     @PutMapping("/{reviewId}/block")
     @ResponseBody
-    public ResponseEntity<Void> blockReview(@PathVariable Long reviewId, @RequestParam boolean block){
-        return reviewAdapter.updateReviewBlock(reviewId,block);
+    public ResponseEntity<Void> blockReview(@PathVariable Long reviewId, @RequestParam boolean block) {
+        return reviewAdapter.updateReviewBlock(reviewId, block);
     }
 }
