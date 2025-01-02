@@ -31,18 +31,54 @@
     <div class="col">
       <div class="container-xl py-4">
         <h2 th:text="'회원: ' + ${member.memberName}"></h2>
-        <p><strong>아이디:</strong> <span th:text="${member.memberId}"></span></p>
-        <p><strong>비밀번호:</strong> <span th:text="${member.memberPassword}"></span></p>
-        <p><strong>이름:</strong> <span th:text="${member.memberName}"></span></p>
-        <p><strong>연락처:</strong> <span th:text="${member.memberNumber}"></span></p>
-        <p><strong>이메일:</strong> <span th:text="${member.memberEmail}"></span></p>
-        <p><strong>생일:</strong> <span th:text="${member.memberBirthAt}"></span></p>
-        <p><strong>생성일:</strong> <span th:text="${member.memberCreatedAt}"></span></p>
-        <p><strong>최근 로그인 시간:</strong> <span th:text="${member.memberLastLoginAt}"></span></p>
-        <p><strong>권한:</strong> <span th:text="${member.memberRole}"></span></p>
-        <p><strong>등급:</strong> <span th:text="${member.rating?.ratingName ?: 'N/A'}"></span></p>
-        <p><strong>회원 상태:</strong> <span th:text="${member.memberStatus?.statusName ?: 'N/A'}"></span></p>
-        <a href="/admin/members" class="btn btn-secondary">목록으로 돌아가기</a>
+
+        <!-- 회원 상세 정보 표 -->
+        <table class="table table-bordered table-striped">
+          <tbody>
+          <tr>
+            <th>아이디</th>
+            <td th:text="${member.memberId}"></td>
+          </tr>
+          <tr>
+            <th>이름</th>
+            <td th:text="${member.memberName}"></td>
+          </tr>
+          <tr>
+            <th>연락처</th>
+            <td th:text="${member.memberNumber}"></td>
+          </tr>
+          <tr>
+            <th>이메일</th>
+            <td th:text="${member.memberEmail}"></td>
+          </tr>
+          <tr>
+            <th>생일</th>
+            <td th:text="${member.memberBirthAt}"></td>
+          </tr>
+          <tr>
+            <th>생성일</th>
+            <td th:text="${member.memberCreatedAt}"></td>
+          </tr>
+          <tr>
+            <th>최근 로그인 시간</th>
+            <td th:text="${member.memberLastLoginAt}"></td>
+          </tr>
+          <tr>
+            <th>권한</th>
+            <td th:text="${member.memberRole}"></td>
+          </tr>
+          <tr>
+            <th>등급</th>
+            <td th:text="${member.rating?.ratingName ?: 'N/A'}"></td>
+          </tr>
+          <tr>
+            <th>회원 상태</th>
+            <td th:text="${member.memberStatus?.statusName ?: 'N/A'}"></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <a href="/admin/members" class="btn btn-secondary mt-3">목록으로 돌아가기</a>
       </div>
     </div>
   </div>
