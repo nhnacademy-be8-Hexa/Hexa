@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <!-- 헤더 -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <!-- 전체 레이아웃 -->
     <div class="row g-4 p-4">
@@ -120,7 +120,7 @@
     </div>
 
     <!-- 풋터 -->
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- Optional: Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

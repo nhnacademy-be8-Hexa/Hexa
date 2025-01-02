@@ -14,7 +14,7 @@
 <body>
 <div class="container">
     <!-- 헤더 포함 -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <!-- 전체 레이아웃 -->
     <div class="row g-4 p-4">
@@ -171,7 +171,7 @@
     </div>
 
     <!-- 풋터 포함 -->
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- TOAST UI Editor JS (CDN 사용) -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
