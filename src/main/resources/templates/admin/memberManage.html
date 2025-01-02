@@ -91,8 +91,7 @@
                     <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
                         <td>
-                            <a href="#" th:data-member-id="${member.memberId}"
-                               class="member-detail-link" th:text="${member.memberName}"></a>
+                            <a th:href="@{'/admin/members/' + ${member.memberId}}" th:text="${member.memberName}"></a>
                         </td>
 
                         <td th:text="${member.memberNumber}"></td>
@@ -153,50 +152,33 @@
     </div>
 
     <script>
-        // 회원 상세보기
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.member-detail-link').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    // 기본 동작 막기
-                    e.preventDefault();
-
-                    // 회원 ID 가져오기
-                    const memberId = this.getAttribute('data-member-id');
-                    console.log('Fetching member ID:', memberId);
-
-                    // Fetch API로 회원 상세 정보 가져오기
-                    fetch(`/admin/members/${memberId}`)
+        // 삭제 버튼 클릭 이벤트
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const memberId = this.dataset.memberId;
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    fetch(`/api/members/${memberId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ memberStatus: '탈퇴' }),
+                    })
                         .then(response => {
-                            if (!response.ok) {
-                                throw new Error('회원 정보를 가져오는 데 실패했습니다.');
+                            if (response.ok) {
+                                alert('회원 상태가 탈퇴로 변경되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            } else {
+                                alert('삭제 실패. 다시 시도해주세요.');
                             }
-                            return response.json();
-                        })
-                        .then(member => {
-                            console.log('Fetched member data:', member);
-
-                            // 모달에 데이터 삽입
-                            document.getElementById('detailMemberId').innerText = member.memberId;
-                            document.getElementById('detailMemberName').innerText = member.memberName;
-                            document.getElementById('detailMemberNumber').innerText = member.memberNumber;
-                            document.getElementById('detailMemberEmail').innerText = member.memberEmail;
-                            document.getElementById('detailMemberBirthAt').innerText = member.memberBirthAt;
-
-                            // 모달 열기
-                            document.getElementById('memberDetailModal').style.display = 'block';
                         })
                         .catch(error => {
-                            console.error('Error fetching member details:', error);
-                            alert('회원 상세 정보를 가져오는 중 오류가 발생했습니다.');
+                            console.error('Error:', error);
+                            alert('삭제 중 오류가 발생했습니다.');
                         });
-                });
+                }
             });
         });
-
-        // 모달 닫기
-        function closeModal() {
-            document.getElementById('memberDetailModal').style.display = 'none';
-        }
     </script>
 </div>
 </body>
