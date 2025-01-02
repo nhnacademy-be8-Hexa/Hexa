@@ -5,6 +5,8 @@ import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import java.util.List;
+
+import com.nhnacademy.hello.image.ImageStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ public class BookController {
 
     private final BookAdapter bookAdapter;
     private final ReviewAdapter reviewAdapter;
+    private final ImageStore imageStore;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -44,6 +47,16 @@ public class BookController {
         // todo
         int reviewCount = 0;
         model.addAttribute("reviewCount", reviewCount);
+
+
+        // 책 섬네일
+
+        String imageName = "bookThumbnail_" + book.bookId();
+        List<String> imagePaths = imageStore.getImage(imageName);
+        String imagePath = (imagePaths != null && !imagePaths.isEmpty()) ?
+                imagePaths.get(0) : "/images/default-book.jpg"; // 기본 이미지 경로로 수정
+
+        model.addAttribute("thumbnailImage", imagePath);
 
         return "book/bookDetail";
     }
