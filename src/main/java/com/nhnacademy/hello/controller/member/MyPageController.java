@@ -177,4 +177,8 @@ public class MyPageController {
         return "redirect:/mypage/address";
     }
 
+    @GetMapping("/mypage/couponList")
+    public String listCoupon(){
+        return "member/couponList";
+    }
 }
