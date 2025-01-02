@@ -1,162 +1,333 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Purchase</title>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase</title>
 
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="/css/styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
 
-    </head>
-    <body>
+<div class="container mt-5">
 
-        <div class="container mt-5">
+    <div th:replace="fragments/header :: header"></div>
 
-            <div th:replace="fragments/header :: header"></div>
+    <h1>배송</h1>
 
-            <h1>배송</h1>
-
-            <!-- 회원 배송 항목 -->
-            <div th:if="${isLoggedIn}" class="card p-3">
-                <!-- 이름 -->
-                <div class="mb-2">
-                    <strong>수령인 이름:</strong>
-                    <span id="recipientNameDisplay"></span>
-                </div>
-                <!-- 주소 -->
-                <div class="mb-2">
-                    <strong>배송지 주소:</strong>
-                    <span id="addressDisplay"></span>
-                </div>
-                <!-- 배송지 변경 버튼 -->
-                <button class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
-            </div>
-
-            <!-- 비회원 배송 항목 -->
-            <div th:unless="${isLoggedIn}" class="card p-3">
-
-                <!-- 배송지 추가 버튼 -->
-                <button id="addAddressButton" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
-            </div>
-
-
-
-            <hr>
-
-            <h1>주문</h1>
-
-            <!-- 장바구니 항목 테이블 -->
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>책 제목</th>
-                    <th>가격 (원)</th>
-                    <th>수량</th>
-                    <th>합계 (원)</th>
-                </tr>
-                </thead>
-                <tbody id="cart-items">
-                <!-- bookList 항목 렌더링 -->
-                <tr th:each="book : ${bookList}" th:data-book-id="${book.bookId}">
-                    <td>
-                        <a th:href="@{'/book/' + ${book.bookId}}" th:text="${book.bookTitle}"></a>
-                    </td>
-                    <td th:text="${#numbers.formatDecimal(book.bookPrice, 0, 0)}"></td>
-                    <td>
-                        <!-- 로컬스토리지의 수량을 JavaScript로 로드 -->
-                        <span class="quantity"></span>
-                    </td>
-                    <td th:data-price="${book.bookPrice}">
-                        <span class="total-price">0</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- 총 가격 -->
-            <div class="text-end mt-4">
-                <h4>총 가격: <span id="total-price">0</span> 원</h4>
-            </div>
-
-            <!-- 결제 버튼 -->
-            <div class="text-center mt-4">
-                <button class="btn btn-primary btn-lg">결제하기</button>
-            </div>
-
-
-            <div th:replace="fragments/footer :: footer"></div>
-
+    <!-- 회원 배송 항목 -->
+    <div th:if="${isLoggedIn}" class="card p-3">
+        <!-- 이름 -->
+        <div class="mb-2">
+            <strong>주소 별칭:</strong>
+            <span id="recipientNameDisplay"></span>
         </div>
+        <!-- 우편번호 -->
+        <div class="mb-2">
+            <strong>배송지 우편번호:</strong>
+            <span id="postCode"></span>
+        </div>
+        <!-- 주소 -->
+        <div class="mb-2">
+            <strong>배송지 주소:</strong>
+            <span id="addressDisplay"></span>
+        </div>
+        <!-- 상세주소 -->
+        <div class="mb-2">
+            <strong>배송지 상세주소:</strong>
+            <span id="addressDetailsDisplay"></span>
+        </div>
+        <!-- 배송지 변경 버튼 -->
+        <button class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
+    </div>
 
+    <!-- 비회원 배송 항목 -->
+    <div th:unless="${isLoggedIn}" class="card p-3">
+        <!-- 배송지 추가 버튼 -->
+        <button id="addAddressButton" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
+    </div>
 
-        <input type="hidden" id="buynow-quantity" th:value="${buynow_quantity != null ? buynow_quantity : ''}">
+    <hr>
 
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
+    <h1>주문</h1>
 
-            // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
-            document.addEventListener("DOMContentLoaded", () => {
-                // 로컬스토리지에서 cart 데이터를 가져옴
-                const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+    <!-- 장바구니 항목 테이블 -->
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>책 제목</th>
+            <th>가격 (원)</th>
+            <th>수량</th>
+            <th>합계 (원)</th>
+        </tr>
+        </thead>
+        <tbody id="cart-items">
+        <!-- bookList 항목 렌더링 -->
+        <tr th:each="book : ${bookList}" th:data-book-id="${book.bookId}">
+            <td>
+                <a th:href="@{'/book/' + ${book.bookId}}" th:text="${book.bookTitle}"></a>
+            </td>
+            <td th:text="${#numbers.formatDecimal(book.bookPrice, 0, 0)}"></td>
+            <td>
+                <!-- 로컬스토리지의 수량을 JavaScript로 로드 -->
+                <span class="quantity"></span>
+            </td>
+            <td th:data-price="${book.bookPrice}">
+                <span class="total-price">0</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-                let totalPrice = 0;
+    <!-- 총 가격 -->
+    <div class="text-end mt-4">
+        <h4>총 가격: <span id="total-price">0</span> 원</h4>
+    </div>
 
-                // 서버에서 전달된 buynow_quantity가 있는지 확인
-                const buynowQuantityElement = document.getElementById("buynow-quantity");
-                const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
-                    ? parseInt(buynowQuantityElement.value, 10) : null;
+    <!-- 결제 버튼 -->
+    <div class="text-center mt-4">
+        <button class="btn btn-primary btn-lg">결제하기</button>
+    </div>
 
-                // 테이블의 각 행을 순회하며 데이터 업데이트
-                document.querySelectorAll("#cart-items tr").forEach(row => {
-                    const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
-                    const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
-                    const quantityElement = row.querySelector(".quantity");
-                    const totalPriceElement = row.querySelector(".total-price");
+    <div th:replace="fragments/footer :: footer"></div>
 
-                    // 수량 결정: buynow_quantity가 우선, 없으면 로컬스토리지 값
-                    let quantity;
-                    if (buynowQuantity !== null) {
-                        quantity = buynowQuantity; // 바로 구매일 경우
-                    } else {
-                        // 장바구니에서 수량을 가져옴
-                        const cartItem = cartItems.find(item => parseInt(item.bookId, 10) === bookId); // bookId를 숫자로 변환 후 비교
-                        quantity = cartItem ? parseInt(cartItem.quantity, 10) : 1; // 기본값 1
-                    }
+</div>
 
-                    // 수량이 NaN인 경우 1로 설정
-                    if (isNaN(quantity)) {
-                        quantity = 1;
-                    }
+<!-- 배송지 목록을 위한 모달 -->
+<div class="modal fade" id="addressListModal" tabindex="-1" aria-labelledby="addressListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- 모달 크기 조정 가능 -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">배송지 목록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group mb-3" id="addressList">
+                    <!-- Thymeleaf를 사용하여 사용자의 배송지 목록을 렌더링 -->
+                    <li th:each="address : ${addressList}" class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong th:text="${address.addressName}">주소 별칭</strong><br>
+                            <span th:text="${address.zoneCode}">우편번호</span><br>
+                            <span th:text="${address.address}">주소</span><br>
+                            <span th:text="${address.addressDetail}">상세주소</span>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" th:attr="data-id=${address.addressId}" onclick="selectAddress(this)">선택</button>
+                    </li>
+                </ul>
+                <button class="btn btn-primary w-100" onclick="openAddAddressModal()">새 배송지 추가</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    // 수량 및 합계 업데이트
-                    quantityElement.textContent = quantity;
-                    const total = price * quantity;
-                    totalPriceElement.textContent = total.toLocaleString();
+<!-- 새 배송지 추가를 위한 모달 -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addAddressForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">새 배송지 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 주소 별칭 입력 필드 -->
+                    <div class="mb-3">
+                        <label for="newRecipientName" class="form-label">주소 별칭</label>
+                        <input type="text" class="form-control" id="newRecipientName" required>
+                    </div>
+                    <!-- 우편번호 및 주소 검색 버튼 -->
+                    <div class="mb-3">
+                        <label for="newPostCode" class="form-label">우편번호</label>
+                        <input type="text" class="form-control" id="newPostCode" readonly>
+                        <button type="button" class="btn btn-secondary mt-2" onclick="sample4_execDaumPostcode()">우편번호 찾기</button>
+                    </div>
+                    <!-- 도로명 주소 -->
+                    <div class="mb-3">
+                        <label for="newAddressDisplay" class="form-label">주소</label>
+                        <input type="text" class="form-control" id="newAddressDisplay" readonly>
+                    </div>
+                    <!-- 상세 주소 입력 -->
+                    <div class="mb-3">
+                        <label for="newDetailAddress" class="form-label">상세 주소</label>
+                        <input type="text" class="form-control" id="newDetailAddress" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">추가</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-                    // 총 가격 계산
-                    totalPrice += total;
-                });
+<input type="hidden" id="buynow-quantity" th:value="${buynow_quantity != null ? buynow_quantity : ''}">
 
-                // 총 가격 업데이트
-                document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Daum 우편번호 API 스크립트 -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+
+    // 배송지 변경 버튼 클릭 시 배송지 목록 모달 열기
+    function goToChangeAddress() {
+        var addressListModal = new bootstrap.Modal(document.getElementById('addressListModal'));
+        addressListModal.show();
+    }
+
+    // 배송지 선택 처리
+    function selectAddress(button) {
+        var addressId = button.getAttribute('data-id');
+        // AJAX 요청을 통해 선택한 주소 정보 가져오기
+        fetch(`/select-address?addressId=${addressId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 주소 정보 업데이트
+                document.getElementById('recipientNameDisplay').textContent = data.recipientName;
+                document.getElementById('postCode').textContent = data.zonecode;
+                document.getElementById('addressDisplay').textContent = data.address;
+                document.getElementById('addressDetailsDisplay').textContent = data.detailAddress;
+
+                // 모달 닫기
+                var addressListModal = bootstrap.Modal.getInstance(document.getElementById('addressListModal'));
+                addressListModal.hide();
+            })
+            .catch(error => {
+                console.error('Error selecting address:', error);
+                alert(error.message || '배송지 선택 중 오류가 발생했습니다.');
             });
+    }
 
-            // 배송지 변경 페이지로 이동
-            function goToChangeAddress() {
-                window.location.href = "/change-address";
+    // 새 배송지 추가 모달 열기
+    function openAddAddressModal() {
+        var addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+        addAddressModal.show();
+    }
+
+    // 새 배송지 추가 처리
+    document.getElementById('addAddressForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var recipientName = document.getElementById('newRecipientName').value.trim();
+        var zonecode = document.getElementById('newPostCode').value.trim();
+        var address = document.getElementById('newAddressDisplay').value.trim();
+        var detailAddress = document.getElementById('newDetailAddress').value.trim();
+
+        if (recipientName && zonecode && address && detailAddress) {
+            // AJAX 요청을 통해 새 주소 추가
+            fetch('/add-address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'recipientName': recipientName,
+                    'zonecode': zonecode,
+                    'address': address,
+                    'detailAddress': detailAddress
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message); // "배송지가 추가되었습니다."
+
+                    // 새로 추가된 주소를 배송지 목록에 반영하기 위해 페이지 새로고침
+                    location.reload(); // 간단하게 페이지 새로고침
+                })
+                .catch(error => {
+                    console.error('Error adding address:', error);
+                    alert(error.message || '배송지 추가 중 오류가 발생했습니다.');
+                });
+        } else {
+            alert('모든 필드를 정확히 입력해주세요.');
+        }
+    });
+
+    // 새 배송지 추가 모달에서 우편번호 찾기
+    function sample4_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 도로명 주소 변수
+                var roadAddr = data.roadAddress;
+                var jibunAddr = data.jibunAddress;
+                var zonecode = data.zonecode;
+
+                // 주소 표시
+                document.getElementById('newPostCode').value = zonecode;
+                document.getElementById('newAddressDisplay').value = roadAddr || jibunAddr;
+            }
+        }).open();
+    }
+
+    // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
+    document.addEventListener("DOMContentLoaded", () => {
+        // 로컬스토리지에서 cart 데이터를 가져옴
+        const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+        let totalPrice = 0;
+
+        // 서버에서 전달된 buynow_quantity가 있는지 확인
+        const buynowQuantityElement = document.getElementById("buynow-quantity");
+        const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
+            ? parseInt(buynowQuantityElement.value, 10) : null;
+
+        // 테이블의 각 행을 순회하며 데이터 업데이트
+        document.querySelectorAll("#cart-items tr").forEach(row => {
+            const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
+            const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
+            const quantityElement = row.querySelector(".quantity");
+            const totalPriceElement = row.querySelector(".total-price");
+
+            // 수량 결정: buynow_quantity가 우선, 없으면 로컬스토리지 값
+            let quantity;
+            if (buynowQuantity !== null) {
+                quantity = buynowQuantity; // 바로 구매일 경우
+            } else {
+                // 장바구니에서 수량을 가져옴
+                const cartItem = cartItems.find(item => parseInt(item.bookId, 10) === bookId); // bookId를 숫자로 변환 후 비교
+                quantity = cartItem ? parseInt(cartItem.quantity, 10) : 1; // 기본값 1
             }
 
-            // 배송지 추가 페이지로 이동
-            function goToAddAddress() {
-                window.location.href = "/add-address";
+            // 수량이 NaN인 경우 1로 설정
+            if (isNaN(quantity)) {
+                quantity = 1;
             }
 
+            // 수량 및 합계 업데이트
+            quantityElement.textContent = quantity;
+            const total = price * quantity;
+            totalPriceElement.textContent = total.toLocaleString();
 
+            // 총 가격 계산
+            totalPrice += total;
+        });
 
-        </script>
+        // 총 가격 업데이트
+        document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+    });
 
-    </body>
+    // 배송지 추가 버튼 클릭 시 새 배송지 추가 모달 열기
+    function goToAddAddress() {
+        openAddAddressModal();
+    }
+</script>
+
+</body>
 </html>
