@@ -54,7 +54,6 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/admin","/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/mypage","/mypage/**").hasRole("MEMBER")
-                                .requestMatchers("/purchase").hasRole("MEMBER") // 구매도 회원만 진행하게 제한 걸어놓음
                                 // 쿠폰이나 다른거 추가할려면 추가하는걸로
                                 .requestMatchers("/","/oauth/**", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll()
