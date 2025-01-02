@@ -66,10 +66,8 @@
         <!-- 메인 컨텐츠 -->
         <div class="col">
             <!-- 검색창 -->
-            <form class="search-bar d-flex" method="get" action="/admin/members">
-                <input type="text" class="form-control" id="search" name="search"
-                       placeholder="아이디로 검색" aria-label="Search by ID"
-                       th:value="${search}">
+            <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members">
+                <input type="text" class="form-control" id="search" name="search" placeholder="아이디로 검색" aria-label="Search by ID">
                 <button class="btn btn-primary ms-2" type="submit">검색</button>
             </form>
 
