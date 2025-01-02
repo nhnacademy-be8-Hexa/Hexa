@@ -114,13 +114,19 @@
                 <!-- Modal 내 '새 배송지 추가' 버튼 비활성화 조건 추가 -->
                 <div class="mt-3">
                     <button class="btn btn-primary w-100"
-                            th:if="${addressList.size() < 10}"
+                            th:if="${#lists.size(addressList ?: {}) < 10}"
                             onclick="openAddAddressModal()">
                         새 배송지 추가
                     </button>
-                    <button class="btn btn-primary w-100" th:if="${addressList.size() >= 10}" disabled>
+                    <button class="btn btn-primary w-100"
+                            th:if="${#lists.size(addressList ?: {}) >= 10}"
+                            disabled>
                         배송지 추가 (최대 10개)
                     </button>
+                </div>
+                <!-- (선택 사항) 최대 배송지 수를 초과했을 때 안내 메시지 추가 -->
+                <div th:if="${#lists.size(addressList ?: {}) >= 10}" class="mt-2 text-danger">
+                    배송지는 최대 10개까지 등록할 수 있습니다.
                 </div>
             </div>
         </div>
