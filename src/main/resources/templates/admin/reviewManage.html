@@ -101,6 +101,9 @@
                     </nav>
                 </div>
             </div>
+            <div th:if="${errorMessage != null}" class="alert alert-danger">
+                <span th:text="${errorMessage}"></span>
+            </div>
         </div>
     </div>
 
