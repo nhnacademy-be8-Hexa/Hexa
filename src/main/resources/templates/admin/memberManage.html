@@ -94,6 +94,7 @@
                             <a href="#" th:data-member-id="${member.memberId}"
                                class="member-detail-link" th:text="${member.memberName}"></a>
                         </td>
+
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
                         <td th:text="${member.memberBirthAt}"></td>
@@ -153,30 +154,42 @@
 
     <script>
         // 회원 상세보기
-        document.querySelectorAll('.member-detail-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.member-detail-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // 기본 동작 막기
+                    e.preventDefault();
 
-                const memberId = this.getAttribute('data-member-id');
-                fetch(`/admin/members/${memberId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('회원 정보를 가져오는 데 실패했습니다.');
-                        }
-                        return response.json();
-                    })
-                    .then(member => {
-                        document.getElementById('detailMemberId').innerText = member.memberId;
-                        document.getElementById('detailMemberName').innerText = member.memberName;
-                        document.getElementById('detailMemberNumber').innerText = member.memberNumber;
-                        document.getElementById('detailMemberEmail').innerText = member.memberEmail;
-                        document.getElementById('detailMemberBirthAt').innerText = member.memberBirthAt;
-                        document.getElementById('memberDetailModal').style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        alert('회원 정보를 가져오는 중 오류가 발생했습니다.');
-                    });
+                    // 회원 ID 가져오기
+                    const memberId = this.getAttribute('data-member-id');
+                    console.log('Fetching member ID:', memberId);
+
+                    // Fetch API로 회원 상세 정보 가져오기
+                    fetch(`/admin/members/${memberId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('회원 정보를 가져오는 데 실패했습니다.');
+                            }
+                            return response.json();
+                        })
+                        .then(member => {
+                            console.log('Fetched member data:', member);
+
+                            // 모달에 데이터 삽입
+                            document.getElementById('detailMemberId').innerText = member.memberId;
+                            document.getElementById('detailMemberName').innerText = member.memberName;
+                            document.getElementById('detailMemberNumber').innerText = member.memberNumber;
+                            document.getElementById('detailMemberEmail').innerText = member.memberEmail;
+                            document.getElementById('detailMemberBirthAt').innerText = member.memberBirthAt;
+
+                            // 모달 열기
+                            document.getElementById('memberDetailModal').style.display = 'block';
+                        })
+                        .catch(error => {
+                            console.error('Error fetching member details:', error);
+                            alert('회원 상세 정보를 가져오는 중 오류가 발생했습니다.');
+                        });
+                });
             });
         });
 
