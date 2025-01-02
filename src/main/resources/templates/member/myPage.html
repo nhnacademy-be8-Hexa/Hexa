@@ -15,7 +15,7 @@
 <div class="container">
 
 <!-- 헤더 포함 -->
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
   <div class="container-fluid d-flex gap-4 p-4 align-items-start">
     <!-- 사이드 메뉴 바 -->
@@ -104,7 +104,7 @@
 
 
   <!-- 풋터 -->
-<div th:replace="fragments/footer :: footer"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </div>
 
