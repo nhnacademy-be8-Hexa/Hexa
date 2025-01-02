@@ -189,16 +189,21 @@
         document.querySelectorAll('.member-detail-link').forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault(); // 기본 링크 동작 방지
+
                 const memberId = this.getAttribute('data-member-id');
+                console.log('Fetching member ID:', memberId); // 디버깅용
 
                 fetch(`/admin/members/${memberId}`)
                     .then(response => {
                         if (!response.ok) {
+                            console.error('Response status:', response.status);
                             throw new Error('회원 정보를 가져오는 데 실패했습니다.');
                         }
                         return response.json();
                     })
                     .then(member => {
+                        console.log('Fetched member data:', member); // 디버깅용
+
                         // 모달에 데이터 삽입
                         document.getElementById('detailMemberId').innerText = member.memberId;
                         document.getElementById('detailMemberName').innerText = member.memberName;
@@ -219,6 +224,7 @@
         function closeModal() {
             document.getElementById('memberDetailModal').style.display = 'none';
         }
+
     </script>
 
     <!-- 풋터 -->
