@@ -111,7 +111,17 @@
                         <button class="btn btn-secondary btn-sm" th:attr="data-id=${address.addressId}" onclick="selectAddress(this)">선택</button>
                     </li>
                 </ul>
-                <button class="btn btn-primary w-100" onclick="openAddAddressModal()">새 배송지 추가</button>
+                <!-- Modal 내 '새 배송지 추가' 버튼 비활성화 조건 추가 -->
+                <div class="mt-3">
+                    <button class="btn btn-primary w-100"
+                            th:if="${addressList.size() < 10}"
+                            onclick="openAddAddressModal()">
+                        새 배송지 추가
+                    </button>
+                    <button class="btn btn-primary w-100" th:if="${addressList.size() >= 10}" disabled>
+                        배송지 추가 (최대 10개)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -278,12 +288,11 @@
             oncomplete: function(data) {
                 // 도로명 주소 변수
                 var roadAddr = data.roadAddress;
-                var jibunAddr = data.jibunAddress;
                 var zonecode = data.zonecode;
 
                 // 주소 표시
                 document.getElementById('newPostCode').value = zonecode;
-                document.getElementById('newAddressDisplay').value = roadAddr || jibunAddr;
+                document.getElementById('newAddressDisplay').value = roadAddr;
             }
         }).open();
     }
@@ -353,7 +362,7 @@
 
         if (recipientNameDisplay && postCode && addressDisplay && addressDetailsDisplay) {
             recipientNameDisplay.textContent = address.addressName;
-            postCode.textContent = address.zoneCode;
+            postCode.textContent = address.zoneCode; // 'zoneCode'로 수정됨
             addressDisplay.textContent = address.address;
             addressDetailsDisplay.textContent = address.addressDetail;
         }
