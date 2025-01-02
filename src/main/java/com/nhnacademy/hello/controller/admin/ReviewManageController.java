@@ -44,16 +44,15 @@ public class ReviewManageController {
 
     // 특정 리뷰 상세 조회
     @GetMapping("/{reviewId}")
-    public ReviewDTO getReportedReviewDetail(@PathVariable Long reviewId){
-
-        List<ReviewDTO> reviews = reviewAdapter.getReviewsFromAdmin(0,1,"reviewId").getBody();
-
+    public String getReviewDetail(@PathVariable Long reviewId, Model model) {
+        List<ReviewDTO> reviews = reviewAdapter.getReviewsFromAdmin(0, 1, "reviewId").getBody();
         for (ReviewDTO review : reviews) {
-            if(review.reviewId().equals(reviewId)){
-                return review;
+            if (review.reviewId().equals(reviewId)) {
+                model.addAttribute("review", review);
+                return "admin/reviewDetail";
             }
         }
-        throw new RuntimeException("cannot found review");
+        throw new RuntimeException("리뷰를 찾을 수 없습니다.");
     }
 
     // 특정 리뷰 수정
