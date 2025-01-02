@@ -29,6 +29,11 @@
 
         <!-- 메인 컨텐츠 -->
         <div class="container-xl">
+            <div th:if="${errorMessage != null}">
+                <div class="alert alert-danger">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+            </div>
             <div th:if="${reviews != null and #lists.size(reviews) > 0}">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">

@@ -11,7 +11,7 @@
 <body>
 <div class="container">
   <!-- 헤더 -->
-  <div th:replace="~{/fragments/header :: header}"></div> <!-- 헤더 경로 수정 -->
+  <div th:replace="~{/fragments/header :: header}"></div>
 
   <div class="page-header d-print-none">
     <div class="container-xl">
@@ -25,12 +25,14 @@
 
   <div class="container-fluid d-flex gap-4 p-4">
     <!-- 세로 메뉴 -->
-    <div th:replace="~{/fragments/admin :: admin}"></div> <!-- 세로 메뉴 경로 수정 -->
+    <div th:replace="~{/fragments/admin :: admin}"></div>
 
     <!-- 메인 컨텐츠 -->
     <div class="container-xl">
-      <div th:if="${review == null}" class="alert alert-danger">
-        <p>리뷰 데이터를 불러오는 데 문제가 발생했습니다.</p>
+      <div th:if="${errorMessage != null}">
+        <div class="alert alert-danger">
+          <p th:text="${errorMessage}"></p>
+        </div>
         <a th:href="@{'/admin/review'}" class="btn btn-secondary">목록으로</a>
       </div>
       <div th:if="${review != null}">
@@ -60,7 +62,7 @@
   </div>
 
   <!-- 풋터 -->
-  <div th:replace="~{/fragments/footer :: footer}"></div> <!-- 풋터 경로 수정 -->
+  <div th:replace="~{/fragments/footer :: footer}"></div>
 </div>
 
 <script>
