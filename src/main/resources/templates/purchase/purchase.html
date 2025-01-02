@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"> <!-- Thymeleaf 네임스페이스 추가 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,9 +17,9 @@
 
     <h1>배송</h1>
 
-    <!-- 회원 배송 항목 -->
-    <div th:if="${isLoggedIn}" class="card p-3">
-        <!-- 이름 -->
+    <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
+    <div class="card p-3">
+        <!-- 주소 별칭 -->
         <div class="mb-2">
             <strong>주소 별칭:</strong>
             <span id="recipientNameDisplay"></span>
@@ -39,14 +39,9 @@
             <strong>배송지 상세주소:</strong>
             <span id="addressDetailsDisplay"></span>
         </div>
-        <!-- 배송지 변경 버튼 -->
-        <button class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
-    </div>
-
-    <!-- 비회원 배송 항목 -->
-    <div th:unless="${isLoggedIn}" class="card p-3">
-        <!-- 배송지 추가 버튼 -->
-        <button id="addAddressButton" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
+        <!-- 로그인 상태에 따른 버튼 표시 -->
+        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
+        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
     </div>
 
     <hr>
@@ -165,6 +160,13 @@
 
 <input type="hidden" id="buynow-quantity" th:value="${buynow_quantity != null ? buynow_quantity : ''}">
 
+<!-- 로그인 상태 전달 (Thymeleaf 변수 to JS) -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+    /*]]>*/
+</script>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Daum 우편번호 API 스크립트 -->
@@ -248,8 +250,18 @@
                 .then(data => {
                     alert(data.message); // "배송지가 추가되었습니다."
 
-                    // 새로 추가된 주소를 배송지 목록에 반영하기 위해 페이지 새로고침
-                    location.reload(); // 간단하게 페이지 새로고침
+                    if (!isLoggedIn && data.address) {
+                        // 비로그인 사용자: 로컬스토리지에 주소 저장 및 표시
+                        localStorage.setItem('temporaryAddress', JSON.stringify(data.address));
+                        displayTemporaryAddress(data.address);
+                    } else {
+                        // 로그인된 사용자: 페이지 새로고침하여 주소 목록 업데이트
+                        location.reload();
+                    }
+
+                    // 모달 닫기
+                    var addAddressModal = bootstrap.Modal.getInstance(document.getElementById('addAddressModal'));
+                    addAddressModal.hide();
                 })
                 .catch(error => {
                     console.error('Error adding address:', error);
@@ -321,7 +333,31 @@
 
         // 총 가격 업데이트
         document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+
+        // 비로그인 사용자: 로컬스토리지에 임시 주소가 있는지 확인하고 표시
+        if (!isLoggedIn) {
+            const tempAddress = JSON.parse(localStorage.getItem("temporaryAddress"));
+            if (tempAddress) {
+                displayTemporaryAddress(tempAddress);
+            }
+        }
     });
+
+    // 비로그인 사용자: 임시 주소 표시 함수
+    function displayTemporaryAddress(address) {
+        // 존재 여부 확인 후 업데이트
+        var recipientNameDisplay = document.getElementById('recipientNameDisplay');
+        var postCode = document.getElementById('postCode');
+        var addressDisplay = document.getElementById('addressDisplay');
+        var addressDetailsDisplay = document.getElementById('addressDetailsDisplay');
+
+        if (recipientNameDisplay && postCode && addressDisplay && addressDetailsDisplay) {
+            recipientNameDisplay.textContent = address.addressName;
+            postCode.textContent = address.zoneCode;
+            addressDisplay.textContent = address.address;
+            addressDetailsDisplay.textContent = address.addressDetail;
+        }
+    }
 
     // 배송지 추가 버튼 클릭 시 새 배송지 추가 모달 열기
     function goToAddAddress() {
