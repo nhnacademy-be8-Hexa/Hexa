@@ -2,8 +2,6 @@ package com.nhnacademy.hello.controller.coupon;
 
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
 import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,19 +17,19 @@ public class CouponMemberController {
     }
 
     @GetMapping("/{memberId}/coupons")
-    public List<CouponMemberDTO> getMemberCoupons(@PathVariable String memberId, HttpServletRequest request) {
-        return couponMemberAdapter.getMemberCoupons(memberId, request);
+    public List<CouponMemberDTO> getMemberCoupons(@PathVariable String memberId) {
+        return couponMemberAdapter.getMemberCoupons(memberId);
     }
 
-    @PostMapping("//{memberId}/coupons/{couponId}")
+    @PostMapping("/{memberId}/coupons/{couponId}")
     public Void createMemberCoupon(
             @PathVariable String memberId,
-            @PathVariable Long couponId, HttpServletRequest request) {
-        return couponMemberAdapter.createMemberCoupon(memberId, couponId, request);
+            @PathVariable Long couponId) {
+        return couponMemberAdapter.createMemberCoupon(memberId, couponId);
     }
 
     @DeleteMapping("/{memberId}/coupons/{couponId}")
-    public Void deleteMemberCoupon(@PathVariable String memberId, @PathVariable Long couponId, HttpServletRequest request) {
-        return couponMemberAdapter.deleteMemberCoupon(memberId, couponId, request);
+    public Void deleteMemberCoupon(@PathVariable String memberId, @PathVariable Long couponId) {
+        return couponMemberAdapter.deleteMemberCoupon(memberId, couponId);
     }
 }
