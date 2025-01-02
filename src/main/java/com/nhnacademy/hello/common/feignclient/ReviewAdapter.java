@@ -27,6 +27,11 @@ public interface ReviewAdapter {
             @RequestParam("sort") String sort
     );
 
+    // 특정 회원의 리뷰 총계를 조회
+    @GetMapping("/members/{memberId}/reviews/total")
+    public ResponseEntity<Long> getTotalReviews(@PathVariable String memberId);
+
+
     @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> updateReview(
             @Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
@@ -59,4 +64,16 @@ public interface ReviewAdapter {
             @RequestParam boolean block
     );
 
+    // 신고 5회 이상 받은 리뷰 목록 조회
+    @GetMapping("/reviews/highReport")
+    public ResponseEntity<List<ReviewDTO>> getReviewsFromHighReport(
+            // 페이징
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String sort
+    );
+
+    // 신고 5회 이상의 리뷰 목록 조회 페이징을 위한 총계
+    @GetMapping("/reviews/highReport/total")
+    public ResponseEntity<Long> getReviewsFromHighReportTotal();
 }
