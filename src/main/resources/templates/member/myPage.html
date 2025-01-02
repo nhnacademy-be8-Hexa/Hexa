@@ -18,34 +18,7 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
   <div class="container-fluid d-flex gap-4 p-4 align-items-start">
-    <!-- 사이드 메뉴 바 -->
-    <div class="bg-light border rounded p-3" style="width: 250px;">
-      <h4 class="text-center">메뉴</h4>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/edit">사용자 정보 수정</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/points">포인트 내역</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/orders">주문 조회</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/address">배송지 관리</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/orders/cancel">취소 주문 내역</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/returns">반품/교환 내역</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/mypage/reviews">내가 쓴 리뷰</a>
-        </li>
-
-      </ul>
-    </div>
+    <div th:replace="~{fragments/mypage :: mypage}"></div>
 
     <!-- 메인 콘텐츠 영역 -->
     <div class="flex-grow-1 bg-white border rounded p-3">
