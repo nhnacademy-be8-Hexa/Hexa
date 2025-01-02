@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 상세정보</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="container">
+  <!-- 헤더 -->
+  <div th:replace="fragments/header :: header"></div>
+
+  <div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h1 class="page-title">회원 상세정보</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 전체 레이아웃 -->
+  <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <!-- 사이드 메뉴 -->
+    <div th:replace="~{fragments/admin :: admin}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="col">
+      <div class="container-xl py-4">
+        <h2 th:text="'회원: ' + ${member.memberName}"></h2>
+        <p><strong>아이디:</strong> <span th:text="${member.memberId}"></span></p>
+        <p><strong>비밀번호:</strong> <span th:text="${member.memberPassword}"></span></p>
+        <p><strong>이름:</strong> <span th:text="${member.memberName}"></span></p>
+        <p><strong>연락처:</strong> <span th:text="${member.memberNumber}"></span></p>
+        <p><strong>이메일:</strong> <span th:text="${member.memberEmail}"></span></p>
+        <p><strong>생일:</strong> <span th:text="${member.memberBirthAt}"></span></p>
+        <p><strong>생성일:</strong> <span th:text="${member.memberCreatedAt}"></span></p>
+        <p><strong>최근 로그인 시간:</strong> <span th:text="${member.memberLastLoginAt}"></span></p>
+        <p><strong>권한:</strong> <span th:text="${member.memberRole}"></span></p>
+        <p><strong>등급:</strong> <span th:text="${member.rating?.ratingName ?: 'N/A'}"></span></p>
+        <p><strong>회원 상태:</strong> <span th:text="${member.memberStatus?.statusName ?: 'N/A'}"></span></p>
+        <a href="/admin/members" class="btn btn-secondary">목록으로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 풋터 -->
+  <div th:replace="fragments/footer :: footer"></div>
+</div>
+</body>
+</html>
