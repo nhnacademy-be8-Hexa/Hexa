@@ -34,6 +34,7 @@ public class MemberManageController {
         }
 
         model.addAttribute("members", members);
+        model.addAttribute("search", search); // 검색어 유지
         return "admin/memberManage"; // 멤버 관리 페이지
     }
 
