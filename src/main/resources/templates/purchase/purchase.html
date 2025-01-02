@@ -351,14 +351,14 @@
         // toss payments
         // ------  SDK 초기화 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
-        const clientKey = /*[[${clientKey}]]*/"[[${clientKey}]]";
+        const clientKey = "[[${clientKey}]]";
         const tossPayments = TossPayments(clientKey);
         let payment;
 
         if(isLoggedIn) {
             // 회원 결제
             // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
-            const customerKey = btoa( /*[[${memberId}]]*/"[[${memberId}]]" ).substring(0, 50);
+            const customerKey = btoa( "[[${member?.memberId ?: null}]]" ).substring(0, 50);
             payment = tossPayments.payment({ customerKey });
         } else {
             // 비회원 결제
@@ -385,8 +385,14 @@
                     orderName += ` 외 ${bookTitles.length - 1}건`;
                 }
 
-                // 
+                const paymentData = {};
 
+                // member가 있을 경우에만 해당 필드를 추가
+                if ( isLoggedIn ) {
+                    paymentData.customerEmail = "[[${member?.memberEmail ?: ""}]]";
+                    paymentData.customerName = "[[${member?.memberName ?: ""}]]";
+                    paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
+                }
 
                 await payment.requestPayment({
                     method: "CARD", // 카드 결제
@@ -398,9 +404,7 @@
                     orderName: orderName,
                     successUrl: window.location.origin + "/success", // 결제 요청이 성공하면 리다이렉트되는 URL
                     failUrl: window.location.origin + "/fail", // 결제 요청이 실패하면 리다이렉트되는 URL
-                    customerEmail: "customer123@gmail.com",
-                    customerName: "김토스",
-                    customerMobilePhone: "01012341234",
+                    ...paymentData,
                     // 카드 결제에 필요한 정보
                     card: {
                         useEscrow: false,

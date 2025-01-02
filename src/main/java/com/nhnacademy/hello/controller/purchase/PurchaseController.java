@@ -30,6 +30,7 @@ public class PurchaseController {
 
     private final BookAdapter bookAdapter;
     private final AddressAdapter addressAdapter;
+    private final MemberAdapter memberAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -62,7 +63,7 @@ public class PurchaseController {
             String sort = "addressId,asc";
             List<AddressDTO> addressList = addressAdapter.getAddresses(memberId, page, size, sort);
             model.addAttribute("addressList", addressList);
-            model.addAttribute("memberId", memberId);
+            model.addAttribute("member", memberAdapter.getMember(memberId));
         }
 
         // 바로구매로 넘어올 시 quantity가 있음
