@@ -24,39 +24,37 @@ public class ReviewManageController {
                                      @RequestParam(required = false) String search,
                                      Model model) {
         try {
-            int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
+            int adjustedPage = Math.max(page - 1, 0);
 
+            // 리뷰 목록 가져오기
             ResponseEntity<List<ReviewDTO>> response = reviewAdapter.getReviewsFromHighReport(adjustedPage, size, sort);
-
-            Long totalReportedReviews = 0L;
-            try {
-                ResponseEntity<Long> totalResponse = reviewAdapter.getReviewsFromHighReportTotal();
-                if (totalResponse != null && totalResponse.getBody() != null) {
-                    totalReportedReviews = totalResponse.getBody();
-                }
-            } catch (Exception e) {
-                System.err.println("Error fetching total reported reviews: " + e.getMessage());
+            List<ReviewDTO> reviews = response.getBody();
+            if (reviews == null) {
+                reviews = List.of(); // 빈 리스트로 초기화
             }
+
+            // 총 리뷰 수 가져오기
+            ResponseEntity<Long> totalResponse = reviewAdapter.getReviewsFromHighReportTotal();
+            long totalReportedReviews = (totalResponse.getBody() != null) ? totalResponse.getBody() : 0;
 
             int totalPages = (int) Math.ceil((double) totalReportedReviews / size);
 
-            model.addAttribute("reviews", response.getBody());
+            model.addAttribute("reviews", reviews);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPage", totalPages);
             model.addAttribute("size", size);
             model.addAttribute("sort", sort);
+            model.addAttribute("search", search);
 
             return "admin/reviewManage";
-
         } catch (Exception e) {
-            // 로그 기록
+            // 예외 처리: 오류 로그 기록 및 사용자에게 메시지 표시
             System.err.println("Error fetching reviews: " + e.getMessage());
-            e.printStackTrace();
-
             model.addAttribute("errorMessage", "리뷰 데이터를 가져오는 중 문제가 발생했습니다.");
             return "error/500"; // 에러 페이지로 이동
         }
     }
+
 
 
     // 특정 리뷰 상세 조회
