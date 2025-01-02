@@ -95,7 +95,21 @@
 
             <!-- 신규 주소 추가 버튼 -->
             <div class="mt-3">
-                <a th:href="@{/mypage/address/form}" class="btn btn-primary">새 배송지 추가</a>
+<!--                &lt;!&ndash; 방법 1: 조건부 렌더링 &ndash;&gt;-->
+<!--                <a th:href="@{/mypage/address/form}" class="btn btn-primary" th:if="${addresses.size() < 10}">새 배송지 추가</a>-->
+<!--                <button class="btn btn-primary" th:if="${addresses.size() >= 10}" disabled>-->
+<!--                    배송지 추가 (최대 10개)-->
+<!--                </button>-->
+
+                <a th:href="${addresses.size() < 10} ? @{/mypage/address/form} : null"
+                   class="btn btn-primary"
+                   th:classappend="${addresses.size() >= 10} ? ' disabled' : ''"
+                   onclick="${addresses.size() >= 10} ? 'return false;' : null;">
+                    새 배송지 추가
+                </a>
+                <div th:if="${addresses.size() >= 10}" class="mt-2 text-danger">
+                    배송지는 최대 10개까지 등록할 수 있습니다.
+                </div>
             </div>
         </div>
     </div>
