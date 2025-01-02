@@ -27,8 +27,13 @@ public class MemberManageController {
         List<MemberDTO> members;
 
         if (search != null && !search.trim().isEmpty()) {
-            // 특정 아이디로 검색
-            members = memberAdapter.getMembers(page, search);
+            try {
+                // 특정 아이디로 검색
+                members = memberAdapter.getMembers(page, search.trim());
+            } catch (Exception e) {
+                model.addAttribute("error", "검색 중 오류가 발생했습니다.");
+                members = List.of(); // 빈 목록 반환
+            }
         } else {
             // 전체 회원 조회
             members = memberAdapter.getMembers(page, null);
