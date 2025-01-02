@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 @Controller
@@ -40,9 +41,12 @@ public class MemberManageController {
 
     // 특정 회원 상세 조회
     @GetMapping("/{memberId}")
-    @ResponseBody
-    public MemberDTO getMember(@PathVariable String memberId) {
-        return memberAdapter.getMember(memberId);
+    public String getMemberDetail(@PathVariable String memberId, Model model) {
+        MemberDTO member = memberAdapter.getMember(memberId);
+
+        model.addAttribute("member",member);
+
+        return "admin/memberDetail";
     }
 
     // 특정 회원 수정 페이지
