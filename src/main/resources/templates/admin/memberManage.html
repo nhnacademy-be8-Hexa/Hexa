@@ -10,7 +10,7 @@
 <body>
 <div class="container">
     <!-- 헤더 -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -119,7 +119,7 @@
         </div>
     </div>
     <!-- 풋터 -->
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 </body>
 </html>
