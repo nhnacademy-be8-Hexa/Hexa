@@ -62,6 +62,7 @@ public class PurchaseController {
             String sort = "addressId,asc";
             List<AddressDTO> addressList = addressAdapter.getAddresses(memberId, page, size, sort);
             model.addAttribute("addressList", addressList);
+            model.addAttribute("memberId", memberId);
         }
 
         // 바로구매로 넘어올 시 quantity가 있음
