@@ -21,7 +21,7 @@
 
             <!-- 책 이미지 -->
             <div class="col-md-4 text-center">
-                <img src="book-placeholder.jpg" alt="책 이미지" class="img-fluid">
+                <img th:src="@{${thumbnailImage}}" alt="책 이미지" class="img-fluid" style="max-width: 70%; height: auto;">
             </div>
 
             <!-- 책 정보 -->
