@@ -21,26 +21,43 @@ public class ReviewManageController {
     public String getReportedReviews(@RequestParam(defaultValue = "1") Integer page,
                                      @RequestParam(defaultValue = "9") int size,
                                      @RequestParam(required = false) String sort,
-                                     @RequestParam (required = false) String search, Model model){
-        // 페이지 번호 조정 (1 기반을 0 기반으로 변환)
-        int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
+                                     @RequestParam(required = false) String search,
+                                     Model model) {
+        try {
+            int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
-        ResponseEntity<List<ReviewDTO>> response = reviewAdapter.getReviewsFromHighReport(adjustedPage,size,sort);
+            ResponseEntity<List<ReviewDTO>> response = reviewAdapter.getReviewsFromHighReport(adjustedPage, size, sort);
 
-        // 5번 이상 신고된 리뷰 총계
-        Long totalReportedReviews = reviewAdapter.getReviewsFromHighReportTotal().getBody();
+            Long totalReportedReviews = 0L;
+            try {
+                ResponseEntity<Long> totalResponse = reviewAdapter.getReviewsFromHighReportTotal();
+                if (totalResponse != null && totalResponse.getBody() != null) {
+                    totalReportedReviews = totalResponse.getBody();
+                }
+            } catch (Exception e) {
+                System.err.println("Error fetching total reported reviews: " + e.getMessage());
+            }
 
-        // 전체 페이지 수
-        int totalPages = (int) Math.ceil((double) totalReportedReviews / size);
+            int totalPages = (int) Math.ceil((double) totalReportedReviews / size);
 
-        model.addAttribute("reviews",response.getBody());
-        model.addAttribute("currentPage",page);
-        model.addAttribute("totalPage",totalPages);
-        model.addAttribute("size",size);
-        model.addAttribute("sort",sort);
+            model.addAttribute("reviews", response.getBody());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPage", totalPages);
+            model.addAttribute("size", size);
+            model.addAttribute("sort", sort);
 
-        return "admin/reviewManage";
+            return "admin/reviewManage";
+
+        } catch (Exception e) {
+            // 로그 기록
+            System.err.println("Error fetching reviews: " + e.getMessage());
+            e.printStackTrace();
+
+            model.addAttribute("errorMessage", "리뷰 데이터를 가져오는 중 문제가 발생했습니다.");
+            return "error/500"; // 에러 페이지로 이동
+        }
     }
+
 
     // 특정 리뷰 상세 조회
     @GetMapping("/{reviewId}")
