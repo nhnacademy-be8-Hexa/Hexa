@@ -13,6 +13,7 @@ public record BookSearchDTO(
         int bookAmount,
         Long bookSellCount,
         String publisherName,
-        String bookStatus
+        String bookStatus,
+        String imagePath
 ) {
 }

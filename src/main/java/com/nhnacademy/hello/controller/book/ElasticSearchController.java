@@ -3,7 +3,9 @@ package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.ElasticSearchAdapter;
 import com.nhnacademy.hello.dto.book.BookSearchDTO;
+import com.nhnacademy.hello.image.ImageStore;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/search")
 public class ElasticSearchController {
     private final ElasticSearchAdapter elasticSearchAdapter;
+    private final ImageStore imageStore;
 
     @GetMapping
     public String searchPage(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
@@ -33,7 +36,8 @@ public class ElasticSearchController {
         }
 
         List<BookSearchDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
-        
+        List<BookSearchDTO> searchBooksWithImages = setImagePaths(searchBooks);
+        model.addAttribute("searchBooksWithImages", searchBooksWithImages);
         model.addAttribute("search", search);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
@@ -41,5 +45,33 @@ public class ElasticSearchController {
         model.addAttribute("searchBooks", searchBooks);
 
         return "book/bookSearch";
+    }
+
+    /**
+     * 도서 리스트에 이미지 경로를 설정하는 메소드
+     */
+    private List<BookSearchDTO> setImagePaths(List<BookSearchDTO> searchBooks) {
+        return searchBooks.stream().map(book -> {
+            String imageName = "bookThumbnail_" + book.bookId();
+            List<String> imagePaths = imageStore.getImage(imageName);
+            String imagePath = (imagePaths != null && !imagePaths.isEmpty()) ?
+                    imagePaths.get(0) : "/images/default-book.jpg"; // 기본 이미지 경로로 수정
+            return new BookSearchDTO(
+                    book.bookId(),
+                    book.bookTitle(),
+                    book.bookDescription(),
+                    book.bookPubDate(),
+                    book.bookIsbn(),
+                    book.bookOriginPrice(),
+                    book.bookPrice(),
+                    book.bookWrappable(),
+                    book.bookView(),
+                    book.bookAmount(),
+                    book.bookSellCount(),
+                    book.publisherName(),
+                    book.bookStatus(),
+                    imagePath
+            );
+        }).collect(Collectors.toList());
     }
 }
