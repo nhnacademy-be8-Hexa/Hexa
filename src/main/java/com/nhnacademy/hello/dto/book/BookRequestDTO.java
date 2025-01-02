@@ -5,8 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Positive;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public record BookRequestDTO(
         @NotBlank
@@ -25,11 +28,11 @@ public record BookRequestDTO(
 
         @NotNull
         @Positive
-        int bookOriginPrice,
+        Integer bookOriginPrice,
 
         @NotNull
         @Positive
-        int bookPrice,
+        Integer bookPrice,
 
         @NotNull
         boolean bookWrappable,
@@ -38,7 +41,26 @@ public record BookRequestDTO(
         String publisherId,
 
         @NotNull
-        String bookStatusId
+        String bookStatusId,
+
+        List<Long> categoryIds
+
+
 ) {
+        // 기본 생성자 제공
+        public BookRequestDTO() {
+                this(
+                        "",
+                        "",
+                        null,
+                        null,
+                        null,
+                        null,
+                        false,
+                        "",
+                        "",
+                        new ArrayList<>()
+                );
+        }
 
 }
