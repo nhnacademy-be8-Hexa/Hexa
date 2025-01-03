@@ -18,7 +18,6 @@ public record BookDTO(
         Long bookSellCount,
         PublisherRequestDTO publisher,
         BookStatusRequestDTO bookStatus,
-        String imagePath,
-        Long bookLikeCount // 좋아요 수
+        String imagePath
 ) {
 }
