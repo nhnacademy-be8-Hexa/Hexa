@@ -45,15 +45,23 @@ public class  AdminPageController {
                 0, 5, "", null, null, null, null, true, null, null, null
         );
 
-        // 각 도서의 저자 리스트 가져오기
+        // 각 도서의 저자 및 좋아요 수 가져오기
         Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
+        Map<Long, Long> bookLikesMap = new HashMap<>();
+
         for (BookDTO book : mostVisitedBooks) {
+            // 저자 정보 가져오기
             List<AuthorDTO> authors = bookAdapter.getAuthors(book.bookId());
             bookAuthorsMap.put(book.bookId(), authors);
+
+            // 좋아요 수 가져오기
+            Long likeCount = bookAdapter.getLikeCount(book.bookId()).getBody();
+            bookLikesMap.put(book.bookId(), likeCount);
         }
 
         model.addAttribute("mostVisitedBooks", mostVisitedBooks);
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
+        model.addAttribute("bookLikesMap", bookLikesMap);
 
 
         return "admin/adminPage"; // 템플릿 파일 경로

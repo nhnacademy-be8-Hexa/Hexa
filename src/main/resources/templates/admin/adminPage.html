@@ -45,18 +45,17 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-md-12 col-lg-10">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h3 class="card-title">Most Visited Books</h3>
+                                        <h3 class="card-title">Most View Books</h3>
                                     </div>
                                     <div class="card-table table-responsive">
                                         <table class="table admin-page-table">
                                             <thead>
                                             <tr>
                                                 <th>BOOK NAME</th>
-                                                <th>AUTHOR</th>
+                                                <th>AUTHOR(S)</th>
                                                 <th>LIKES</th>
                                                 <th>BOOK VIEW</th>
                                             </tr>
@@ -64,18 +63,19 @@
                                             <tbody>
                                             <tr th:each="book : ${mostVisitedBooks}">
                                                 <td th:text="${book.bookTitle}"></td>
-                                                <td th:text="${book.publisher.publisherName}"></td>
-                                                <td th:text="${book.bookLikeCount}"></td>
+                                                <td>
+                                                    <ul>
+                                                        <li th:each="author : ${bookAuthorsMap[book.bookId]}" th:text="${author.authorName}"></li>
+                                                    </ul>
+                                                </td>
+                                                <td th:text="${bookLikesMap[book.bookId]}"></td>
                                                 <td th:text="${book.bookView}"></td>
                                             </tr>
                                             </tbody>
                                         </table>
                                     </div>
-
                                 </div>
                             </div>
-
-
                             <div class="col-md-12 col-lg-10">
                                 <div class="card mb-4">
                                     <div class="card-header">
