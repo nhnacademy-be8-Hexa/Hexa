@@ -2,11 +2,13 @@ package com.nhnacademy.hello.controller.purchase;
 
 import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
+import com.nhnacademy.hello.common.feignclient.tossPayment.TossPaymentClient;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
+import com.nhnacademy.hello.dto.purchase.PaymentRequest;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class PurchaseController {
     private final OrderAdapter orderAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
+
+    private final TossPaymentClient tossPaymentClient;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -161,7 +165,13 @@ public class PurchaseController {
             @RequestBody PurchaseDTO purchaseDTO
     ){
         // toss에 결제 승인 요청
-        // POST https://api.tosspayments.com/v1/payments/confirm
+        tossPaymentClient.confirm(
+                new PaymentRequest(
+                        purchaseDTO.paymentKey(),
+                        purchaseDTO.orderId(),
+                        purchaseDTO.amount()
+                )
+        );
 
         // 'WAIT' 주문 상태의 아이디 검색
         Long statusId = 1L;

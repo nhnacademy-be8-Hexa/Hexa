@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Optional;
 
-@Component
 public class FeignClientJwtInterceptor implements RequestInterceptor {
 
     private final HttpServletRequest request;
