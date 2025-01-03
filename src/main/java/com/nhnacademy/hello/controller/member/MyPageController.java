@@ -181,4 +181,20 @@ public class MyPageController {
     public String listCoupon(){
         return "member/couponList";
     }
+
+    @GetMapping("/mypage/delete")
+    public String memberDelete() {
+        MemberUpdateDTO updateDTO = new MemberUpdateDTO(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "3"
+        );
+        // 멤버 상태를 '탈퇴'로 업데이트
+        memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
+        return "redirect:/logout";
+    }
 }
