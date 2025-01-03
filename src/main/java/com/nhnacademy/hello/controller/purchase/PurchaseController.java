@@ -9,6 +9,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nimbusds.openid.connect.sdk.claims.Address;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,10 @@ public class PurchaseController {
 
     private final BookAdapter bookAdapter;
     private final AddressAdapter addressAdapter;
+    private final MemberAdapter memberAdapter;
+
+    @Value("${toss.client.key}")
+    private String tossClientKey;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -58,12 +63,16 @@ public class PurchaseController {
             String sort = "addressId,asc";
             List<AddressDTO> addressList = addressAdapter.getAddresses(memberId, page, size, sort);
             model.addAttribute("addressList", addressList);
+            model.addAttribute("member", memberAdapter.getMember(memberId));
         }
 
         // 바로구매로 넘어올 시 quantity가 있음
         if(quantity != null && quantity > 0) {
             model.addAttribute("buynow_quantity", quantity);
         }
+
+        // toss client key
+        model.addAttribute("clientKey", tossClientKey);
 
         return "purchase/purchase";
     }
