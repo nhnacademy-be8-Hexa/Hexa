@@ -6,48 +6,11 @@
     <title>회원 관리</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
-    <style>
-        /* 모달 스타일 예제 */
-        .modal {
-            display: none; /* 기본적으로 숨김 */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5); /* 반투명 배경 */
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-        }
-    </style>
 </head>
 <body>
 <div class="container">
     <!-- 헤더 -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
@@ -67,7 +30,9 @@
         <div class="col">
             <!-- 검색창 -->
             <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/members">
-                <input type="text" class="form-control" id="search" name="search" placeholder="아이디로 검색" aria-label="Search by ID">
+                <input type="text" class="form-control" id="search" name="search"
+                       placeholder="아이디로 검색"
+                       th:value="${search}" aria-label="Search by ID">
                 <button class="btn btn-primary ms-2" type="submit">검색</button>
             </form>
 
@@ -91,9 +56,9 @@
                     <tr th:each="member : ${members}">
                         <td th:text="${member.memberId}"></td>
                         <td>
-                            <a href="#" th:data-member-id="${member.memberId}"
-                               class="member-detail-link" th:text="${member.memberName}"></a>
+                            <a th:href="@{'/admin/members/' + ${member.memberId}}" th:text="${member.memberName}"></a>
                         </td>
+
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
                         <td th:text="${member.memberBirthAt}"></td>
@@ -115,76 +80,75 @@
                 </table>
 
                 <!-- 페이징 네비게이션 -->
-                <nav aria-label="Page navigation example" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/admin/members'(page=${currentPage - 1}, search=${search})}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
-                            th:classappend="${i eq currentPage} ? 'active'">
-                            <a class="page-link" th:text="${i}"
-                               th:href="@{'/admin/members'(page=${i}, search=${search})}">1</a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/admin/members'(page=${currentPage + 1}, search=${search})}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-
-                <!-- 회원 상세 보기 모달 추가 -->
-                <div id="memberDetailModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="closeModal()">&times;</span>
-                        <h2>회원 상세 정보</h2>
-                        <p><strong>아이디:</strong> <span id="detailMemberId"></span></p>
-                        <p><strong>이름:</strong> <span id="detailMemberName"></span></p>
-                        <p><strong>연락처:</strong> <span id="detailMemberNumber"></span></p>
-                        <p><strong>이메일:</strong> <span id="detailMemberEmail"></span></p>
-                        <p><strong>생일:</strong> <span id="detailMemberBirthAt"></span></p>
-                    </div>
+                <div th:if="${currentPage == null || totalPages == null}">
+                    <p class="text-danger">페이지 정보를 가져오는 데 문제가 발생했습니다. 다시 시도해 주세요.</p>
                 </div>
+                <div th:if="${currentPage != null && totalPages != null}">
+                    <!-- 페이징 네비게이션 -->
+                    <nav aria-label="Page navigation example" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <!-- 이전 버튼 -->
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{'/admin/members'(page=${currentPage > 1 ? currentPage - 1 : 1}, search=${search})}"
+                                   aria-label="Previous">
+                                    &laquo;
+                                </a>
+                            </li>
+
+                            <!-- 페이지 번호 -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" th:text="${i}"
+                                   th:href="@{'/admin/members'(page=${i}, search=${search})}"></a>
+                            </li>
+
+                            <!-- 다음 버튼 -->
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{'/admin/members'(page=${currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}"
+                                   aria-label="Next">
+                                    &raquo;
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
             </div>
         </div>
     </div>
-
-    <script>
-        // 회원 상세보기
-        document.querySelectorAll('.member-detail-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                const memberId = this.getAttribute('data-member-id');
-                fetch(`/admin/members/${memberId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('회원 정보를 가져오는 데 실패했습니다.');
-                        }
-                        return response.json();
-                    })
-                    .then(member => {
-                        document.getElementById('detailMemberId').innerText = member.memberId;
-                        document.getElementById('detailMemberName').innerText = member.memberName;
-                        document.getElementById('detailMemberNumber').innerText = member.memberNumber;
-                        document.getElementById('detailMemberEmail').innerText = member.memberEmail;
-                        document.getElementById('detailMemberBirthAt').innerText = member.memberBirthAt;
-                        document.getElementById('memberDetailModal').style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        alert('회원 정보를 가져오는 중 오류가 발생했습니다.');
-                    });
-            });
-        });
-
-        // 모달 닫기
-        function closeModal() {
-            document.getElementById('memberDetailModal').style.display = 'none';
-        }
-    </script>
+    <!-- 풋터 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 </body>
 </html>
+    <script>
+        // 삭제 버튼 클릭 이벤트
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const memberId = this.dataset.memberId;
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    fetch(`/api/members/${memberId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ memberStatus: '탈퇴' }),
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('회원 상태가 탈퇴로 변경되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            } else {
+                                alert('삭제 실패. 다시 시도해주세요.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('삭제 중 오류가 발생했습니다.');
+                        });
+                }
+            });
+        });
+    </script>

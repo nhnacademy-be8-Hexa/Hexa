@@ -30,7 +30,10 @@
                  th:each="book : ${best_seller_books}"
                  th:data-book-id="${book.bookId()}">
                 <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
+                <div class="book-title"
+                     th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
+                    책 제목
+                </div>
             </div>
 
         </div>
@@ -45,7 +48,10 @@
                  th:each="book : ${most_viewed_books}"
                  th:data-book-id="${book.bookId()}">
                 <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
+                <div class="book-title"
+                     th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
+                    책 제목
+                </div>
             </div>
 
         </div>
@@ -60,7 +66,10 @@
                  th:each="book : ${most_liked_books}"
                  th:data-book-id="${book.bookId()}">
                 <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
-                <div class="book-title" th:text="${#strings.substringBefore(book.bookTitle(), '-')}">책 제목</div>
+                <div class="book-title"
+                     th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
+                    책 제목
+                </div>
             </div>
 
         </div>

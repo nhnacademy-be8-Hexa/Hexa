@@ -186,13 +186,15 @@
 .container-fluid {
     display: flex;
     gap: 20px; /* 사이드 메뉴와 콘텐츠 사이 간격 */
-    padding: 20px;
+    /*padding: 20px;*/
+    background-color: #EFEDF6; /* 배경색 추가 */
 }
 
 .col {
     flex-grow: 1;
     max-width: calc(100% - 200px); /* 세로 메뉴 너비를 제외한 너비 */
     overflow-x: auto; /* 콘텐츠 가로 스크롤 허용 */
+    background-color: #EFEDF6; /* 배경색 추가 */
 }
 
 .modal {
@@ -221,5 +223,8 @@
     right: 10px;
     font-size: 18px;
     cursor: pointer;
+}
+.text-center {
+    text-align: center;
 }
 

@@ -12,13 +12,13 @@ import java.util.List;
 @FeignClient(name = "hexa-gateway", contextId = "reviewAdapter")
 public interface ReviewAdapter {
 
-    @PostMapping("/members/{memberId}/books/{bookId}/reviews")
+    @PostMapping("/api/members/{memberId}/books/{bookId}/reviews")
     public ResponseEntity<Void> createReview(
             @Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
             @PathVariable String memberId,
             @PathVariable Long bookId);
 
-    @GetMapping("/members/{memberId}/reviews")
+    @GetMapping("/api/members/{memberId}/reviews")
     public ResponseEntity<List<ReviewDTO>> getReviewsFromMember(
             @PathVariable String memberId,
             // 페이징
@@ -28,16 +28,16 @@ public interface ReviewAdapter {
     );
 
     // 특정 회원의 리뷰 총계를 조회
-    @GetMapping("/members/{memberId}/reviews/total")
+    @GetMapping("/api/members/{memberId}/reviews/total")
     public ResponseEntity<Long> getTotalReviews(@PathVariable String memberId);
 
 
-    @PutMapping("/reviews/{reviewId}")
+    @PutMapping("/api/reviews/{reviewId}")
     public ResponseEntity<Void> updateReview(
             @Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
             @PathVariable Long reviewId);
 
-    @GetMapping("/books/{bookId}/reviews")
+    @GetMapping("/api/books/{bookId}/reviews")
     public ResponseEntity<List<ReviewDTO>> getReviewsFromBook(
             @PathVariable Long bookId,
             // 페이징
@@ -46,11 +46,11 @@ public interface ReviewAdapter {
             @RequestParam("sort") String sort
             );
 
-    @DeleteMapping("/reviews/{reviewId}")
+    @DeleteMapping("/api/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long reviewId);
 
-    @GetMapping("/reviews")
+    @GetMapping("/api/reviews")
     public ResponseEntity<List<ReviewDTO>> getReviewsFromAdmin(
             // 페이징
             @RequestParam("page") int page,
@@ -58,14 +58,14 @@ public interface ReviewAdapter {
             @RequestParam("sort") String sort
     );
 
-    @PutMapping("/reviews/{reviewId}/block")
+    @PutMapping("/api/reviews/{reviewId}/block")
     public ResponseEntity<Void> updateReviewBlock(
             @PathVariable Long reviewId,
             @RequestParam boolean block
     );
 
     // 신고 5회 이상 받은 리뷰 목록 조회
-    @GetMapping("/reviews/highReport")
+    @GetMapping("/api/reviews/highReport")
     public ResponseEntity<List<ReviewDTO>> getReviewsFromHighReport(
             // 페이징
             @RequestParam("page") int page,
@@ -74,6 +74,6 @@ public interface ReviewAdapter {
     );
 
     // 신고 5회 이상의 리뷰 목록 조회 페이징을 위한 총계
-    @GetMapping("/reviews/highReport/total")
+    @GetMapping("/api/reviews/highReport/total")
     public ResponseEntity<Long> getReviewsFromHighReportTotal();
 }

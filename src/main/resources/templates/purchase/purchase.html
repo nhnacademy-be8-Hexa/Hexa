@@ -8,12 +8,16 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
+
+    <!-- toss payments sdk -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+
 </head>
 <body>
 
 <div class="container mt-5">
 
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <h1>배송</h1>
 
@@ -83,10 +87,10 @@
 
     <!-- 결제 버튼 -->
     <div class="text-center mt-4">
-        <button class="btn btn-primary btn-lg">결제하기</button>
+        <button id="payment-button" class="btn btn-primary btn-lg">toss로 간편 결제하기</button>
     </div>
 
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
 </div>
 
@@ -111,7 +115,23 @@
                         <button class="btn btn-secondary btn-sm" th:attr="data-id=${address.addressId}" onclick="selectAddress(this)">선택</button>
                     </li>
                 </ul>
-                <button class="btn btn-primary w-100" onclick="openAddAddressModal()">새 배송지 추가</button>
+                <!-- Modal 내 '새 배송지 추가' 버튼 비활성화 조건 추가 -->
+                <div class="mt-3">
+                    <button class="btn btn-primary w-100"
+                            th:if="${#lists.size(addressList ?: {}) < 10}"
+                            onclick="openAddAddressModal()">
+                        새 배송지 추가
+                    </button>
+                    <button class="btn btn-primary w-100"
+                            th:if="${#lists.size(addressList ?: {}) >= 10}"
+                            disabled>
+                        배송지 추가 (최대 10개)
+                    </button>
+                </div>
+                <!-- (선택 사항) 최대 배송지 수를 초과했을 때 안내 메시지 추가 -->
+                <div th:if="${#lists.size(addressList ?: {}) >= 10}" class="mt-2 text-danger">
+                    배송지는 최대 10개까지 등록할 수 있습니다.
+                </div>
             </div>
         </div>
     </div>
@@ -171,6 +191,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Daum 우편번호 API 스크립트 -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
 
     // 배송지 변경 버튼 클릭 시 배송지 목록 모달 열기
@@ -278,18 +299,17 @@
             oncomplete: function(data) {
                 // 도로명 주소 변수
                 var roadAddr = data.roadAddress;
-                var jibunAddr = data.jibunAddress;
                 var zonecode = data.zonecode;
 
                 // 주소 표시
                 document.getElementById('newPostCode').value = zonecode;
-                document.getElementById('newAddressDisplay').value = roadAddr || jibunAddr;
+                document.getElementById('newAddressDisplay').value = roadAddr;
             }
         }).open();
     }
 
-    // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
     document.addEventListener("DOMContentLoaded", () => {
+        // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
         // 로컬스토리지에서 cart 데이터를 가져옴
         const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -341,6 +361,82 @@
                 displayTemporaryAddress(tempAddress);
             }
         }
+
+
+        // toss payments
+        // ------  SDK 초기화 ------
+        // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
+        const clientKey = "[[${clientKey}]]";
+        const tossPayments = TossPayments(clientKey);
+        let payment;
+
+        if(isLoggedIn) {
+            // 회원 결제
+            // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
+            const customerKey = btoa( "[[${member?.memberId ?: null}]]" ).substring(0, 50);
+            payment = tossPayments.payment({ customerKey });
+        } else {
+            // 비회원 결제
+            payment = tossPayments.payment({customerKey: TossPayments.ANONYMOUS})
+        }
+
+        // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+        // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
+        document.getElementById("payment-button").addEventListener("click", async () => {
+
+            try{
+                // 결제 정보 설정
+                // 주문 정보 구성
+                const orderId = `order-${Date.now()}`; // 고유한 주문 번호 (예: timestamp)
+                console.log(orderId);
+
+                // 장바구니 테이블에서 책 제목 추출
+                const bookTitles = Array.from(document.querySelectorAll("#cart-items tr"))
+                    .map(row => row.querySelector("td:first-child a").textContent.trim()); // 책 제목 리스트 생성
+
+                // 첫 번째 책 이름 + 나머지 개수
+                let orderName = bookTitles[0];
+                if (bookTitles.length > 1) {
+                    orderName += ` 외 ${bookTitles.length - 1}건`;
+                }
+
+                const paymentData = {};
+
+                // member가 있을 경우에만 해당 필드를 추가
+                if ( isLoggedIn ) {
+                    paymentData.customerEmail = "[[${member?.memberEmail ?: ""}]]";
+                    paymentData.customerName = "[[${member?.memberName ?: ""}]]";
+                    paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
+                }
+
+                await payment.requestPayment({
+                    method: "CARD", // 카드 결제
+                    amount: {
+                        currency: "KRW",
+                        value: totalPrice,
+                    },
+                    orderId: orderId, // 고유 주문번호
+                    orderName: orderName,
+                    successUrl: window.location.origin + "/success", // 결제 요청이 성공하면 리다이렉트되는 URL
+                    failUrl: window.location.origin + "/fail", // 결제 요청이 실패하면 리다이렉트되는 URL
+                    ...paymentData,
+                    // 카드 결제에 필요한 정보
+                    card: {
+                        useEscrow: false,
+                        flowMode: "DEFAULT", // 통합결제창 여는 옵션
+                        useCardPoint: false,
+                        useAppCardOnly: false,
+                    },
+                });
+
+            } catch(error){
+                console.log("결제 중 문제 발생", error);
+                alert("결제 진행 중 문제가 발생했습니다.");
+            }
+
+        });
+
+
     });
 
     // 비로그인 사용자: 임시 주소 표시 함수
@@ -353,7 +449,7 @@
 
         if (recipientNameDisplay && postCode && addressDisplay && addressDetailsDisplay) {
             recipientNameDisplay.textContent = address.addressName;
-            postCode.textContent = address.zoneCode;
+            postCode.textContent = address.zoneCode; // 'zoneCode'로 수정됨
             addressDisplay.textContent = address.address;
             addressDetailsDisplay.textContent = address.addressDetail;
         }
@@ -363,6 +459,9 @@
     function goToAddAddress() {
         openAddAddressModal();
     }
+
+
+
 </script>
 
 </body>
