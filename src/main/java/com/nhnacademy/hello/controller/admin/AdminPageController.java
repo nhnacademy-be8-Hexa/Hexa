@@ -1,8 +1,10 @@
 package com.nhnacademy.hello.controller.admin;
 
+import com.nhnacademy.hello.common.feignclient.AuthorAdapter;
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
+import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +12,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
 public class  AdminPageController {
     private final MemberAdapter memberAdapter;
     private final BookAdapter bookAdapter;
+    private final AuthorAdapter authorAdapter;
+
 
     @GetMapping("/admin")
     public String adminPage(Model model){
@@ -38,7 +44,17 @@ public class  AdminPageController {
         List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(
                 0, 5, "", null, null, null, null, true, null, null, null
         );
+
+        // 각 도서의 저자 리스트 가져오기
+        Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
+        for (BookDTO book : mostVisitedBooks) {
+            List<AuthorDTO> authors = bookAdapter.getAuthors(book.bookId());
+            bookAuthorsMap.put(book.bookId(), authors);
+        }
+
         model.addAttribute("mostVisitedBooks", mostVisitedBooks);
+        model.addAttribute("bookAuthorsMap", bookAuthorsMap);
+
 
         return "admin/adminPage"; // 템플릿 파일 경로
     }
