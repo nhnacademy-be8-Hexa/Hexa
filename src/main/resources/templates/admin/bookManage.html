@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/css/admin.css">
     <!-- Bootstrap CSS 추가 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons (옵션) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
 <div class="container">
@@ -24,7 +26,7 @@
                     <a class="nav-link" href="/admin/members">회원 관리</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/bookManage/books">도서 관리</a>
+                    <a class="nav-link active" href="/admin/bookManage">도서 관리</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
@@ -40,6 +42,14 @@
 
         <!-- 메인 컨텐츠 -->
         <div class="col">
+            <!-- 도서 추가 버튼 -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>도서 관리</h2>
+                <a th:href="@{/admin/bookManage/add}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-2"></i>도서 추가
+                </a>
+            </div>
+
             <!-- 검색창 -->
             <div class="mb-4">
                 <form class="search-bar d-flex" id="searchForm" method="get" action="/admin/bookManage">
@@ -96,7 +106,9 @@
                 <ul class="pagination justify-content-center">
                     <!-- 이전 페이지 버튼 -->
                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/admin/bookManage'(page=${currentPage - 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}" aria-label="Previous">
+                        <a class="page-link"
+                           th:href="@{'/admin/bookManage'(page=${currentPage - 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}"
+                           aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -110,7 +122,9 @@
 
                     <!-- 다음 페이지 버튼 -->
                     <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/admin/bookManage'(page=${currentPage + 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}" aria-label="Next">
+                        <a class="page-link"
+                           th:href="@{'/admin/bookManage'(page=${currentPage + 1}, sort=${sort}, search=${search}, categoryIds=${categoryIds}, publisherName=${publisherName}, authorName=${authorName}, sortByView=${sortByView}, sortBySellCount=${sortBySellCount}, sortByLikeCount=${sortByLikeCount}, latest=${latest})}"
+                           aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
