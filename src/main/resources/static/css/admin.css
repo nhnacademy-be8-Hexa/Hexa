@@ -233,3 +233,9 @@
     margin: 0 !important;
     padding: 0 !important;
 }
+
+.container {
+    max-width: 100% !important; /* Bootstrap 기본 너비 제한 해제 */
+    margin: 0 !important;
+    padding: 0 !important;
+}
