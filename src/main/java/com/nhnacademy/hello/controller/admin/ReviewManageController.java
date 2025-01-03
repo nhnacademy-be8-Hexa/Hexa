@@ -7,15 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/review")
-public class ReviewManageController {
+public class
+ReviewManageController {
     private final ReviewAdapter reviewAdapter;
 
     // 신고 5회 이상 받은 리뷰 전체 조회
