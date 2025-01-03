@@ -7,6 +7,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import java.util.List;
 
 import com.nhnacademy.hello.image.ImageStore;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +40,9 @@ public class BookController {
         // 책의 좋아요 수
         Long likeCount = bookAdapter.getLikeCount(bookId).getBody();
         model.addAttribute("likeCount", likeCount);
+
+        // todo
+        bookAdapter.incrementBookView(bookId);
 
         // 리뷰의 평점 평균 (별 0.5 ~ 5.0)
         // todo
