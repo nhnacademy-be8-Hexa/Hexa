@@ -383,6 +383,7 @@
         // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
         document.getElementById("payment-button").addEventListener("click", async () => {
+            const overlay = document.getElementById("loading-overlay");
 
             try{
                 // 배송 정보 읽기
@@ -452,6 +453,9 @@
                         window.location.href = failUrl;
                     });
 
+                // 서버에 데이터 저장 중 로딩 오버레이
+                overlay.style.display = "block";
+
                 // 결제 데이터 저장 post 요청
                 const response = await fetch('/purchase', {
                     method: 'POST',
@@ -480,6 +484,8 @@
             } catch(error){
                 console.log("결제 에러", error);
                 alert("결제 진행 중 문제가 발생했습니다.");
+            } finally {
+                overlay.style.display = "none";
             }
 
         });
@@ -513,4 +519,30 @@
 </script>
 
 </body>
+
+<!-- 결제 처리 중 로딩 오버레이 -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="spinner"></div>
+        <p style="color: white;">처리 중입니다. 잠시만 기다려주세요...</p>
+    </div>
+</div>
+
+<!-- 로딩 스피너 스타일 -->
+<style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
 </html>
