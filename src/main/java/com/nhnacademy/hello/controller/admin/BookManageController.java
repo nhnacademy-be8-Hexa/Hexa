@@ -169,6 +169,14 @@ public class BookManageController {
         // 도서 등록 API 호출
         ResponseEntity<BookDTO> response = bookAdapter.createBook(bookRequestDTO);
 
+        List<Long> categoryIds = bookRequestDTO.categoryIds();
+
+        for (Long categoryId : categoryIds) {
+            categoryAdapter.insertBook(categoryId, response.getBody().bookId());
+        }
+
+        bookAdapter.incrementBookAmountIncrease(response.getBody().bookId(), bookRequestDTO.bookAmount());
+
         if (response.getStatusCode().is2xxSuccessful()) {
             return "redirect:/admin/bookManage"; // 도서 목록 페이지로 리다이렉트
         } else {
@@ -194,7 +202,7 @@ public class BookManageController {
         BookDTO book = bookAdapter.getBook(bookId);
         if (book == null) {
             // 도서가 존재하지 않을 경우 처리 (예: 에러 페이지로 이동)
-            return "redirect:/admin/bookManage/books";
+            return "redirect:/admin/bookManage/bookManage";
         }
 
         // BookDTO를 BookUpdateRequestDTO로 매핑
