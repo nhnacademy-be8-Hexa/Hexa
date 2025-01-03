@@ -57,21 +57,21 @@
         const memberId = document.getElementById("memberId").value;
 
 
-        // 포인트 합계 불러오기
-        fetch(`/members/${memberId}/pointDetails/sum`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('포인트 합계를 불러오는 데 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById("pointSum").innerText = data;
-            })
-            .catch(error => {
-                console.error('Error fetching point sum:', error);
-                alert('포인트 합계를 불러오는 중 오류가 발생했습니다.');
-            });
+        // // 포인트 합계 불러오기
+        // fetch(`/members/${memberId}/pointDetails/sum`)
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('포인트 합계를 불러오는 데 실패했습니다.');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         document.getElementById("pointSum").innerText = data;
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching point sum:', error);
+        //         alert('포인트 합계를 불러오는 중 오류가 발생했습니다.');
+        //     });
 
         // 포인트 상세 내역 불러오기
         fetch(`/members/${memberId}/pointDetails?page=0&size=10&sort=date,desc`)
