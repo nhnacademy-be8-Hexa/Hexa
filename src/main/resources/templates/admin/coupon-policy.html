@@ -76,7 +76,7 @@
                             <label for="discountType" class="form-label">할인 타입</label>
                             <select class="form-control" id="discountType" required>
                                 <option value="AMOUNT">AMOUNT</option>
-                                <option value="PERCENT">PERCENT</option>
+                                <option value="PERCENTAGE">PERCENTAGE</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -85,12 +85,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="maxDiscountAmount" class="form-label">최대 할인 금액</label>
-                            <input type="number" class="form-control" id="maxDiscountAmount" required>
+                            <input type="text" class="form-control" id="maxDiscountAmount">
                         </div>
                         <div class="mb-3">
                             <label for="eventType" class="form-label">이벤트 타입</label>
-                            <select class="form-control" id="eventType" required>
-                                <option value="" disabled selected>선택하세요</option>
+                            <select class="form-control" id="eventType">
+                                <option value="" selected>선택하세요</option>
                                 <option value="welcome">welcome</option>
                                 <option value="birthday">birthday</option>
                             </select>
@@ -115,7 +115,7 @@
                             <label for="editDiscountType" class="form-label">할인 타입</label>
                             <select class="form-control" id="editDiscountType" required>
                                 <option value="AMOUNT">AMOUNT</option>
-                                <option value="PERCENT">PERCENT</option>
+                                <option value="PERCENTAGE">PERCENTAGE</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -124,12 +124,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="editMaxDiscountAmount" class="form-label">최대 할인 금액</label>
-                            <input type="number" class="form-control" id="editMaxDiscountAmount" required>
+                            <input type="text" class="form-control" id="editMaxDiscountAmount">
                         </div>
                         <div class="mb-3">
                             <label for="editEventType" class="form-label">이벤트 타입</label>
-                            <select class="form-control" id="editEventType" required>
-                                <option value="" disabled selected>선택하세요</option>
+                            <select class="form-control" id="editEventType" >
+                                <option value="" selected>선택하세요</option>
                                 <option value="welcome">welcome</option>
                                 <option value="birthday">birthday</option>
                             </select>
@@ -218,7 +218,10 @@
         const minPurchaseAmount = document.getElementById('minPurchaseAmount').value;
         const discountType = document.getElementById('discountType').value;
         const discountValue = document.getElementById('discountValue').value;
-        const maxDiscountAmount = new Date(document.getElementById('maxDiscountAmount').value);
+        const maxDiscountAmount = document.getElementById('maxDiscountAmount').value;
+        const data = {
+            maxDiscountAmount: maxDiscountAmount === "" ? null : maxDiscountAmount
+        };
         const eventType = document.getElementById('eventType').value;
 
         const newCouponPolicy = {
@@ -226,7 +229,7 @@
             minPurchaseAmount,
             discountType,
             discountValue,
-            maxDiscountAmount,
+            data,
             eventType
         };
 
@@ -286,7 +289,10 @@
         const minPurchaseAmount = document.getElementById('editMinPurchaseAmount').value;
         const discountType = document.getElementById('editDiscountType').value;
         const discountValue = document.getElementById('editDiscountValue').value;
-        const maxDiscountAmount = document.getElementById('editMaxDiscountAmount').value;
+        const maxDiscountAmount = document.getElementById('maxDiscountAmount').value;
+        const data = {
+            maxDiscountAmount: maxDiscountAmount === "" ? null : maxDiscountAmount
+        };
         const eventType = document.getElementById('editEventType').value;
 
         const updatedCouponPolicy = {
@@ -294,7 +300,7 @@
             minPurchaseAmount,
             discountType,
             discountValue,
-            maxDiscountAmount,
+            data,
             eventType
         };
 
