@@ -222,4 +222,7 @@
     font-size: 18px;
     cursor: pointer;
 }
+.text-center {
+    text-align: center;
+}
 

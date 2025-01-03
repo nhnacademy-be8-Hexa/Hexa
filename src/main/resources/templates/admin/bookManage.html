@@ -19,26 +19,7 @@
     <!-- 전체 레이아웃 -->
     <div class="row g-4 p-4">
         <!-- 사이드 메뉴 바 -->
-        <div class="col-auto bg-light border rounded p-3" style="width: 250px;">
-            <h4 class="text-center">메뉴</h4>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/members">회원 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/admin/bookManage">도서 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/reviewManage">리뷰 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/coupon">쿠폰 발행</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/point">포인트 관리</a>
-                </li>
-            </ul>
-        </div>
+        <div th:replace="~{fragments/admin :: admin}"></div>
 
         <!-- 메인 컨텐츠 -->
         <div class="col">
