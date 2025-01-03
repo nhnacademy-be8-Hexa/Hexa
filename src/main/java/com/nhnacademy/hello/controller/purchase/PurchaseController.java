@@ -151,4 +151,33 @@ public class PurchaseController {
             return ResponseEntity.ok(response);
         }
     }
+
+    // 결제 정보 처리
+    @PostMapping("/purchase")
+    public ResponseEntity<?> purchase(
+
+    ){
+
+        return ResponseEntity.ok("결제 성공.");
+    }
+
+    // 결제 성공 페이지
+    @GetMapping("/purchase/success")
+    public String purchaseSuccess(
+
+    ) {
+
+        return "purchase/success";
+    }
+
+    //결제 실패 페이지
+    @GetMapping("/purchase/fail")
+    public String purchaseFail(
+
+    ) {
+
+        return "purchase/fail";
+    }
+
 }
+
