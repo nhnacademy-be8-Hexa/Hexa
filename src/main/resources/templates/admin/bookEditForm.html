@@ -14,9 +14,10 @@
 
     <div class="row g-4 p-4">
         <!-- 사이드 메뉴 바 -->
-        <div th:replace="~{fragments/admin :: admin}"></div>
+        <div th:replace="~{fragments/admin :: admin}" class="col-md-3"></div>
 
-        <div class="col-9">
+        <!-- 도서 수정 컨텐츠 -->
+        <div class="col-md-9">
             <h2>도서 수정</h2>
 
             <form id="bookEditForm"
