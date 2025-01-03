@@ -6,6 +6,7 @@ import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import com.nhnacademy.hello.dto.point.PointDetailsDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/members/{memberId}/pointDetails")
 @RequiredArgsConstructor
+@Slf4j
 public class PointDetailsController {
     private final PointDetailsAdapter pointDetailsAdapter;
 
@@ -60,6 +62,8 @@ public class PointDetailsController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "date,desc") String sort) {
-        return pointDetailsAdapter.getPointDetails(memberId, page, size, sort);
+        ResponseEntity<List<PointDetailsDTO>> pointDetails = pointDetailsAdapter.getPointDetails(memberId, page, size, sort);
+        log.info(pointDetails.getBody().toString());
+        return pointDetails;
     }
 }
