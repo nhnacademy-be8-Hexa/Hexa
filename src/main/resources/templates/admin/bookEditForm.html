@@ -17,7 +17,7 @@
         <div th:replace="~{fragments/admin :: admin}" class="col-md-3"></div>
 
         <!-- 도서 수정 컨텐츠 -->
-        <div class="col-md-9">
+        <div class="col">
             <h2>도서 수정</h2>
 
             <form id="bookEditForm"
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="editor" class="form-label">설명:</label>
+                    <label for="content" class="form-label">설명:</label>
                     <div id="editor"></div>
                     <textarea id="content" name="bookDescription" style="display:none;"
                               th:field="*{bookDescription}"></textarea>
