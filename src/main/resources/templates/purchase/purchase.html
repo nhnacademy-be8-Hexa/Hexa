@@ -385,6 +385,17 @@
         document.getElementById("payment-button").addEventListener("click", async () => {
 
             try{
+                // 배송 정보 읽기
+                const zoneCode = document.getElementById("postCode").textContent.trim();
+                const address = document.getElementById("addressDisplay").textContent.trim();
+                const addressDetail = document.getElementById("addressDetailsDisplay").textContent.trim();
+
+                // 주소 값 확인
+                if (!zoneCode || !address || !addressDetail) {
+                    alert("주소를 설정해주세요.");
+                    return; // 결제 요청 중단
+                }
+
                 // 결제 정보 설정
                 // 주문 정보 구성
                 const orderId = `order-${Date.now()}`; // 고유한 주문 번호 (예: timestamp)
@@ -452,6 +463,9 @@
                         orderId: result.orderId,
                         amount: result.amount.value,
                         books: books,
+                        zoneCode: zoneCode,
+                        address: address,
+                        addressDetail: addressDetail,
                     }),
                 });
 
