@@ -18,7 +18,8 @@
 
         <!-- 메인 콘텐츠 영역 -->
         <div class="flex-grow-1 bg-white border rounded p-3">
-            <h1 class="text-center mb-4">내 쿠폰함</h1>
+            <h1 id="couponListTitle" class="text-center">내 쿠폰함</h1>
+            <button id="toggleCouponButton" class="btn btn-secondary">사용된 쿠폰 보기</button>
             <table class="table">
                 <thead>
                 <tr>
@@ -43,8 +44,22 @@
 </html>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        // 페이지 로드 시 쿠폰 리스트 불러오기
+        let showingUsedCoupons = false; // 현재 보여주고 있는 쿠폰 상태
         loadCouponList();
+
+        const toggleButton = document.getElementById("toggleCouponButton");
+        toggleButton.addEventListener("click", function() {
+            showingUsedCoupons = !showingUsedCoupons; // 상태 변경
+            if (showingUsedCoupons) {
+                document.getElementById("couponListTitle").innerText = "사용된 쿠폰 목록";
+                toggleButton.innerText = "사용할 수 있는 쿠폰 보기";
+                loadUsedCouponList();
+            } else {
+                document.getElementById("couponListTitle").innerText = "내 쿠폰함";
+                toggleButton.innerText = "사용된 쿠폰 보기";
+                loadCouponList();
+            }
+        });
     });
 
     function loadCouponList() {
@@ -68,8 +83,56 @@
                     return;
                 }
 
-                // 쿠폰 ID를 사용해 상세 데이터 호출
                 return fetch(`/coupons?couponIds=${couponIds}`);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 상세 데이터를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(detailedCoupons => {
+                const tableBody = document.getElementById('userCouponTableBody');
+                tableBody.innerHTML = ''; // 기존 데이터를 비웁니다.
+
+                detailedCoupons.forEach((coupon, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><a href="#" onclick="openDetailModal('${coupon.couponId}')">${coupon.couponName}</a></td>
+
+                        <td>${coupon.couponDeadline}</td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading coupons:', error);
+                alert('쿠폰 리스트를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    function loadUsedCouponList() {
+        const memberId = /*[[(${member.memberId})]]*/ '';
+
+        console.log(memberId);
+
+        fetch(`/members/${memberId}/coupons`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('쿠폰 데이터를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(coupons => {
+                // 쿠폰 ID 배열 생성
+                const couponIds = coupons.map(coupon => coupon.couponId).join(',');
+                if (!couponIds) {
+                    alert("사용한 쿠폰이 없습니다.");
+                    return;
+                }
+
+                return fetch(`/coupons?couponIds=${couponIds}&active=false`);
             })
             .then(response => {
                 if (!response.ok) {
