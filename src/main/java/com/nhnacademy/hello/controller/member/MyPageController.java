@@ -181,4 +181,10 @@ public class MyPageController {
     public String listCoupon(){
         return "member/couponList";
     }
+
+    @GetMapping("/mypage/points")
+    public String pointsPage(Model model) {
+        MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
+        model.addAttribute("member", member);
+        return "member/points"; }
 }

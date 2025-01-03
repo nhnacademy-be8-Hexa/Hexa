@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>포인트 정책 관리</title>
+  <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .main-content {
+      margin-left: 20px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1050;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .modal.show {
+      display: block;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+    }
+    .table {
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div th:replace="~{fragments/header :: header}"></div>
+  <div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col"><h1 class="page-title">ADMIN PAGE</h1></div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <div th:replace="~{fragments/admin :: admin}"></div>
+    <div class="main-content">
+      <div class="container-xl py-4">
+        <h2>포인트 정책 관리</h2>
+        <div class="button-container">
+          <button class="btn btn-primary" id="createPointPolicyButton" onclick="toggleModal('createPointPolicyModal')">포인트 정책 생성</button>
+        </div>
+
+        <!-- 생성 모달 -->
+        <div id="createPointPolicyModal" class="modal">
+          <h5 class="modal-title">포인트 정책 생성</h5>
+          <form>
+            <div class="mb-3">
+              <label for="pointPolicyName" class="form-label">포인트 정책 이름</label>
+              <input type="text" class="form-control" id="pointPolicyName" maxlength="20" required>
+            </div>
+            <div class="mb-3">
+              <label for="pointDelta" class="form-label">포인트 증감</label>
+              <input type="number" class="form-control" id="pointDelta" required>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="toggleModal('createPointPolicyModal')">취소</button>
+            <button type="button" class="btn btn-primary" onclick="submitCreatePointPolicy()">저장</button>
+          </form>
+        </div>
+
+        <!-- 수정 모달 -->
+        <div id="editPointPolicyModal" class="modal">
+          <h5 class="modal-title">포인트 정책 수정</h5>
+          <form>
+            <div class="mb-3">
+              <label for="editPointPolicyName" class="form-label">포인트 정책 이름</label>
+              <input type="text" class="form-control" id="editPointPolicyName" maxlength="20" required readonly>
+            </div>
+            <div class="mb-3">
+              <label for="editPointDelta" class="form-label">포인트 증감</label>
+              <input type="number" class="form-control" id="editPointDelta" required>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="toggleModal('editPointPolicyModal')">취소</button>
+            <button type="button" class="btn btn-primary" onclick="submitEditPointPolicy()">저장</button>
+          </form>
+        </div>
+
+        <!-- 테이블 -->
+        <table class="table">
+          <thead>
+          <tr>
+            <th>번호</th>
+            <th>포인트 정책 이름</th>
+            <th>포인트 증감</th>
+            <th>수정</th>
+            <th>삭제</th>
+          </tr>
+          </thead>
+          <tbody id="pointPolicyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", loadPointPolicyList);
+
+  function toggleModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.toggle('show');
+  }
+
+  function loadPointPolicyList() {
+    fetch('/pointPolicies')
+            .then(response => {
+              if (!response.ok) throw new Error('포인트 정책 데이터를 불러오는 데 실패했습니다.');
+              return response.json();
+            })
+            .then(policies => {
+              const tableBody = document.getElementById('pointPolicyTableBody');
+              tableBody.innerHTML = '';
+              policies.forEach((policy, index) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${policy.pointPolicyName}</td>
+            <td>${policy.pointDelta}</td>
+            <td><button class="btn btn-warning btn-sm" onclick="editPointPolicy('${policy.pointPolicyName}', ${policy.pointDelta})">수정</button></td>
+            <td><button class="btn btn-danger btn-sm" onclick="deletePointPolicy('${policy.pointPolicyName}')">삭제</button></td>
+          `;
+                tableBody.appendChild(newRow);
+              });
+            })
+            .catch(() => alert('포인트 정책 리스트를 불러오는 중 오류가 발생했습니다.'));
+  }
+
+  function submitCreatePointPolicy() {
+    const pointPolicyName = document.getElementById('pointPolicyName').value.trim();
+    const pointDelta = document.getElementById('pointDelta').value.trim();
+
+    if (!pointPolicyName || !pointDelta) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    const newPointPolicy = { pointPolicyName, pointDelta: parseInt(pointDelta) };
+
+    fetch('/pointPolicies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPointPolicy)
+    })
+            .then(response => {
+              if (!response.ok) throw new Error('포인트 정책 생성 실패');
+              alert('포인트 정책이 성공적으로 생성되었습니다.');
+              toggleModal('createPointPolicyModal');
+              loadPointPolicyList();
+            })
+            .catch(() => alert('포인트 정책 생성 중 오류가 발생했습니다.'));
+  }
+
+  function editPointPolicy(name, delta) {
+    document.getElementById('editPointPolicyName').value = name;
+    document.getElementById('editPointDelta').value = delta;
+    document.getElementById('editPointPolicyModal').setAttribute('data-name', name);
+    toggleModal('editPointPolicyModal');
+  }
+
+  function submitEditPointPolicy() {
+    const name = document.getElementById('editPointPolicyModal').getAttribute('data-name');
+    const pointDelta = document.getElementById('editPointDelta').value.trim();
+
+    if (!pointDelta) {
+      alert('포인트 증감을 입력해주세요.');
+      return;
+    }
+
+    const updatedPointPolicy = { pointPolicyName: name, pointDelta: parseInt(pointDelta) };
+
+    fetch('/pointPolicies', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedPointPolicy)
+    })
+            .then(response => {
+              if (!response.ok) throw new Error('포인트 정책 수정 실패');
+              alert('포인트 정책이 성공적으로 수정되었습니다.');
+              toggleModal('editPointPolicyModal');
+              loadPointPolicyList();
+            })
+            .catch(() => alert('포인트 정책 수정 중 오류가 발생했습니다.'));
+  }
+
+  function deletePointPolicy(name) {
+    if (!confirm(`${name}을(를) 삭제하시겠습니까?`)) return;
+
+    fetch(`/pointPolicies/${name}`, { method: 'DELETE' })
+            .then(response => {
+              if (!response.ok) throw new Error('포인트 정책 삭제 실패');
+              alert(`${name}이(가) 삭제되었습니다.`);
+              loadPointPolicyList();
+            })
+            .catch(() => alert('포인트 정책 삭제 중 오류가 발생했습니다.'));
+  }
+</script>
+</body>
+</html>
