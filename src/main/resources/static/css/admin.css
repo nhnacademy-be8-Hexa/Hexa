@@ -228,3 +228,8 @@
     text-align: center;
 }
 
+/* 도서 관리 배경색 때문에 적용*/
+.container, .row, .col .container-fluid {
+    margin: 0 !important;
+    padding: 0 !important;
+}
