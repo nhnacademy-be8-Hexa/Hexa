@@ -1,23 +1,21 @@
 package com.nhnacademy.hello.controller.purchase;
 
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.member.MemberDTO;
-import com.nimbusds.openid.connect.sdk.claims.Address;
+import com.nhnacademy.hello.dto.order.OrderRequestDTO;
+import com.nhnacademy.hello.dto.order.OrderStatusDTO;
+import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
+import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -31,6 +29,11 @@ public class PurchaseController {
     private final BookAdapter bookAdapter;
     private final AddressAdapter addressAdapter;
     private final MemberAdapter memberAdapter;
+
+    // 주문 정보
+    private final OrderAdapter orderAdapter;
+    private final WrappingPaperAdapter wrappingPaperAdapter;
+    private final OrderStatusAdapter orderStatusAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -151,4 +154,62 @@ public class PurchaseController {
             return ResponseEntity.ok(response);
         }
     }
+
+    // 결제 정보 저장
+    @PostMapping("/purchase")
+    public ResponseEntity<?> purchase(
+            @RequestBody PurchaseDTO purchaseDTO
+    ){
+        // toss에 결제 승인 요청
+        // POST https://api.tosspayments.com/v1/payments/confirm
+
+        // 'WAIT' 주문 상태의 아이디 검색
+        Long statusId = 1L;
+        for(OrderStatusDTO dto : orderStatusAdapter.getAllOrderStatus()){
+            if(dto.orderStatus().equals("WAIT")){
+                statusId = dto.orderStatusId();
+                break;
+            }
+        }
+
+        // order 저장
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
+                AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
+                purchaseDTO.amount(),
+                null,
+                statusId,
+                purchaseDTO.zoneCode(),
+                purchaseDTO.address(),
+                purchaseDTO.addressDetail()
+        );
+
+        orderAdapter.createOrder(
+                orderRequestDTO,
+                purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
+                purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
+                null
+                );
+
+        return ResponseEntity.ok("결제 성공.");
+    }
+
+    // 결제 성공 페이지
+    @GetMapping("/purchase/success")
+    public String purchaseSuccess(
+
+    ) {
+
+        return "purchase/success";
+    }
+
+    //결제 실패 페이지
+    @GetMapping("/purchase/fail")
+    public String purchaseFail(
+
+    ) {
+
+        return "purchase/fail";
+    }
+
 }
+
