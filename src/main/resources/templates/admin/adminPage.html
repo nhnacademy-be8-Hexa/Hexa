@@ -19,12 +19,12 @@
 <script src="/css/dist/demo-theme.min.js?1692870487"></script>
 <div class="container">
     <!-- 헤더 포함 -->
-    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}" class="col-3"></div>
 
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">
-                <div class="col">
+                <div class="col-9">
                     <h1 class="page-title">ADMIN PAGE</h1>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 <div class="page-body">
                     <div class="container-xl">
                         <div class="row row-deck row-cards">
-                            <div class="col-md-12 col-lg-8">
+                            <div class="col-md-12 col-lg-10">
                                 <div class="card">
                                     <div class="card-body">
                                         <h3 class="card-title">카테고리별 판매된 도서 수</h3>
@@ -45,57 +45,38 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-12 col-lg-8">
+                            <div class="col-md-12 col-lg-10">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h3 class="card-title">Most Visited Books</h3>
+                                        <h3 class="card-title">Most View Books</h3>
                                     </div>
                                     <div class="card-table table-responsive">
                                         <table class="table admin-page-table">
                                             <thead>
                                             <tr>
                                                 <th>BOOK NAME</th>
-                                                <th>AUTHOR</th>
+                                                <th>AUTHOR(S)</th>
                                                 <th>LIKES</th>
                                                 <th>BOOK VIEW</th>
                                             </tr>
                                             </thead>
-                                            <tr>
-                                                <td>/</td>
-                                                <td class="text-secondary">4,896</td>
-                                                <td class="text-secondary">3,654</td>
-                                                <td class="text-secondary">82.54%</td>
+                                            <tbody>
+                                            <tr th:each="book : ${mostVisitedBooks}">
+                                                <td th:text="${book.bookTitle}"></td>
+                                                <td>
+                                                    <ul>
+                                                        <li th:each="author : ${bookAuthorsMap[book.bookId]}" th:text="${author.authorName}"></li>
+                                                    </ul>
+                                                </td>
+                                                <td th:text="${bookLikesMap[book.bookId]}"></td>
+                                                <td th:text="${book.bookView}"></td>
                                             </tr>
-                                            <tr>
-                                                <td>/form-elements.html</td>
-                                                <td class="text-secondary">3,652</td>
-                                                <td class="text-secondary">3,215</td>
-                                                <td class="text-secondary">76.29%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/index.html</td>
-                                                <td class="text-secondary">3,256</td>
-                                                <td class="text-secondary">2,865</td>
-                                                <td class="text-secondary">72.65%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/icons.html</td>
-                                                <td class="text-secondary">986</td>
-                                                <td class="text-secondary">865</td>
-                                                <td class="text-secondary">44.89%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/docs/</td>
-                                                <td class="text-secondary">912</td>
-                                                <td class="text-secondary">822</td>
-                                                <td class="text-secondary">41.12%</td>
-                                            </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12 col-lg-8">
+                            <div class="col-md-12 col-lg-10">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h3 class="card-title">배송 상태 관리</h3>
@@ -174,7 +155,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12 col-lg-8">
+                            <div class="col-md-12 col-lg-10">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h3 class="card-title">반품 상태 관리</h3>

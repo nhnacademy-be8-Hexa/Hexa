@@ -9,6 +9,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nimbusds.openid.connect.sdk.claims.Address;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,10 @@ public class PurchaseController {
 
     private final BookAdapter bookAdapter;
     private final AddressAdapter addressAdapter;
+    private final MemberAdapter memberAdapter;
+
+    @Value("${toss.client.key}")
+    private String tossClientKey;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -58,6 +63,7 @@ public class PurchaseController {
             String sort = "addressId,asc";
             List<AddressDTO> addressList = addressAdapter.getAddresses(memberId, page, size, sort);
             model.addAttribute("addressList", addressList);
+            model.addAttribute("member", memberAdapter.getMember(memberId));
         }
 
         // 바로구매로 넘어올 시 quantity가 있음
@@ -65,8 +71,12 @@ public class PurchaseController {
             model.addAttribute("buynow_quantity", quantity);
         }
 
+        // toss client key
+        model.addAttribute("clientKey", tossClientKey);
+
         return "purchase/purchase";
     }
+
     // 배송지 선택 처리
     @PostMapping("/select-address")
     @ResponseBody
@@ -110,23 +120,35 @@ public class PurchaseController {
             @RequestParam String detailAddress,
             Principal principal
     ) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        if (principal != null) {
+            // 로그인된 사용자: 주소를 데이터베이스에 저장
+            String memberId = principal.getName();
+            AddressDTO newAddress = AddressDTO.builder()
+                    .addressName(recipientName)
+                    .zoneCode(zonecode)
+                    .address(address)
+                    .addressDetail(detailAddress)
+                    .build();
+
+            AddressDTO createdAddress = addressAdapter.addAddress(memberId, newAddress);
+
+            // JSON 응답 반환
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "배송지가 추가되었습니다.");
+            return ResponseEntity.ok(response);
+        } else {
+            // 비로그인 사용자: 주소 데이터를 클라이언트에 반환
+            AddressDTO tempAddress = AddressDTO.builder()
+                    .addressName(recipientName)
+                    .zoneCode(zonecode)
+                    .address(address)
+                    .addressDetail(detailAddress)
+                    .build();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "배송지가 추가되었습니다.");
+            response.put("address", tempAddress);
+            return ResponseEntity.ok(response);
         }
-
-        String memberId = principal.getName();
-        AddressDTO newAddress = AddressDTO.builder()
-                .addressName(recipientName)
-                .zoneCode(zonecode)
-                .address(address)
-                .addressDetail(detailAddress)
-                .build();
-
-        AddressDTO createdAddress = addressAdapter.addAddress(memberId, newAddress);
-
-        // JSON 응답 반환
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "배송지가 추가되었습니다.");
-        return ResponseEntity.ok(response);
     }
 }

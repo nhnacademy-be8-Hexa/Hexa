@@ -2,8 +2,10 @@ package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
+import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
 import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
 import com.nhnacademy.hello.dto.book.*;
+import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +27,15 @@ public class BookManageController {
     private final PublisherAdapter publisherAdapter;
     private final BookStatusAdapter bookStatusAdapter;
     private final ImageStore imageStore;
+    private final CategoryAdapter categoryAdapter;
 
     @Autowired
-    public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter, BookStatusAdapter bookStatusAdapter, ImageStore imageStore) {
+    public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter, BookStatusAdapter bookStatusAdapter, ImageStore imageStore, CategoryAdapter categoryAdapter) {
         this.bookAdapter = bookAdapter;
         this.publisherAdapter = publisherAdapter;
         this.bookStatusAdapter = bookStatusAdapter;
         this.imageStore = imageStore;
+        this.categoryAdapter = categoryAdapter;
     }
 
     @GetMapping
@@ -113,37 +117,83 @@ public class BookManageController {
         return "admin/bookManage";
     }
 
-    // 도서 등록 폼
-    @GetMapping("/new")
-    public String showCreateBookForm(Model model) {
-        BookRequestDTO bookRequestDTO = new BookRequestDTO(
-                "", "", null, null, 0, 0, false, "", ""
-        );
+    /**
+     * 도서 등록 폼 페이지 로드
+     *
+     * @param model 모델 객체
+     * @return 도서 등록 페이지 뷰
+     */
+    @GetMapping("/add")
+    public String showAddBookForm(Model model) {
+        BookRequestDTO bookRequestDTO = new BookRequestDTO();
         model.addAttribute("bookRequestDTO", bookRequestDTO);
-        model.addAttribute("isEdit", false);
 
-        // 출판사 목록 추가 (선택 사항)
+        // 출판사 목록 불러오기
         List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
         model.addAttribute("publishers", publishers);
 
-        return "admin/bookCreateForm"; // 도서 등록 폼 템플릿
+        // 카테고리 목록 불러오기
+        ResponseEntity<List<CategoryDTO>> categoriesResponse = categoryAdapter.getCategories();
+        if (categoriesResponse.getStatusCode().is2xxSuccessful()) {
+            model.addAttribute("categories", categoriesResponse.getBody());
+        } else {
+            model.addAttribute("categories", List.of());
+        }
+
+        return "admin/bookCreateForm"; // Thymeleaf 템플릿 경로
     }
 
-    // 도서 등록 처리
-    @PostMapping("/new")
-    public String createBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO,
-                             BindingResult bindingResult,
-                             Model model) {
+    /**
+     * 도서 등록 처리 (POST /admin/bookManage/add)
+     *
+     * @param bookRequestDTO 도서 등록 정보
+     * @return 도서 목록 페이지로 리다이렉트
+     */
+    @PostMapping("/add")
+    public String addBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("isEdit", false);
+            // 출판사 목록과 카테고리 목록을 다시 모델에 추가
             List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
             model.addAttribute("publishers", publishers);
+
+            ResponseEntity<List<CategoryDTO>> categoriesResponse = categoryAdapter.getCategories();
+            if (categoriesResponse.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("categories", categoriesResponse.getBody());
+            } else {
+                model.addAttribute("categories", List.of());
+            }
+
             return "admin/bookCreateForm";
         }
 
-        // 도서 생성 로직
-        bookAdapter.createBook(bookRequestDTO);
-        return "redirect:/admin/bookManage/books";
+        // 도서 등록 API 호출
+        ResponseEntity<BookDTO> response = bookAdapter.createBook(bookRequestDTO);
+
+        List<Long> categoryIds = bookRequestDTO.categoryIds();
+
+        for (Long categoryId : categoryIds) {
+            categoryAdapter.insertBook(categoryId, response.getBody().bookId());
+        }
+
+        bookAdapter.incrementBookAmountIncrease(response.getBody().bookId(), bookRequestDTO.bookAmount());
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return "redirect:/admin/bookManage"; // 도서 목록 페이지로 리다이렉트
+        } else {
+            model.addAttribute("error", "도서 등록에 실패했습니다.");
+            // 출판사 목록과 카테고리 목록을 다시 모델에 추가
+            List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
+            model.addAttribute("publishers", publishers);
+
+            ResponseEntity<List<CategoryDTO>> categoriesResponse = categoryAdapter.getCategories();
+            if (categoriesResponse.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("categories", categoriesResponse.getBody());
+            } else {
+                model.addAttribute("categories", List.of());
+            }
+
+            return "admin/bookCreateForm";
+        }
     }
 
     // 도서 수정 폼
@@ -152,7 +202,7 @@ public class BookManageController {
         BookDTO book = bookAdapter.getBook(bookId);
         if (book == null) {
             // 도서가 존재하지 않을 경우 처리 (예: 에러 페이지로 이동)
-            return "redirect:/admin/bookManage/books";
+            return "redirect:/admin/bookManage/bookManage";
         }
 
         // BookDTO를 BookUpdateRequestDTO로 매핑

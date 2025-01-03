@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 @Controller
@@ -20,29 +21,43 @@ public class MemberManageController {
 
     // 멤버 전체 조회
     @GetMapping
-    public String getMembers(@RequestParam(defaultValue = "0") int page,
+    public String getMembers(@RequestParam(defaultValue = "1") int page,
                              @RequestParam(required = false) String search,
                              Model model) {
         List<MemberDTO> members;
+        int totalPages = 1; // 기본값
 
-        if (search != null && !search.trim().isEmpty()) {
-            // 특정 아이디로 검색
-            members = memberAdapter.getMembers(page, search);
-        } else {
-            // 전체 회원 조회
-            members = memberAdapter.getMembers(page, null);
+        try {
+            if (search != null && !search.trim().isEmpty()) {
+                // 특정 아이디로 검색
+                members = memberAdapter.getMembers(page - 1, search.trim());
+            } else {
+                // 전체 회원 조회
+                members = memberAdapter.getMembers(page - 1, null);
+            }
+
+            // 전체 페이지 수 계산 (여기서는 더미 값 사용)
+            totalPages = Math.max(1, (int) Math.ceil(members.size() / 10.0)); // 예제용
+        } catch (Exception e) {
+            model.addAttribute("error", "회원 데이터를 불러오는 중 오류가 발생했습니다.");
+            members = List.of(); // 빈 목록 반환
         }
 
         model.addAttribute("members", members);
+        model.addAttribute("currentPage", page); // 기본값: 1
+        model.addAttribute("totalPages", totalPages); // 기본값: 1
         model.addAttribute("search", search); // 검색어 유지
         return "admin/memberManage"; // 멤버 관리 페이지
     }
 
     // 특정 회원 상세 조회
     @GetMapping("/{memberId}")
-    @ResponseBody
-    public MemberDTO getMember(@PathVariable String memberId) {
-        return memberAdapter.getMember(memberId);
+    public String getMemberDetail(@PathVariable String memberId, Model model) {
+        MemberDTO member = memberAdapter.getMember(memberId);
+
+        model.addAttribute("member",member);
+
+        return "admin/memberDetail";
     }
 
     // 특정 회원 수정 페이지

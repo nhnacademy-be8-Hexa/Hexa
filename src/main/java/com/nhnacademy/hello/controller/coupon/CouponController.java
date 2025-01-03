@@ -24,7 +24,7 @@ public class CouponController {
         return couponAdapter.getCouponById(couponId);
     }
 
-    // 모든 쿠폰 조회
+    // 모든 쿠폰 조회 & 유저가 가진 쿠폰들 조회
     @GetMapping
     public List<CouponDTO> getCouponsByActive(
             @RequestParam(required = false) List<Long> couponIds,
