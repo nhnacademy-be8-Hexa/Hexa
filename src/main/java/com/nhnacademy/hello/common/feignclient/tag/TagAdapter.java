@@ -12,7 +12,7 @@ import java.util.List;
 @FeignClient(name = "hexa-gateway", contextId = "tagAdapter")
 public interface TagAdapter {
     @PostMapping("/admin/tags")
-    public ResponseEntity<Void> createTag(
+    public ResponseEntity<TagDTO> createTag(
             @RequestBody @Valid TagRequestDTO requestDTO
     );
 

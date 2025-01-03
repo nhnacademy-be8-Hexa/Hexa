@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>BOOK Detail</title>
@@ -83,6 +83,9 @@
                 <div class="d-flex">
                     <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
                     <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin/bookManage" class="btn btn-outline-primary ms-2">도서 정보 수정</a>
+
+
                 </div>
 
             </div>
@@ -92,23 +95,14 @@
         <!-- 태그 섹션 -->
         <div class="row mt-4">
             <div class="col-md-8">
-                <h4>태그</h4>
+
                 <ul class="list-group mb-3">
                     <li class="list-group-item" th:each="tag : ${tags}">
                         <span th:text="${tag.name}">태그 이름</span>
-                        <!-- admin 권한일 때 CRUD 버튼 표시 -->
-                        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="float-end">
-                            <a th:href="@{'/tags/edit/' + ${tag.id}}" class="btn btn-sm btn-primary me-1">수정</a>
-                            <form th:action="@{'/tags/delete/' + ${tag.id}}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-                            </form>
-                        </span>
+
                     </li>
                 </ul>
-                <!-- admin 권한일 때 태그 추가 버튼 표시 -->
-                <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="mb-3">
-                    <a href="/tags/create" class="btn btn-success">태그 추가</a>
-                </div>
+
             </div>
         </div>
 
@@ -177,6 +171,52 @@
             // 바로 구매 페이지로 이동
             window.location.href = purchaseUrl;
         });
+
+
+        document.getElementById('addTagButton').addEventListener('click', function () {
+            const tagName = document.getElementById('newTagName').value.trim();
+
+            if (!tagName) {
+                alert('태그 이름을 입력해주세요.');
+                return;
+            }
+
+            fetch('/tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: tagName })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('태그 추가에 실패했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(newTag => {
+                    const tagList = document.querySelector('.list-group');
+                    const newTagElement = document.createElement('li');
+                    newTagElement.className = 'list-group-item';
+                    newTagElement.innerHTML = `
+                    <span>${newTag.name}</span>
+                    <span th:if="${#authorization.expression('hasRole("ADMIN")')}" class="float-end">
+                            <a th:href="@{'/tags/edit/' + ${newTag.id}}" class="btn btn-sm btn-primary me-1">수정</a>
+                            <form th:action="@{'/tags/' + ${newTag.id}}" method="post" style="display:inline;">
+                            <input type="hidden" name="_method" value="delete" />
+                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                            </form>
+                        </span>
+            `;
+                    tagList.appendChild(newTagElement);
+                    document.getElementById('newTagName').value = ''; // 입력 필드 초기화
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
+
+
 
     </script>
 

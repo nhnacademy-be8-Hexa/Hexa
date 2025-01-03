@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(name = "hexa-gateway", contextId = "bookTagAdapter")
-public interface BooKTagController {
+public interface BooKTagAdapter {
 
     @PostMapping("/admin/books/{bookId}/tags/{tagId}")
     public ResponseEntity<Void> addBookTag(@PathVariable Long bookId, @PathVariable Long tagId);
