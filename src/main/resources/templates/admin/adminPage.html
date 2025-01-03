@@ -61,40 +61,21 @@
                                                 <th>BOOK VIEW</th>
                                             </tr>
                                             </thead>
-                                            <tr>
-                                                <td>/</td>
-                                                <td class="text-secondary">4,896</td>
-                                                <td class="text-secondary">3,654</td>
-                                                <td class="text-secondary">82.54%</td>
+                                            <tbody>
+                                            <tr th:each="book : ${mostVisitedBooks}">
+                                                <td th:text="${book.bookTitle}"></td>
+                                                <td th:text="${book.publisher.publisherName}"></td>
+                                                <td th:text="${book.bookLikeCount}"></td>
+                                                <td th:text="${book.bookView}"></td>
                                             </tr>
-                                            <tr>
-                                                <td>/form-elements.html</td>
-                                                <td class="text-secondary">3,652</td>
-                                                <td class="text-secondary">3,215</td>
-                                                <td class="text-secondary">76.29%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/index.html</td>
-                                                <td class="text-secondary">3,256</td>
-                                                <td class="text-secondary">2,865</td>
-                                                <td class="text-secondary">72.65%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/icons.html</td>
-                                                <td class="text-secondary">986</td>
-                                                <td class="text-secondary">865</td>
-                                                <td class="text-secondary">44.89%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>/docs/</td>
-                                                <td class="text-secondary">912</td>
-                                                <td class="text-secondary">822</td>
-                                                <td class="text-secondary">41.12%</td>
-                                            </tr>
+                                            </tbody>
                                         </table>
                                     </div>
+
                                 </div>
                             </div>
+
+
                             <div class="col-md-12 col-lg-8">
                                 <div class="card mb-4">
                                     <div class="card-header">
