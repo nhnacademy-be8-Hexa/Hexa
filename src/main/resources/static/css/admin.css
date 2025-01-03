@@ -194,6 +194,7 @@
     flex-grow: 1;
     max-width: calc(100% - 200px); /* 세로 메뉴 너비를 제외한 너비 */
     overflow-x: auto; /* 콘텐츠 가로 스크롤 허용 */
+    background-color: #EFEDF6; /* 배경색 추가 */
 }
 
 .modal {

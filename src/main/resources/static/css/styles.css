@@ -23,6 +23,7 @@ body {
     max-width: 100%;
     padding: 0;
     flex-grow: 1; /* 풋터가 항상 화면 하단에 위치하도록 */
+    background-color: #EFEDF6; /* 배경색 추가 */
 }
 
 /* 헤더 스타일 */
