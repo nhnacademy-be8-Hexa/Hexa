@@ -62,7 +62,13 @@ public class LoginController {
         response.addCookie(cookie);
 
         // 로그인 시간 업데이트 요청을 보낸다
-        memberAdapter.loginMember(loginRequest.id());
+        try {
+            memberAdapter.loginMember(loginRequest.id());
+        } catch (Exception e) {
+            model.addAttribute("error", "로그인 실패!");
+            return "login";
+        }
+
 
 
 //        List<CartDTO> carts = new ArrayList<>();
