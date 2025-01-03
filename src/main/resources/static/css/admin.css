@@ -187,7 +187,7 @@
     display: flex;
     gap: 20px; /* 사이드 메뉴와 콘텐츠 사이 간격 */
     /*padding: 20px;*/
-    /*background-color: #EFEDF6; !* 배경색 추가 *!*/
+    background-color: #EFEDF6; /* 배경색 추가 */
 }
 
 .col {
@@ -234,3 +234,7 @@
     padding: 0 !important;
 }
 
+/* 부트스트랩 카드와 테이블의 배경색 통일 */
+.table, .card {
+    background-color: #FFFFFF; /* 카드와 테이블 배경 하얀색 */
+}
