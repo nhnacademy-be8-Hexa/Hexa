@@ -3,11 +3,13 @@ package com.nhnacademy.hello.common.feignclient;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusRequestDTO;
 import jakarta.validation.Valid;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@FeignClient(name="hexa-gateway", contextId = "orderStatusAdapter")
 public interface OrderStatusAdapter {
 
     @GetMapping
