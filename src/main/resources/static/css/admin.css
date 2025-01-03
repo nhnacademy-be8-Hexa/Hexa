@@ -187,7 +187,7 @@
     display: flex;
     gap: 20px; /* 사이드 메뉴와 콘텐츠 사이 간격 */
     /*padding: 20px;*/
-    background-color: #EFEDF6; /* 배경색 추가 */
+    /*background-color: #EFEDF6; !* 배경색 추가 *!*/
 }
 
 .col {
