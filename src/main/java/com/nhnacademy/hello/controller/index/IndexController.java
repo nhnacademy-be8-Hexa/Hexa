@@ -82,8 +82,7 @@ public class IndexController {
                     book.bookSellCount(),
                     book.publisher(),
                     book.bookStatus(),
-                    imagePath,
-                    book.bookLikeCount()
+                    imagePath
             );
         }).collect(Collectors.toList());
     }
