@@ -202,4 +202,10 @@ public class MyPageController {
         memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
         return "redirect:/logout";
     }
+
+    @GetMapping("/mypage/points")
+    public String pointsPage(Model model) {
+        MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
+        model.addAttribute("member", member);
+        return "member/points"; }
 }
