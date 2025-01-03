@@ -42,7 +42,6 @@ public class PointDetailsController {
      */
     @GetMapping("/sum")
     public ResponseEntity<Long> getPointSum(@PathVariable String memberId) {
-        System.out.println("Fetching total points for memberId: " + memberId);
         return pointDetailsAdapter.sumPoint(memberId);
     }
 
@@ -63,7 +62,7 @@ public class PointDetailsController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "date,desc") String sort) {
         ResponseEntity<List<PointDetailsDTO>> pointDetails = pointDetailsAdapter.getPointDetails(memberId, page, size, sort);
-        log.info(pointDetails.getBody().toString());
+        log.warn(pointDetails.toString());
         return pointDetails;
     }
 }
