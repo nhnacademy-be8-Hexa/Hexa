@@ -1,11 +1,17 @@
 package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.dto.category.CategoryDTO;
+import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
+import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
+import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "hexa-gateway", contextId = "categoryAdapter", path = "/api/categories")
 public interface CategoryAdapter {
@@ -20,8 +26,9 @@ public interface CategoryAdapter {
      * @param category 생성할 카테고리 정보
      * @return 생성된 카테고리 정보
      */
+
     @PostMapping
-    ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO category);
+    ResponseEntity<PagedCategoryDTO> createCategory(@RequestBody FirstCategoryRequestDTO category);
 
     /**
      * 특정 1차 카테고리에 2차 카테고리 삽입
@@ -30,8 +37,9 @@ public interface CategoryAdapter {
      * @param subCategoryId 삽입할 2차 카테고리의 ID
      * @return 생성된 2차 카테고리 정보
      */
+
     @PostMapping("/{categoryId}/subcategories/{subCategoryId}")
-    ResponseEntity<CategoryDTO> insertSubCategory(
+    ResponseEntity<PagedCategoryDTO> insertCategory(
             @PathVariable("categoryId") Long categoryId,
             @PathVariable("subCategoryId") Long subCategoryId
     );
@@ -48,6 +56,19 @@ public interface CategoryAdapter {
             @PathVariable("categoryId") Long categoryId,
             @PathVariable("bookId") Long bookId
     );
+
+
+    @GetMapping("/paged")
+    ResponseEntity<List<PagedCategoryDTO>> getAllPagedCategories(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    );
+
+    @GetMapping("/total")
+    ResponseEntity<Long> getTotal();
+
+    @GetMapping("/unPaged")
+    ResponseEntity<List<PagedCategoryDTO>> getAllUnPagedCategories();
 
     /**
      * 카테고리 삭제
