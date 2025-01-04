@@ -1,6 +1,7 @@
 package com.nhnacademy.hello.controller.member;
 
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
@@ -26,6 +27,7 @@ public class MyPageController {
 
     private final MemberAdapter memberAdapter;
     private final AddressAdapter addressAdapter;
+    private final PointDetailsAdapter pointDetailsAdapter;
 
     @GetMapping("/mypage")
     public String myPage(
@@ -207,5 +209,6 @@ public class MyPageController {
     public String pointsPage(Model model) {
         MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
         model.addAttribute("member", member);
+        model.addAttribute("sum", pointDetailsAdapter.sumPoint(AuthInfoUtils.getUsername()));
         return "member/points"; }
 }

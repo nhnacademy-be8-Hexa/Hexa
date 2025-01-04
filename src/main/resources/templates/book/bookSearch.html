@@ -7,7 +7,7 @@
 
     <!-- 외부 CSS 파일 링크 -->
     <link rel="stylesheet" href="/css/styles.css">
-
+    
     <script>
         // 책을 클릭 시 상세 페이지로 이동
         function goToBookPage(bookId) {
@@ -27,7 +27,7 @@
         <h2 class="section-title">검색 결과</h2>
 
         <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
-        <div th:if="${#lists.isEmpty(searchBooks)}" class="no-results">
+        <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
             <p>검색 결과가 없습니다.</p>
         </div>
 
