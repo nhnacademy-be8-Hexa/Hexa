@@ -59,13 +59,16 @@ public interface CategoryAdapter {
 
 
     @GetMapping("/paged")
-    ResponseEntity<List<PagedCategoryDTO>> getAllCategories(
+    ResponseEntity<List<PagedCategoryDTO>> getAllPagedCategories(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     );
 
     @GetMapping("/total")
-    ResponseEntity<Long> getTotalCategories();
+    ResponseEntity<Long> getTotal();
+
+    @GetMapping("/unPaged")
+    ResponseEntity<List<PagedCategoryDTO>> getAllUnPagedCategories();
 
     /**
      * 카테고리 삭제

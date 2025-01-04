@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <!-- 헤더 -->
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="row g-4 p-4">
         <!-- 사이드 메뉴 바 -->
@@ -47,7 +47,7 @@
                 </div>
             </div>
 
-            <form action="/admin/categoryManage/new" method="post">
+            <form action="/admin/categoryManage" method="post">
                 <div class="mb-3">
                     <label for="categoryName" class="form-label">Category Name</label>
                     <input type="text" class="form-control" id="categoryName" name="categoryName" required
@@ -71,6 +71,7 @@
                     <th>카테고리 이름</th>
                     <th>부모 카테고리</th>
                     <th>부모 카테고리 수정</th>
+                    <th>삭제</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -85,35 +86,47 @@
                         <span th:text="${category.parentCategory != null ? category.parentCategory.categoryName : '없음'}"></span>
                     </td>
                     <td>
-                        <form action="/admin/categoryManage/insert" method="post">
+                        <form action="/admin/categoryManage/add" method="post">
                             <!-- 카테고리 ID를 hidden input으로 전송 -->
                             <input type="hidden" name="subCategoryId" th:value="${category.categoryId}">
                             <!-- 드롭다운에서 선택된 부모 카테고리 ID는 자동으로 전송됨 -->
-                            <div style="display: inline-block; margin-right: 10px;">
-                                <select class="form-select" name="categoryId">
-                                    <option th:each="parentCategory : ${pagedCategories}"
-                                            th:value="${parentCategory.categoryId}"
-                                            th:text="${parentCategory.categoryName}"
-                                            th:selected="${category.parentCategory != null && category.parentCategory.categoryId == parentCategory.categoryId}"
-                                            th:if="${parentCategory.parentCategory == null && parentCategory.categoryId != category.categoryId}">
-                                    </option>
-                                </select>
-                            </div>
-                            <div style="display: inline-block;">
-                                <!-- 수정 버튼 비활성화 처리 -->
-                                <button type="submit" class="btn"
-                                        style="background-color: #9E8DBF; color: white;"
-                                        th:disabled="${#lists.contains(categoriesWithSubCategories, category.categoryId)}">
-                                    수정
-                                </button>
+                            <div class="d-flex align-items-center">
+                                <!-- 드롭다운 -->
+                                <div class="me-2">
+                                    <select class="form-select" name="categoryId">
+                                        <option th:each="parentCategory : ${unPagedCategories}"
+                                                th:value="${parentCategory.categoryId}"
+                                                th:text="${parentCategory.categoryName}"
+                                                th:selected="${category.parentCategory != null && category.parentCategory.categoryId == parentCategory.categoryId}"
+                                                th:if="${parentCategory.parentCategory == null && parentCategory.categoryId != category.categoryId}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <!-- 수정 버튼 -->
+                                <div>
+                                    <button type="submit" class="btn"
+                                            style="background-color: #9E8DBF; color: white;"
+                                            th:disabled="${#lists.contains(categoriesWithSubCategories, category.categoryId)}">
+                                        수정
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </td>
+                    <td>
+                        <form th:action="@{/admin/categoryManage/{categoryId}(categoryId=${category.categoryId})}"
+                              method="post"
+                              onsubmit="return confirm('정말로 이 카테고리를 삭제하시겠습니까?');">
+                            <input type="hidden" name="categoryId" th:value="${category.categoryId}">
+                            <button type="submit" class="btn btn-danger">삭제</button>
+                        </form>
 
-
+                    </td>
                 </tr>
                 </tbody>
             </table>
+
+
         </div>
     </div>
 
@@ -151,7 +164,7 @@
 </div>
 
 <!-- 풋터 -->
-<div th:replace="fragments/footer :: footer"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 

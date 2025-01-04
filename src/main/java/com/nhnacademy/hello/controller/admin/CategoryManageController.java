@@ -7,12 +7,14 @@ import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.category.SecondCategoryRequestDTO;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,13 +30,14 @@ public class CategoryManageController {
     }
 
     @GetMapping
-    public String categoryList(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-                               Model model) {
+    public String categoryList(
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            Model model) {
         final int size = 9;
 
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
-        Long totalCategories = categoryAdapter.getTotalCategories().getBody();
+        Long totalCategories = categoryAdapter.getTotal().getBody();
 
         int totalPages = (int) Math.ceil((double) totalCategories / size);
 
@@ -42,13 +45,15 @@ public class CategoryManageController {
             adjustedPage = totalPages - 1;
             page = totalPages;
         }
-        List<CategoryDTO> categoryList = categoryAdapter.getCategories().getBody();
-        List<Long> categoriesWithSubCategories = getCategoriesWithSubCategories(categoryList);
 
-        List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllCategories(adjustedPage, size).getBody();
+        List<CategoryDTO> categories = categoryAdapter.getCategories().getBody();
+        List<Long> categoriesWithSubCategories = findCategoriesIdsWithSubCategories(Objects.requireNonNull(categories));
+        List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllPagedCategories(adjustedPage, size).getBody();
+        List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
 
+        model.addAttribute("unPagedCategories", unPagedCategories);
         model.addAttribute("categoriesWithSubCategories", categoriesWithSubCategories);
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
@@ -61,22 +66,27 @@ public class CategoryManageController {
     }
 
 
-    @PostMapping("/new")
+    @PostMapping
     public String createFirstCategory(
             @Valid @ModelAttribute("firstCategoryRequestDTO") FirstCategoryRequestDTO firstCategoryRequestDTO) {
         categoryAdapter.createCategory(firstCategoryRequestDTO);
         return "redirect:/admin/categoryManage";
     }
 
-    @PostMapping("/insert")
+    @PostMapping("/add")
     public String createSecondCategory(
             @Valid @ModelAttribute("secondCategoryRequestDTO") SecondCategoryRequestDTO secondCategoryRequestDTO) {
         categoryAdapter.insertCategory(secondCategoryRequestDTO.categoryId(), secondCategoryRequestDTO.subCategoryId());
         return "redirect:/admin/categoryManage";
     }
 
-    public List<Long> getCategoriesWithSubCategories(List<CategoryDTO> allCategories) {
+    @PostMapping("/{categoryId}")
+    public String deleteCategory(@PathVariable Long categoryId) {
+        categoryAdapter.deleteCategory(categoryId);
+        return "redirect:/admin/categoryManage";
+    }
 
+    public List<Long> findCategoriesIdsWithSubCategories(List<CategoryDTO> allCategories) {
         return allCategories.stream()
                 .filter(category -> !category.getSubCategories().isEmpty())
                 .map(CategoryDTO::getCategoryId)
