@@ -447,16 +447,13 @@
                     },
                 };
 
-                const result = await payment.requestPayment(paymentRequest)
-                    .catch(err => {
-                        const failUrl = `/purchase/fail?error=${err}`;
-                        window.location.href = failUrl;
-                    });
+                // 결제 요청
+                const result = await payment.requestPayment(paymentRequest);
 
                 // 서버에 데이터 저장 중 로딩 오버레이
                 overlay.style.display = "block";
 
-                // 결제 데이터 저장 post 요청
+                // 결제 승인, 데이터 저장
                 const response = await fetch('/purchase', {
                     method: 'POST',
                     headers: {
@@ -473,8 +470,9 @@
                     }),
                 });
 
-                if(!response.ok) {
-                    throw new Error('결제 정보 전달 실패!');
+                if (!response.ok) {
+                    const errorMessage = await response.text(); // 서버에서 보낸 에러 메시지 받기
+                    throw new Error(`서버 오류: ${errorMessage}`);
                 }
 
                 // GET /purchase/success
@@ -482,8 +480,11 @@
                 window.location.href = successUrl;
 
             } catch(error){
-                console.log("결제 에러", error);
-                alert("결제 진행 중 문제가 발생했습니다.");
+                console.error("결제 에러", error);
+
+                // 에러 메시지와 코드를 fail 페이지로 전달
+                const failUrl = `/purchase/fail?errorCode=${encodeURIComponent(error.code)}&errorMessage=${encodeURIComponent(error.message)}`;
+                window.location.href = failUrl;
             } finally {
                 overlay.style.display = "none";
             }
@@ -524,7 +525,7 @@
 <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="spinner"></div>
-        <p style="color: white;">처리 중입니다. 잠시만 기다려주세요...</p>
+        <p style="color: white;">결제 처리 중입니다. 잠시만 기다려주세요...</p>
     </div>
 </div>
 

@@ -19,7 +19,18 @@
 
   <div th:replace="~{fragments/header :: header}"></div>
 
-  <h1>주문이 완료되었습니다.</h1>
+  <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+    <div class="text-center">
+      <h1>주문이 완료되었습니다.</h1>
+      <p class="h4 text-success">
+        주문하신 상품: <span th:text="${orderName}"></span>
+      </p>
+      <p class="h4 text-primary">
+        총 결제 금액: <span th:text="${totalPrice}"></span> 원
+      </p>
+      <a href="/" class="btn btn-primary mt-4">홈으로</a>
+    </div>
+  </div>
 
   <div th:replace="~{fragments/footer :: footer}"></div>
 

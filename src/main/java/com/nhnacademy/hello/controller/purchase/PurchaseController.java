@@ -17,7 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +43,9 @@ public class PurchaseController {
 
     @Value("${toss.client.key}")
     private String tossClientKey;
+
+    @Value("${toss.secret.key}")
+    private String tossSecretKey;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -160,8 +169,32 @@ public class PurchaseController {
     public ResponseEntity<?> purchase(
             @RequestBody PurchaseDTO purchaseDTO
     ){
+
         // toss에 결제 승인 요청
-        // POST https://api.tosspayments.com/v1/payments/confirm
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .header("Authorization", "Basic " + tossSecretKey)
+                .header("Content-Type", "application/json")
+                .method("POST", HttpRequest.BodyPublishers.ofString("{\"paymentKey\":\"" + purchaseDTO.paymentKey() + "\",\"orderId\":\"" + purchaseDTO.orderId() + "\",\"amount\":" + purchaseDTO.amount() + "}"))
+                .build();
+
+        try {
+            HttpResponse<?> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 성공적인 응답
+            if (response.statusCode() != 200) {
+                // 토스에서 반환한 에러 메시지
+                return ResponseEntity
+                        .status(response.statusCode())
+                        .body(response.body());
+            }
+
+        } catch (IOException | InterruptedException e) {
+            // 시스템 예외
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("결제 처리 중 내부 오류가 발생했습니다.");
+        }
 
         // 'WAIT' 주문 상태의 아이디 검색
         Long statusId = 1L;
@@ -196,18 +229,24 @@ public class PurchaseController {
     // 결제 성공 페이지
     @GetMapping("/purchase/success")
     public String purchaseSuccess(
-
+            @RequestParam("orderName") String orderName,
+            @RequestParam("amount") String amount,
+            Model model
     ) {
-
+        model.addAttribute("orderName", orderName);
+        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(Double.valueOf(amount)));
         return "purchase/success";
     }
 
     //결제 실패 페이지
     @GetMapping("/purchase/fail")
     public String purchaseFail(
-
+            @RequestParam("errorCode") String errorCode,
+            @RequestParam("errorMessage") String errorMessage,
+            Model model
     ) {
-
+        model.addAttribute("errorCode", errorCode);
+        model.addAttribute("errorMessage", errorMessage);
         return "purchase/fail";
     }
 
