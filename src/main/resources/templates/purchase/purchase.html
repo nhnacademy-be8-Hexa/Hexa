@@ -383,12 +383,23 @@
         // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
         document.getElementById("payment-button").addEventListener("click", async () => {
+            const overlay = document.getElementById("loading-overlay");
 
             try{
+                // 배송 정보 읽기
+                const zoneCode = document.getElementById("postCode").textContent.trim();
+                const address = document.getElementById("addressDisplay").textContent.trim();
+                const addressDetail = document.getElementById("addressDetailsDisplay").textContent.trim();
+
+                // 주소 값 확인
+                if (!zoneCode || !address || !addressDetail) {
+                    alert("주소를 설정해주세요.");
+                    return; // 결제 요청 중단
+                }
+
                 // 결제 정보 설정
                 // 주문 정보 구성
                 const orderId = `order-${Date.now()}`; // 고유한 주문 번호 (예: timestamp)
-                console.log(orderId);
 
                 // 장바구니 테이블에서 책 제목 추출
                 const bookTitles = Array.from(document.querySelectorAll("#cart-items tr"))
@@ -409,7 +420,16 @@
                     paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
                 }
 
-                await payment.requestPayment({
+                // 화면에 표시된 책 정보 가져오기
+                const books = Array.from(document.querySelectorAll("#cart-items tr")).map(row => {
+                    const bookId = parseInt(row.dataset.bookId, 10);
+                    const quantity = parseInt(row.querySelector(".quantity").textContent, 10);
+
+                    return { bookId, quantity };
+                });
+
+                // 결제 요청 데이터
+                const paymentRequest = {
                     method: "CARD", // 카드 결제
                     amount: {
                         currency: "KRW",
@@ -417,8 +437,6 @@
                     },
                     orderId: orderId, // 고유 주문번호
                     orderName: orderName,
-                    successUrl: window.location.origin + "/success", // 결제 요청이 성공하면 리다이렉트되는 URL
-                    failUrl: window.location.origin + "/fail", // 결제 요청이 실패하면 리다이렉트되는 URL
                     ...paymentData,
                     // 카드 결제에 필요한 정보
                     card: {
@@ -427,11 +445,47 @@
                         useCardPoint: false,
                         useAppCardOnly: false,
                     },
+                };
+
+                const result = await payment.requestPayment(paymentRequest)
+                    .catch(err => {
+                        const failUrl = `/purchase/fail?error=${err}`;
+                        window.location.href = failUrl;
+                    });
+
+                // 서버에 데이터 저장 중 로딩 오버레이
+                overlay.style.display = "block";
+
+                // 결제 데이터 저장 post 요청
+                const response = await fetch('/purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentKey: result.paymentKey,
+                        orderId: result.orderId,
+                        amount: result.amount.value,
+                        books: books,
+                        zoneCode: zoneCode,
+                        address: address,
+                        addressDetail: addressDetail,
+                    }),
                 });
 
+                if(!response.ok) {
+                    throw new Error('결제 정보 전달 실패!');
+                }
+
+                // GET /purchase/success
+                const successUrl = `/purchase/success?orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
+                window.location.href = successUrl;
+
             } catch(error){
-                console.log("결제 중 문제 발생", error);
+                console.log("결제 에러", error);
                 alert("결제 진행 중 문제가 발생했습니다.");
+            } finally {
+                overlay.style.display = "none";
             }
 
         });
@@ -465,4 +519,30 @@
 </script>
 
 </body>
+
+<!-- 결제 처리 중 로딩 오버레이 -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="spinner"></div>
+        <p style="color: white;">처리 중입니다. 잠시만 기다려주세요...</p>
+    </div>
+</div>
+
+<!-- 로딩 스피너 스타일 -->
+<style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
 </html>
