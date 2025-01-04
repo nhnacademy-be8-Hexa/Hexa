@@ -1,7 +1,6 @@
 package com.nhnacademy.hello.common.config;
 
 import com.nhnacademy.hello.common.interceptor.FeignClientJwtInterceptor;
-import com.nhnacademy.hello.common.interceptor.TossPaymentInterceptor;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

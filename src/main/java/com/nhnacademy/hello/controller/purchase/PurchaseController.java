@@ -2,13 +2,11 @@ package com.nhnacademy.hello.controller.purchase;
 
 import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
-import com.nhnacademy.hello.common.feignclient.tossPayment.TossPaymentClient;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
-import com.nhnacademy.hello.dto.purchase.PaymentRequest;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +41,11 @@ public class PurchaseController {
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
 
-    private final TossPaymentClient tossPaymentClient;
-
     @Value("${toss.client.key}")
     private String tossClientKey;
+
+    @Value("${toss.secret.key}")
+    private String tossSecretKey;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -164,14 +169,32 @@ public class PurchaseController {
     public ResponseEntity<?> purchase(
             @RequestBody PurchaseDTO purchaseDTO
     ){
+
         // toss에 결제 승인 요청
-        tossPaymentClient.confirm(
-                new PaymentRequest(
-                        purchaseDTO.paymentKey(),
-                        purchaseDTO.orderId(),
-                        purchaseDTO.amount()
-                )
-        );
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .header("Authorization", "Basic " + tossSecretKey)
+                .header("Content-Type", "application/json")
+                .method("POST", HttpRequest.BodyPublishers.ofString("{\"paymentKey\":\"" + purchaseDTO.paymentKey() + "\",\"orderId\":\"" + purchaseDTO.orderId() + "\",\"amount\":" + purchaseDTO.amount() + "}"))
+                .build();
+
+        try {
+            HttpResponse<?> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 성공적인 응답
+            if (response.statusCode() != 200) {
+                // 토스에서 반환한 에러 메시지
+                return ResponseEntity
+                        .status(response.statusCode())
+                        .body(response.body());
+            }
+
+        } catch (IOException | InterruptedException e) {
+            // 시스템 예외
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("결제 처리 중 내부 오류가 발생했습니다.");
+        }
 
         // 'WAIT' 주문 상태의 아이디 검색
         Long statusId = 1L;
@@ -215,9 +238,12 @@ public class PurchaseController {
     //결제 실패 페이지
     @GetMapping("/purchase/fail")
     public String purchaseFail(
-
+            @RequestParam("errorCode") String errorCode,
+            @RequestParam("errorMessage") String errorMessage,
+            Model model
     ) {
-
+        model.addAttribute("errorCode", errorCode);
+        model.addAttribute("errorMessage", errorMessage);
         return "purchase/fail";
     }
 
