@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,9 +229,12 @@ public class PurchaseController {
     // 결제 성공 페이지
     @GetMapping("/purchase/success")
     public String purchaseSuccess(
-
+            @RequestParam("orderName") String orderName,
+            @RequestParam("amount") String amount,
+            Model model
     ) {
-
+        model.addAttribute("orderName", orderName);
+        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(Double.valueOf(amount)));
         return "purchase/success";
     }
 
