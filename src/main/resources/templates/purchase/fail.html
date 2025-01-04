@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>결제 오류</title>
+  <title>Fail</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,18 +19,7 @@
 
   <div th:replace="~{fragments/header :: header}"></div>
 
-  <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
-    <div class="text-center">
-      <h1>결제 도중 문제가 발생했습니다.</h1>
-      <p class="text-muted small">
-        <span th:text="'{' + ${errorCode} + '}: ' + ${errorMessage}"></span>
-      </p>
-
-      <!-- 뒤로가기 버튼 -->
-      <a href="javascript:history.back();" class="btn" style="background-color: #6a0dad; color: white; border: none; padding: 10px 20px; border-radius: 5px;">뒤로가기</a>
-
-    </div>
-  </div>
+  <h1>주문 중에 문제가 발생했습니다.</h1>
 
   <div th:replace="~{fragments/footer :: footer}"></div>
 

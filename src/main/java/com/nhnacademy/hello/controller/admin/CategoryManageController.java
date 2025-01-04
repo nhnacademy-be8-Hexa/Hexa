@@ -52,7 +52,7 @@ public class CategoryManageController {
         List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-        
+
         model.addAttribute("unPagedCategories", unPagedCategories);
         model.addAttribute("categoriesWithSubCategories", categoriesWithSubCategories);
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
