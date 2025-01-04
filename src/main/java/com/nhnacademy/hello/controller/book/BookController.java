@@ -2,10 +2,12 @@ package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
+import com.nhnacademy.hello.common.feignclient.tag.TagAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import java.util.List;
 
+import com.nhnacademy.hello.dto.tag.TagDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class BookController {
     private final BookAdapter bookAdapter;
     private final ReviewAdapter reviewAdapter;
     private final ImageStore imageStore;
+    private final TagAdapter tagAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -61,6 +64,10 @@ public class BookController {
                 imagePaths.get(0) : "/images/default-book.jpg"; // 기본 이미지 경로로 수정
 
         model.addAttribute("thumbnailImage", imagePath);
+
+        //책의 태그
+        List<TagDTO> tags = tagAdapter.getAllTags().getBody();
+        model.addAttribute("tags", tags);
 
         return "book/bookDetail";
     }

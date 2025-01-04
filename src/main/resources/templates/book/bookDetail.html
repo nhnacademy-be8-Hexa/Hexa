@@ -84,6 +84,7 @@
                     <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
                     <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
                     <a sec:authorize="hasRole('ADMIN')" href="/admin/bookManage" class="btn btn-outline-primary ms-2">도서 정보 수정</a>
+                    <a sec:authorize="hasRole('ADMIN')" href="/admin/tagManage" class="btn btn-outline-dark ms-2" >태그 정보 수정</a>
 
 
                 </div>
@@ -98,7 +99,7 @@
 
                 <ul class="list-group mb-3">
                     <li class="list-group-item" th:each="tag : ${tags}">
-                        <span th:text="${tag.name}">태그 이름</span>
+                        <span th:text="${tag.tagName()}">태그 이름</span>
 
                     </li>
                 </ul>

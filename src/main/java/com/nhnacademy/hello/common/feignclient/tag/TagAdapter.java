@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway", contextId = "tagAdapter")
+@FeignClient(name = "hexa-gateway", contextId = "tagAdapter" ,path = "/api")
 public interface TagAdapter {
     @PostMapping("/admin/tags")
     public ResponseEntity<TagDTO> createTag(
