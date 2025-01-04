@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.controller.admin;
 
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.member.MemberDTO;
@@ -15,10 +16,10 @@ public class CouponPageController {
     private final MemberAdapter memberAdapter;
 
     @GetMapping("/admin/coupon")
-    public String adminPage(Model model) {
+    public String adminPage(Model model){
 
         // 로그인 검사
-        if (!AuthInfoUtils.isLogin()) {
+        if(!AuthInfoUtils.isLogin()){
             return "redirect:/login";
         }
 
@@ -26,11 +27,11 @@ public class CouponPageController {
         MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
 
         // 관리자인지 검사
-        if (!"ADMIN".equals(memberDTO.memberRole())) {
+        if(!"ADMIN".equals(memberDTO.memberRole())){
             return "redirect:/index";
         }
 
-        model.addAttribute("member", memberDTO);
+        model.addAttribute("member",memberDTO);
 
         return "admin/coupon";
     }
