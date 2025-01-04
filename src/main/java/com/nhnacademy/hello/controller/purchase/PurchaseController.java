@@ -230,11 +230,11 @@ public class PurchaseController {
     @GetMapping("/purchase/success")
     public String purchaseSuccess(
             @RequestParam("orderName") String orderName,
-            @RequestParam("amount") String amount,
+            @RequestParam("amount") Double amount,
             Model model
     ) {
         model.addAttribute("orderName", orderName);
-        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(Double.valueOf(amount)));
+        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(amount));
         return "purchase/success";
     }
 
