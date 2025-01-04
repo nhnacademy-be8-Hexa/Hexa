@@ -72,9 +72,12 @@
                             <input type="hidden" name="subCategoryId" th:value="${category.categoryId}">
                             <!-- 드롭다운에서 선택된 부모 카테고리 ID는 자동으로 전송됨 -->
                             <div class="d-flex align-items-center">
+
                                 <!-- 드롭다운 -->
                                 <div class="me-2">
                                     <select class="form-select" name="categoryId">
+                                        <option value="0" th:selected="${category.parentCategory == null}">없음
+                                        </option>
                                         <option th:each="parentCategory : ${unPagedCategories}"
                                                 th:value="${parentCategory.categoryId}"
                                                 th:text="${parentCategory.categoryName}"
