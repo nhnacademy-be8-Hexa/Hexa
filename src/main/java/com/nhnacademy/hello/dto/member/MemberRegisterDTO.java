@@ -1,9 +1,8 @@
 package com.nhnacademy.hello.dto.member;
 
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
-
 import java.time.LocalDate;
+import org.hibernate.validator.constraints.Length;
 
 public record MemberRegisterDTO(
         @Length(min = 3, max = 20, message = "아이디는 3~20 글자이어야 합니다.")
