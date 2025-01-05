@@ -16,11 +16,6 @@ import java.util.List;
 @FeignClient(name = "hexa-gateway", contextId = "memberAdapter")
 public interface MemberAdapter {
 
-    // auth api
-    // login request (id, password) 를 보내고 토큰을 받음
-    @PostMapping("/api/auth/login")
-    public String login(@RequestBody LoginRequest request);
-
 
     // service api
     // member

@@ -1,13 +1,14 @@
 package com.nhnacademy.hello.controller.login;
 
+import com.nhnacademy.hello.common.feignclient.auth.TokenAdapter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
-import com.nhnacademy.hello.dto.cart.CartDTO;
+import com.nhnacademy.hello.common.util.CookieUtil;
+import com.nhnacademy.hello.dto.jwt.AccessRefreshTokenDTO;
 import com.nhnacademy.hello.dto.member.LoginRequest;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
 import com.nhnacademy.hello.service.MessageSendService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -34,6 +33,7 @@ public class LoginController {
 
     private final JwtProperties jwtProperties;
     private final MemberAdapter memberAdapter;
+    private final TokenAdapter tokenAdapter;
     private final MessageSendService messageSendService;
 
     @Value("${jwt_token_cookie_secure}")
@@ -56,10 +56,10 @@ public class LoginController {
             HttpSession session
     ) throws IOException {
         // 인증 서버에 로그인 요청을 하고 토큰을 받는다.
-        String token = memberAdapter.login(loginRequest);
+        AccessRefreshTokenDTO accessRefreshTokenDTO = tokenAdapter.login(loginRequest);
 
         // 토큰 예외처리 (로그인 실패)
-        if(token == null) {
+        if(Objects.isNull(accessRefreshTokenDTO)) {
             log.error("Authorization failure id: {}", loginRequest.id());
             model.addAttribute("error", "로그인 실패!");
             return "login";
@@ -124,13 +124,17 @@ public class LoginController {
             return "login";
         }
 
+
+        String access_token = accessRefreshTokenDTO.accessToken();
+        String refresh_token = accessRefreshTokenDTO.refreshToken();
+
+
         // 토큰을 쿠키에 저장한다
-        Cookie cookie = new Cookie("token", token);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(jwtProperties.getExpirationTime());
-        cookie.setSecure(Boolean.parseBoolean(secure));
-        response.addCookie(cookie);
+        CookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getAccessTokenExpirationTime());
+        CookieUtil.addResponseRefreshTokenCookie(response,refresh_token,jwtProperties.getRefreshTokenExpirationTime());
+
+        tokenAdapter.saveToken(jwtProperties.getTokenPrefix() + " " +refresh_token);
+
 
 
         // 로그인 후 홈페이지로 이동

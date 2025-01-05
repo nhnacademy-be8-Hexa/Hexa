@@ -16,9 +16,9 @@ public class JwtUtils {
     private final JwtProperties jwtProperties;
 
     // JWT에서 사용자 ID 추출
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromAccessToken(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtProperties.getSecret())
+                .setSigningKey(jwtProperties.getAccessSecret())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -26,21 +26,55 @@ public class JwtUtils {
     }
 
     // JWT에서 권한 추출
-    public String getRoleFromToken(String token) {
+    public String getRoleFromAccessToken(String token) {
 
         return Jwts.parser()
-                        .setSigningKey(jwtProperties.getSecret())
+                .setSigningKey(jwtProperties.getAccessSecret())
                 .build()
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .get("role", String.class);
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
 
     }
 
     // jwt가 올바른지 검증
-    public Boolean validateToken(String token) {
+    public Boolean validateAccessToken(String token) {
         try{
-            Jwts.parser().setSigningKey(jwtProperties.getSecret()).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(jwtProperties.getAccessSecret()).build().parseClaimsJws(token);
+            return true;
+        } catch (SignatureException | ExpiredJwtException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+            return false;
+        }
+    }
+
+
+    // JWT에서 사용자 ID 추출
+    public String getUsernameFromRefreshToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtProperties.getRefreshSecret())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", String.class);
+    }
+
+    // JWT에서 권한 추출
+    public String getRoleFromRefreshToken(String token) {
+
+        return Jwts.parser()
+                .setSigningKey(jwtProperties.getRefreshSecret())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+
+    }
+
+    // jwt가 올바른지 검증
+    public Boolean validateRefreshToken(String token) {
+        try{
+            Jwts.parser().setSigningKey(jwtProperties.getRefreshSecret()).build().parseClaimsJws(token);
             return true;
         } catch (SignatureException | ExpiredJwtException e) {
             log.error("Invalid JWT signature: {}", e.getMessage());
