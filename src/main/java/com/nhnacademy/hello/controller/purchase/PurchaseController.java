@@ -7,6 +7,7 @@ import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
+import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +83,10 @@ public class PurchaseController {
         if(quantity != null && quantity > 0) {
             model.addAttribute("buynow_quantity", quantity);
         }
+
+        // 포장지 목록 전달
+        List<WrappingPaperDTO> wrappingPaperList = wrappingPaperAdapter.getAllWrappingPapers();
+        model.addAttribute("wrappingPaperList", wrappingPaperList);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
