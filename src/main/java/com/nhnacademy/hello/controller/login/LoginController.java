@@ -59,7 +59,7 @@ public class LoginController {
         AccessRefreshTokenDTO accessRefreshTokenDTO = tokenAdapter.login(loginRequest);
 
         // 토큰 예외처리 (로그인 실패)
-        if(Objects.isNull(accessRefreshTokenDTO)) {
+        if(accessRefreshTokenDTO == null || accessRefreshTokenDTO.accessToken()==null) {
             log.error("Authorization failure id: {}", loginRequest.id());
             model.addAttribute("error", "로그인 실패!");
             return "login";
