@@ -1,7 +1,7 @@
 package com.nhnacademy.hello.common.config;
 
+import com.nhnacademy.hello.common.feignclient.auth.TokenAdapter;
 import com.nhnacademy.hello.common.security.OAuth2.hanlder.CustomOAuth2LoginSuccessHandler;
-//import com.nhnacademy.hello.common.security.OAuth2.resolver.CustomOAuth2AuthorizationRequestResolver;
 import com.nhnacademy.hello.common.security.OAuth2.service.CustomOAuth2UserService;
 import com.nhnacademy.hello.common.filter.JwtAuthenticationFilter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
@@ -24,6 +24,7 @@ public class SecurityConfig {
 
     private final JwtProperties jwtProperties;
     private final JwtUtils jwtUtils;
+    private final TokenAdapter tokenAdapter;
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final ClientRegistrationRepository clientRegistrationRepository;
@@ -95,20 +96,17 @@ public class SecurityConfig {
                         logout.logoutUrl("/logout")
                                 // 로그아웃 시 홈페이지로 이동
                                 .logoutSuccessUrl("/?clearLocalCart=true")
-                                .deleteCookies("token")
+                                .deleteCookies("accessToken")
+                                .deleteCookies("refreshToken")
         );
 
         // 필터 설정
         http
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProperties, jwtUtils),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProperties, jwtUtils , tokenAdapter),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
 }
