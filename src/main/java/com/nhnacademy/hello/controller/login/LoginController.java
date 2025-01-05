@@ -35,9 +35,7 @@ public class LoginController {
     private final MemberAdapter memberAdapter;
     private final TokenAdapter tokenAdapter;
     private final MessageSendService messageSendService;
-
-    @Value("${jwt_token_cookie_secure}")
-    private String secure;
+    private final CookieUtil cookieUtil;
 
     private static final String AUTH_CODE_SESSION_KEY = "authCode";
     private static final String AUTH_CODE_TIMESTAMP_KEY = "timestamp";
@@ -130,8 +128,8 @@ public class LoginController {
 
 
         // 토큰을 쿠키에 저장한다
-        CookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getAccessTokenExpirationTime());
-        CookieUtil.addResponseRefreshTokenCookie(response,refresh_token,jwtProperties.getRefreshTokenExpirationTime());
+        cookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getAccessTokenExpirationTime());
+        cookieUtil.addResponseRefreshTokenCookie(response,refresh_token,jwtProperties.getRefreshTokenExpirationTime());
 
         tokenAdapter.saveToken(jwtProperties.getTokenPrefix() + " " +refresh_token);
 
