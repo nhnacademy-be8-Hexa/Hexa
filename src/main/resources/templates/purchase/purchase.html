@@ -55,8 +55,9 @@
     <!-- 장바구니 항목 테이블 -->
     <table class="table table-bordered">
         <thead>
-        <tr>
+        <tr class="table-secondary">
             <th>책 제목</th>
+            <th>포장 가능 여부</th>
             <th>가격 (원)</th>
             <th>수량</th>
             <th>합계 (원)</th>
@@ -67,6 +68,11 @@
         <tr th:each="book : ${bookList}" th:data-book-id="${book.bookId}">
             <td>
                 <a th:href="@{'/book/' + ${book.bookId}}" th:text="${book.bookTitle}"></a>
+            </td>
+            <td>
+                <!-- 포장 가능 여부 표시 -->
+                <span th:text="${book.bookWrappable() ? '포장 가능' : '포장 불가능'}"
+                      th:classappend="${book.bookWrappable() ? 'text-primary' : 'text-danger'}"></span>
             </td>
             <td th:data-price="${book.bookPrice}" id="book-price-${book.bookId}">
                 <span th:text="${book.bookPrice}"></span>
@@ -83,9 +89,13 @@
 
 <!--    포장지 선택-->
     <div class="form-group">
-        <label for="wrapping-paper-select" class="font-weight-bold h5" >포장지 선택</label>
-        <select id="wrapping-paper-select" class="form-control">
-            <option value="0" data-price="0">선택하지 않음 (0원)</option>
+        <label for="wrapping-paper-select" class="font-weight-bold h5">
+            포장지 선택
+            <span th:if="${not isWrappable}" style="color: red; font-size: small;">포장 불가능한 상품이 포함되어 있습니다.</span>
+        </label>
+        <select id="wrapping-paper-select" class="form-control"
+                th:disabled="${not isWrappable}" >
+            <option value="-1" data-price="0">선택하지 않음 (0원)</option>
             <!-- 포장지 옵션들 -->
             <option th:each="paper : ${wrappingPaperList}"
                     th:value="${paper.wrappingPaperId}"
@@ -200,6 +210,12 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+    /*]]>*/
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var isWrappable = /*[[${isWrappable}]]*/ true;
     /*]]>*/
 </script>
 
@@ -400,6 +416,7 @@
         // 포장지 선택 필드 데이터
         const wrappingPaperSelect = document.getElementById("wrapping-paper-select");
 
+
         let totalPrice = 0;
 
         // 서버에서 전달된 buynow_quantity가 있는지 확인
@@ -459,7 +476,14 @@
         calculateTotalPrice();
 
         // 포장지 선택 시 가격 재계산
-        wrappingPaperSelect.addEventListener("change", calculateTotalPrice);
+        wrappingPaperSelect.addEventListener("change", () => {
+            if(isWrappable === false) {
+                alert("포장할 수 없는 상품이 포함되어 있습니다!");
+                // 선택 안함으로 되돌리기
+                wrappingPaperSelect.value = "-1";
+            }
+            calculateTotalPrice();
+        });
 
 
         // toss payments

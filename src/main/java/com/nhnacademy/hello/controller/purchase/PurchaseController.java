@@ -88,6 +88,16 @@ public class PurchaseController {
         List<WrappingPaperDTO> wrappingPaperList = wrappingPaperAdapter.getAllWrappingPapers();
         model.addAttribute("wrappingPaperList", wrappingPaperList);
 
+        // 포장 가능 여부 계산해서 전달
+        boolean isWrappable = true;
+        for(BookDTO bookDTO : bookList) {
+            if(!bookDTO.bookWrappable()){
+                isWrappable = false;
+                break;
+            }
+        }
+        model.addAttribute("isWrappable", isWrappable);
+
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
 
@@ -214,7 +224,7 @@ public class PurchaseController {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
                 purchaseDTO.amount(),
-                purchaseDTO.wrappingPaperId(),
+                purchaseDTO.wrappingPaperId() <= 0 ? null : purchaseDTO.wrappingPaperId(),
                 statusId,
                 purchaseDTO.zoneCode(),
                 purchaseDTO.address(),
