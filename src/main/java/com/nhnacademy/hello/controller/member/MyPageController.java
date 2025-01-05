@@ -3,11 +3,16 @@ package com.nhnacademy.hello.controller.member;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
+import com.nhnacademy.hello.common.feignclient.auth.TokenAdapter;
+import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
+import com.nhnacademy.hello.common.util.CookieUtil;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
 import feign.FeignException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -28,6 +33,8 @@ public class MyPageController {
     private final MemberAdapter memberAdapter;
     private final AddressAdapter addressAdapter;
     private final PointDetailsAdapter pointDetailsAdapter;
+    private final TokenAdapter tokenAdapter;
+    private final JwtProperties jwtProperties;
 
     @GetMapping("/mypage")
     public String myPage(
@@ -176,6 +183,7 @@ public class MyPageController {
         } catch (FeignException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "주소 삭제 중 오류가 발생했습니다.");
         }
+
         return "redirect:/mypage/address";
     }
 
@@ -190,7 +198,7 @@ public class MyPageController {
     }
 
     @GetMapping("/mypage/delete")
-    public String memberDelete() {
+    public String memberDelete(HttpServletRequest request , HttpServletResponse response) {
         MemberUpdateDTO updateDTO = new MemberUpdateDTO(
                 null,
                 null,
@@ -202,7 +210,9 @@ public class MyPageController {
         );
         // 멤버 상태를 '탈퇴'로 업데이트
         memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
-        return "redirect:/logout";
+        String refreshToken = CookieUtil.getCookieValue(request,"refreshToken");
+        tokenAdapter.deleteToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
+        return "redirect:/";
     }
 
     @GetMapping("/mypage/points")
