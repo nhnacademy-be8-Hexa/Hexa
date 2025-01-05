@@ -9,7 +9,8 @@ public record PurchaseDTO(
         List<PurchaseBookDTO> books,
         String zoneCode,
         String address,
-        String addressDetail
+        String addressDetail,
+        Long wrappingPaperId
 ) {
 }
 

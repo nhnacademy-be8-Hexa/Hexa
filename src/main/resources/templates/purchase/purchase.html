@@ -373,6 +373,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+        const overlay = document.getElementById("loading-overlay");
+
         // 포장지 가격 표시 포매팅
         initializeWrappingPaperFormatting();
 
@@ -395,6 +397,9 @@
         // 로컬스토리지에서 cart 데이터를 가져옴
         const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
 
+        // 포장지 선택 필드 데이터
+        const wrappingPaperSelect = document.getElementById("wrapping-paper-select");
+
         let totalPrice = 0;
 
         // 서버에서 전달된 buynow_quantity가 있는지 확인
@@ -404,9 +409,11 @@
 
         // 동적 총액 계산 함수
         const calculateTotalPrice = () => {
+            overlay.style.display = "block";
+
             totalPrice = 0;
 
-            // 테이블의 각 행을 순회하며 데이터 업데이트
+            // 도서 목록 테이블의 각 행을 순회하며 가격 더하기
             document.querySelectorAll("#cart-items tr").forEach(row => {
                 const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
                 const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
@@ -437,22 +444,22 @@
                 totalPrice += total;
             });
 
+            // 포장지 가격 추가
+            const selectedOption = wrappingPaperSelect.options[wrappingPaperSelect.selectedIndex];
+            const wrappingPrice = parseInt(selectedOption.dataset.price, 10) || 0; // 선택된 포장지 가격
+            totalPrice += wrappingPrice;
+
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
 
+            overlay.style.display = "none";
         }
 
         // 초기 페이지 로딩 시 가격 계산 실행
         calculateTotalPrice();
 
-        // 장바구니 데이터 및 수량 갱신 시마다 가격 재계산
-        document.querySelectorAll("#cart-items tr").forEach(row => {
-            const quantityElement = row.querySelector(".quantity");
-            quantityElement.addEventListener("input", () => {
-                calculateTotalPrice();
-            });
-        });
-
+        // 포장지 선택 시 가격 재계산
+        wrappingPaperSelect.addEventListener("change", calculateTotalPrice);
 
 
         // toss payments
@@ -475,7 +482,6 @@
         // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
         document.getElementById("payment-button").addEventListener("click", async () => {
-            const overlay = document.getElementById("loading-overlay");
 
             try{
                 // 배송 정보 읽기
@@ -559,6 +565,7 @@
                         zoneCode: zoneCode,
                         address: address,
                         addressDetail: addressDetail,
+                        wrappingPaperId: wrappingPaperSelect.value
                     }),
                 });
 
@@ -596,7 +603,7 @@
 <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="spinner"></div>
-        <p style="color: white;">결제 처리 중입니다. 잠시만 기다려주세요...</p>
+        <p style="color: white;">잠시만 기다려주세요...</p>
     </div>
 </div>
 

@@ -214,7 +214,7 @@ public class PurchaseController {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
                 purchaseDTO.amount(),
-                null,
+                purchaseDTO.wrappingPaperId(),
                 statusId,
                 purchaseDTO.zoneCode(),
                 purchaseDTO.address(),
