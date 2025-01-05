@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "hexa-gatewway", contextId = "wrappingPaperAdapter")
+@FeignClient(name = "hexa-gateway", contextId = "wrappingPaperAdapter", path = "/api/wrappingPaper")
 public interface WrappingPaperAdapter {
 
     @GetMapping
