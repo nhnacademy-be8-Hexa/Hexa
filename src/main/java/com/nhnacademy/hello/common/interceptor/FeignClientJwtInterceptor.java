@@ -24,6 +24,7 @@ public class FeignClientJwtInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate requestTemplate) {
 
         String url = requestTemplate.url();
+        // auth 쪽으로 가는건 따로 refresh token 사용하기에 추가함
         if (!url.contains("auth/")) {
             // 쿠키에서 토큰 가져오기
             String jwtToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
