@@ -35,6 +35,7 @@ public class MyPageController {
     private final PointDetailsAdapter pointDetailsAdapter;
     private final TokenAdapter tokenAdapter;
     private final JwtProperties jwtProperties;
+    private final CookieUtil cookieUtil;
 
     @GetMapping("/mypage")
     public String myPage(
@@ -210,7 +211,7 @@ public class MyPageController {
         );
         // 멤버 상태를 '탈퇴'로 업데이트
         memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
-        String refreshToken = CookieUtil.getCookieValue(request,"refreshToken");
+        String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
         tokenAdapter.deleteToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
         return "redirect:/";
     }

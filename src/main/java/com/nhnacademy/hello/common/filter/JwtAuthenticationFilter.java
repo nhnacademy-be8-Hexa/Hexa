@@ -27,11 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProperties jwtProperties;
     private final JwtUtils jwtUtils;
     private final TokenAdapter tokenAdapter;
+    private final CookieUtil cookieUtil;
 
-    public JwtAuthenticationFilter(JwtProperties jwtProperties, JwtUtils jwtUtils, TokenAdapter tokenAdapter) {
+    public JwtAuthenticationFilter(JwtProperties jwtProperties, JwtUtils jwtUtils, TokenAdapter tokenAdapter, CookieUtil cookieUtil) {
         this.jwtProperties = jwtProperties;
         this.jwtUtils = jwtUtils;
         this.tokenAdapter = tokenAdapter;
+        this.cookieUtil = cookieUtil;
     }
 
     @Override
@@ -40,9 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // access 토큰와 refresh 토큰을 각각 가져옴
 
-        String accessToken = CookieUtil.getCookieValue(request,"accessToken");
+        String accessToken = cookieUtil.getCookieValue(request,"accessToken");
 
-        String refreshToken = CookieUtil.getCookieValue(request,"refreshToken");
+        String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
 
         // refresh 토큰은 무조건 있어야함
 
@@ -82,21 +84,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // 컨텍스트에 인증 설정 (security 인증)
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    CookieUtil.addResponseAccessTokenCookie(response,accessToken,jwtProperties.getAccessTokenExpirationTime());
-                    CookieUtil.addResponseRefreshTokenCookie(response,refreshToken,jwtProperties.getRefreshTokenExpirationTime());
+                    cookieUtil.addResponseAccessTokenCookie(response,accessToken,jwtProperties.getAccessTokenExpirationTime());
+                    cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,jwtProperties.getRefreshTokenExpirationTime());
 
                 }
                 else {
                     // 리프레시 토큰 지워서 보내기
-                    CookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
+                    cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
                 }
 
             }
             else{
                 // 서버에 저장된 유저의 토큰이 null 이면 이것도 만료된거니까  지워서 보내기
                 // 서버 토큰이랑 리프레시 토큰이랑 다르면 서버쪽 토큰 지우고 그냥 보내서 그 계정으로 접속한 사람들 비로그인 상태로 만들기
-                CookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
-                CookieUtil.addResponseAccessTokenCookie(response,accessToken,0);
+                cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
+                cookieUtil.addResponseAccessTokenCookie(response,accessToken,0);
             }
 
         }

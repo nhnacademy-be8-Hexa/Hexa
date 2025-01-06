@@ -5,6 +5,7 @@ import com.nhnacademy.hello.common.security.OAuth2.hanlder.CustomOAuth2LoginSucc
 import com.nhnacademy.hello.common.security.OAuth2.service.CustomOAuth2UserService;
 import com.nhnacademy.hello.common.filter.JwtAuthenticationFilter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
+import com.nhnacademy.hello.common.util.CookieUtil;
 import com.nhnacademy.hello.common.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final CustomOAuth2LoginSuccessHandler customOAuth2LoginSuccessHandler;
+    private final CookieUtil cookieUtil;
 
 
     @Bean
@@ -102,7 +104,7 @@ public class SecurityConfig {
 
         // 필터 설정
         http
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProperties, jwtUtils , tokenAdapter),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProperties, jwtUtils , tokenAdapter , cookieUtil),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
