@@ -7,6 +7,7 @@ import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
+import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +83,20 @@ public class PurchaseController {
         if(quantity != null && quantity > 0) {
             model.addAttribute("buynow_quantity", quantity);
         }
+
+        // 포장지 목록 전달
+        List<WrappingPaperDTO> wrappingPaperList = wrappingPaperAdapter.getAllWrappingPapers();
+        model.addAttribute("wrappingPaperList", wrappingPaperList);
+
+        // 포장 가능 여부 계산해서 전달
+        boolean isWrappable = true;
+        for(BookDTO bookDTO : bookList) {
+            if(!bookDTO.bookWrappable()){
+                isWrappable = false;
+                break;
+            }
+        }
+        model.addAttribute("isWrappable", isWrappable);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
@@ -209,7 +224,7 @@ public class PurchaseController {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
                 purchaseDTO.amount(),
-                null,
+                purchaseDTO.wrappingPaperId() <= 0 ? null : purchaseDTO.wrappingPaperId(),
                 statusId,
                 purchaseDTO.zoneCode(),
                 purchaseDTO.address(),
@@ -230,11 +245,11 @@ public class PurchaseController {
     @GetMapping("/purchase/success")
     public String purchaseSuccess(
             @RequestParam("orderName") String orderName,
-            @RequestParam("amount") String amount,
+            @RequestParam("amount") Double amount,
             Model model
     ) {
         model.addAttribute("orderName", orderName);
-        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(Double.valueOf(amount)));
+        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(amount));
         return "purchase/success";
     }
 

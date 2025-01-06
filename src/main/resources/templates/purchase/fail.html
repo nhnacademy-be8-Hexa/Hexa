@@ -23,7 +23,7 @@
     <div class="text-center">
       <h1>결제 도중 문제가 발생했습니다.</h1>
       <p class="text-muted small">
-        <span th:text="'{' + ${errorCode} + '}: ' + ${errorMessage}"></span>
+        <span th:text="${errorCode} + ': ' + ${errorMessage}"></span>
       </p>
 
       <!-- 뒤로가기 버튼 -->
