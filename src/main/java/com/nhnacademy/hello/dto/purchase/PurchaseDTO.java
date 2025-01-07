@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.dto.purchase;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record PurchaseDTO(
@@ -10,7 +11,9 @@ public record PurchaseDTO(
         String zoneCode,
         String address,
         String addressDetail,
-        Long wrappingPaperId
+        Long wrappingPaperId,
+        Integer usingPoint,
+        LocalDateTime deliveryDate
 ) {
 }
 

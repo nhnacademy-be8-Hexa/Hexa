@@ -53,6 +53,19 @@
             <div class="category-menu">
                 <a href="/bestsellers" class="category-item">베스트셀러</a>
                 <a href="/newarrivals" class="category-item">신작</a>
+                <a href="/manyreview" class="category-item">리뷰순</a>
+
+
+                <!-- 이름순 드롭다운 메뉴 -->
+                <div class="dropdown">
+                    <a href="#" class="category-item dropdown-toggle" id="nameOrderDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        이름순
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="nameOrderDropdown">
+                        <a th:href="@{/name(sort='asc')}" class="dropdown-item">오름차순</a>
+                        <a th:href="@{/name(sort='desc')}" class="dropdown-item">내림차순</a>
+                    </div>
+                </div>
 
 
                 <div class="dropdown">

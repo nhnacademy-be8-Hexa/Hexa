@@ -11,4 +11,7 @@ import java.util.List;
 public interface BookStatusAdapter {
     @GetMapping("/api/bookStatuses")
     List<BookStatusRequestDTO> getBookStatus(@RequestParam("bookId") String bookId);
+
+    @GetMapping("/api/bookStatuses")
+    public List<BookStatusRequestDTO> getBookStatus();
 }

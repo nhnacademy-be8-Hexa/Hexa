@@ -2,10 +2,7 @@ package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.common.config.FeignConfig;
 import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.member.LoginRequest;
-import com.nhnacademy.hello.dto.member.MemberDTO;
-import com.nhnacademy.hello.dto.member.MemberRequestDTO;
-import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
+import com.nhnacademy.hello.dto.member.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,8 +31,31 @@ public interface MemberAdapter {
     @PutMapping("/api/members/{memberId}/login")
     public ResponseEntity<Void> loginMember(@PathVariable String memberId);
 
+    // 회원 목록 조회 (페이징 및 검색)
     @GetMapping("/api/members")
-    public List<MemberDTO> getMembers(
-            @RequestParam(defaultValue  = "0") int page, @RequestParam(required = false) String search);
+    List<MemberDTO> getMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String search);
 
+    // 전체 회원 수 조회 (검색 조건 포함)
+    @GetMapping("/api/members/count")
+    public ResponseEntity<Long> getMemberCount(
+            @RequestParam(required = false) String search);
+
+    // 회원 등급 가져오기
+    @GetMapping("/api/ratings")
+    public List<RatingDTO> getRatings() ;
+
+    // 회원 등급 수정
+    @PutMapping("/api/ratings/{ratingId}")
+    public ResponseEntity<RatingDTO> updateRating(@PathVariable Long ratingId, @RequestBody MemberUpdateDTO memberUpdateDTO);
+
+    // 회원 상태 가져오기
+    @GetMapping("/api/memberStatus")
+    public List<MemberStatusDTO> getMemberStatus();
+
+    // 회원 상태 수정
+    @PutMapping("/api/memberStatus/{memberStatusId}")
+    public ResponseEntity<MemberStatusDTO> updateMemberStatus(@PathVariable Long memberStatusId, @RequestBody MemberUpdateDTO memberUpdateDTO);
 }

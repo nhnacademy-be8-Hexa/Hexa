@@ -42,7 +42,7 @@ public class  AdminPageController {
 
         // 가장 많이 방문한 도서 Top 5 조회
         List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(
-                0, 5, "", null, null, null, null, true, null, null, null
+                0, 5, "", null, null, null, null, true, null, null, null, null, null, null
         );
 
         // 각 도서의 저자 및 좋아요 수 가져오기

@@ -1,10 +1,19 @@
 package com.nhnacademy.hello.controller.member;
 
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponPolicyAdapter;
+import com.nhnacademy.hello.dto.coupon.CouponDTO;
+import com.nhnacademy.hello.dto.coupon.CouponPolicyDTO;
+import com.nhnacademy.hello.dto.coupon.CouponRequestDTO;
 import com.nhnacademy.hello.dto.member.MemberRegisterDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
+import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,9 +23,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/register")
@@ -24,6 +35,10 @@ public class MemberRegisterController {
 
     private final MemberAdapter memberAdapter;
     private final PasswordEncoder passwordEncoder;
+    private final CouponMemberAdapter couponMemberAdapter;
+    private final CouponPolicyAdapter couponPolicyAdapter;
+    private final CouponAdapter couponAdapter;
+    private final PointDetailsAdapter pointDetailsAdapter;
 
     @GetMapping
     public String registerForm() {
@@ -58,6 +73,27 @@ public class MemberRegisterController {
         );
 
         memberAdapter.createMember(requestDTO);
+
+        try {
+            // welcomeCoupon 발급
+            CouponPolicyDTO couponPolicy = couponPolicyAdapter.getPolicyByEventType("welcome"); // welcome 쿠폰 정책 찾기
+            CouponRequestDTO couponRequest = new CouponRequestDTO(couponPolicy.couponPolicyId(),
+                    "welcome!", "ALL", null, ZonedDateTime.now().plusDays(30)); // 쿠폰 생성 값
+            List<CouponDTO> coupon = couponAdapter.createCoupons(1, couponRequest); // 쿠폰 생성
+            couponMemberAdapter.createMemberCoupon(registerDTO.memberId(), coupon.getFirst().couponId()); // 쿠폰 배부
+        }catch (Exception e){
+            log.error("쿠폰 발급 오류", e);
+        }
+
+        try {
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                5000,
+                "회원가입 포인트 지급"
+            );
+            pointDetailsAdapter.createPointDetails(registerDTO.memberId(), createPointDetailDTO);
+        }catch (Exception e){
+            log.error("포인트 지급 오류", e);
+        }
 
         return "redirect:/";
     }

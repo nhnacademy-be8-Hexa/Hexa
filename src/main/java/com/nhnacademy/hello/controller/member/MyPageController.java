@@ -10,6 +10,7 @@ import com.nhnacademy.hello.common.util.CookieUtil;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
+import com.nhnacademy.hello.dto.point.PointDetailsDTO;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -216,10 +217,4 @@ public class MyPageController {
         return "redirect:/";
     }
 
-    @GetMapping("/mypage/points")
-    public String pointsPage(Model model) {
-        MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
-        model.addAttribute("member", member);
-        model.addAttribute("sum", pointDetailsAdapter.sumPoint(AuthInfoUtils.getUsername()));
-        return "member/points"; }
 }

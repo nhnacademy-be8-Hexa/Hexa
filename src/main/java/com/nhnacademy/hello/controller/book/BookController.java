@@ -2,10 +2,13 @@ package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
+import com.nhnacademy.hello.common.feignclient.tag.BooKTagAdapter;
+import com.nhnacademy.hello.common.feignclient.tag.TagAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import java.util.List;
 
+import com.nhnacademy.hello.dto.tag.TagDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,8 @@ public class BookController {
     private final BookAdapter bookAdapter;
     private final ReviewAdapter reviewAdapter;
     private final ImageStore imageStore;
+    private final TagAdapter tagAdapter;
+    private final BooKTagAdapter bookTagAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -62,8 +67,25 @@ public class BookController {
 
         model.addAttribute("thumbnailImage", imagePath);
 
+        //책의 태그
+        List<TagDTO> assignedTags = bookTagAdapter.getTagsByBook(bookId).getBody();
+        if (assignedTags == null) {
+            assignedTags = List.of();
+        }
+
+
+        model.addAttribute("assignedTags", assignedTags);
+        model.addAttribute("bookId", bookId);
+
         return "book/bookDetail";
+
     }
+
+
+
+
+
+
 
 //    @GetMapping("/book")
 //    public String bookList(

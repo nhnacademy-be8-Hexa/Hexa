@@ -1,10 +1,10 @@
 package com.nhnacademy.hello.dto.returns;
 
 public record ReturnsDTO(
-        Long OrderId,
+        Long orderId,
         Long returnsReasonId,
         String returnsDetail,
         OrderDTO order
 ) {
-    public record OrderDTO(Long OrderID) {}
+    public record OrderDTO(Long orderID) {}
 }

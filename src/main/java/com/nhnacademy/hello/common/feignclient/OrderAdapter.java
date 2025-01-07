@@ -15,7 +15,7 @@ import java.util.List;
 public interface OrderAdapter {
 
     @PostMapping("/api/orders")
-    public ResponseEntity<Void> createOrder(
+    public ResponseEntity<Long> createOrder(
             @Valid @RequestBody OrderRequestDTO orderRequestDTO,
             @RequestParam List<Long> bookIds,
             @RequestParam List<Integer> amounts,

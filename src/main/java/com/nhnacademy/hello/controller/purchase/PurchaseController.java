@@ -5,11 +5,17 @@ import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
+import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
+import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
+import com.nhnacademy.hello.dto.toss.TossPayment;
+import com.nhnacademy.hello.service.TossService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,11 +24,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -41,12 +42,14 @@ public class PurchaseController {
     private final OrderAdapter orderAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
+    private final PointDetailsAdapter pointDetailsAdapter;
+    private final DeliveryAdapter deliveryAdapter;
+    private final BookStatusAdapter bookStatusAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
 
-    @Value("${toss.secret.key}")
-    private String tossSecretKey;
+    private final TossService tossService;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -97,6 +100,15 @@ public class PurchaseController {
             }
         }
         model.addAttribute("isWrappable", isWrappable);
+
+        // 포인트 전달 (비회원은 0으로)
+        Long havingPoint = 0L;
+        if(isLoggedIn){
+            String memberId = principal.getName();
+            ResponseEntity<Long> pointSumResponse = pointDetailsAdapter.sumPoint(memberId);
+            havingPoint = pointSumResponse.getBody();
+        }
+        model.addAttribute("havingPoint", havingPoint);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
@@ -186,30 +198,51 @@ public class PurchaseController {
     ){
 
         // toss에 결제 승인 요청
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
-                .header("Authorization", "Basic " + tossSecretKey)
-                .header("Content-Type", "application/json")
-                .method("POST", HttpRequest.BodyPublishers.ofString("{\"paymentKey\":\"" + purchaseDTO.paymentKey() + "\",\"orderId\":\"" + purchaseDTO.orderId() + "\",\"amount\":" + purchaseDTO.amount() + "}"))
-                .build();
+        ResponseEntity<?> response = tossService.confirmPayment(purchaseDTO.paymentKey(), purchaseDTO.orderId(), purchaseDTO.amount());
 
-        try {
-            HttpResponse<?> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-
-            // 성공적인 응답
-            if (response.statusCode() != 200) {
-                // 토스에서 반환한 에러 메시지
-                return ResponseEntity
-                        .status(response.statusCode())
-                        .body(response.body());
-            }
-
-        } catch (IOException | InterruptedException e) {
-            // 시스템 예외
+        // 성공적인 응답
+        if (response.getStatusCode() != HttpStatus.OK) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("결제 처리 중 내부 오류가 발생했습니다.");
         }
+
+        TossPayment payment = (TossPayment) response.getBody();
+
+
+        // 데이터 변동-----------------------------------------------------------------
+
+        // '수량부족' 책 상태 아이디 조회
+        Long bookStatusId = 2L;
+        List<BookStatusRequestDTO> bookStatusList = bookStatusAdapter.getBookStatus();
+        for(BookStatusRequestDTO bookStatusRequestDTO : bookStatusList) {
+            if(bookStatusRequestDTO.bookStatus().equals("수량부족")){
+                bookStatusId = bookStatusRequestDTO.bookStatusId();
+                break;
+            }
+        }
+
+        // 책들 판매 처리
+        for(PurchaseBookDTO book : purchaseDTO.books()){
+            // 책 판매량 증가, 재고 감소
+            bookAdapter.incrementBookSellCount(book.bookId(), book.quantity());
+
+            // 해당 책의 갯수가 5개 이하가 되면 수량 부족 상태로 전환.
+            if(bookAdapter.getBook(book.bookId()).bookAmount() < 5){
+                bookAdapter.updateBook(book.bookId(),
+                        new BookUpdateRequestDTO(
+                                null,
+                                null,
+                                null,
+                                null,
+                                bookStatusId.toString()
+                        )
+                );
+
+            }
+        }
+
+        // order 저장
 
         // 'WAIT' 주문 상태의 아이디 검색
         Long statusId = 1L;
@@ -220,7 +253,6 @@ public class PurchaseController {
             }
         }
 
-        // order 저장
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
                 purchaseDTO.amount(),
@@ -231,12 +263,41 @@ public class PurchaseController {
                 purchaseDTO.addressDetail()
         );
 
-        orderAdapter.createOrder(
+        Long savedOrderId = orderAdapter.createOrder(
                 orderRequestDTO,
                 purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
                 purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
                 null
-                );
+                ).getBody();
+
+        // 포인트 사용 처리
+        if(purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0){
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                    purchaseDTO.usingPoint() * (-1),
+                    "주문 : " + payment.orderName()
+            );
+            pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
+        }
+
+        // 포인트 적립 처리
+        if(AuthInfoUtils.isLogin()){
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                    (int)(purchaseDTO.amount() * 0.01 * memberAdapter.getMember(AuthInfoUtils.getUsername()).rating().ratingPercent()) ,
+                    "주문 포인트 적립 : " + payment.orderName()
+            );
+            pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
+        }
+
+        // 배송 정보 저장
+        DeliveryRequestDTO deliveryRequestDTO = new DeliveryRequestDTO(
+                savedOrderId,
+                3000,
+                purchaseDTO.deliveryDate(),
+                purchaseDTO.deliveryDate().minusDays(1)
+        );
+        deliveryAdapter.createDelivery(deliveryRequestDTO);
+
+        // ------------------------------------------------------------------------
 
         return ResponseEntity.ok("결제 성공.");
     }
