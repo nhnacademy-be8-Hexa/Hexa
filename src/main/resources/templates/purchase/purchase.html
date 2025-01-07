@@ -115,7 +115,7 @@
     </div>
 
 <!--    포인트 사용-->
-    <div th:if="${isLoggedIn}" class="form-group">
+    <div th:if="${isLoggedIn}" class="form-group mt-4">
         <label for="point-input" class="font-weight-bold h5">포인트 사용</label>
         <div class="input-group">
             <input type="number"
@@ -131,6 +131,15 @@
         </div>
     </div>
 
+<!--   배송일 지정 필드-->
+    <div class="form-group mt-4">
+        <label for="delivery-date" class="font-weight-bold h5">배송일 선택</label>
+        <input type="date" id="delivery-date" class="form-control" required>
+        <small class="text-muted">하루 뒤 부터 선택 가능합니다.</small>
+    </div>
+
+    <!--    배송비 표시-->
+    <h5 class="mt-4">배송비 3000원</h5>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -500,6 +509,8 @@
                 totalPrice -= parseInt(pointInput.value, 10) || 0;
             }
 
+            // 배송비 추가
+            totalPrice += 3000;
 
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
@@ -549,8 +560,24 @@
             calculateTotalPrice();
         });
 
+        // 배송일 지정 필드 설정
+        // 내일부터 날짜를 계산
+        const deliveryDateInput = document.getElementById("delivery-date");
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // 내일
 
-        // toss payments
+        // YYYY-MM-DD 형식으로 변환
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDate = `${yyyy}-${mm}-${dd}`;
+
+        // 최소 날짜, 기본값 설정
+        deliveryDateInput.value = minDate;
+        deliveryDateInput.min = minDate;
+
+
+        // toss payments --------------------------------------------------------------------
         // ------  SDK 초기화 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
         const clientKey = "[[${clientKey}]]";
@@ -641,7 +668,18 @@
 
                 // 결제 승인, 데이터 저장
 
+                // 포인트 사용량
                 const pointValue = pointInput ? parseInt(pointInput.value, 10) : 0;
+
+                // 배송일 지정
+                const deliveryDate = new Date(deliveryDateInput.value);
+
+                // 시간을 00:00:00으로 설정 (필요 시 다른 시간으로 설정 가능)
+                deliveryDate.setHours(0, 0, 0, 0);
+
+                // LocalDateTime 포맷으로 변환 (yyyy-MM-ddTHH:mm:ss)
+                const formattedDeliveryDate = deliveryDate.toISOString().split('.')[0]; // ISO 형식에서 초단위까지만 사용
+
 
                 const response = await fetch('/purchase', {
                     method: 'POST',
@@ -658,6 +696,7 @@
                         addressDetail: addressDetail,
                         wrappingPaperId: wrappingPaperSelect.value,
                         usingPoint: isNaN(pointValue) ? 0 : pointValue,
+                        deliveryDate: formattedDeliveryDate,
                     }),
                 });
 
