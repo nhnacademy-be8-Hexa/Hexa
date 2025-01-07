@@ -66,6 +66,11 @@ public class MemberManageController {
     public String getUpdateForm(@PathVariable String memberId, Model model) {
         MemberDTO member = memberAdapter.getMember(memberId);
 
+        if (member == null) { // 멤버가 존재하지 않을 경우 예외 처리
+            model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
+            return "admin/memberManage"; // 목록 페이지로 리다이렉트
+        }
+
         // FeignClient를 통해 등급 및 상태 목록을 가져오기
         List<RatingDTO> ratings = memberAdapter.getRatings();
         List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
@@ -76,8 +81,10 @@ public class MemberManageController {
         model.addAttribute("ratings", ratings);
         model.addAttribute("memberStatuses", memberStatuses);
         model.addAttribute("roles", roles);
+
         return "admin/memberUpdateForm";
     }
+
 
 
 
