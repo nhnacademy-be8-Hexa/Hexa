@@ -115,7 +115,7 @@
     </div>
 
 <!--    포인트 사용-->
-    <div th:if="${isLoggedIn}" class="form-group">
+    <div th:if="${isLoggedIn}" class="form-group mt-4">
         <label for="point-input" class="font-weight-bold h5">포인트 사용</label>
         <div class="input-group">
             <input type="number"
@@ -130,6 +130,9 @@
             </div>
         </div>
     </div>
+
+<!--    배송비 표시-->
+    <h5 class="mt-4">배송비 3000원</h5>
 
 
     <!-- 총 가격 -->
@@ -500,6 +503,8 @@
                 totalPrice -= parseInt(pointInput.value, 10) || 0;
             }
 
+            // 배송비 추가
+            totalPrice += 3000;
 
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
