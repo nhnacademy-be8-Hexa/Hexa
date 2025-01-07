@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.dto.member;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
@@ -14,7 +15,9 @@ public record MemberUpdateDTO(
         @Length(max = 320, message = "이메일은 320자 이하이어야 합니다.")
         String memberEmail,
         LocalDate memberBirthAt,
+        @JsonProperty("ratingId")
         String ratingId,
+        @JsonProperty("statusId")
         String statusId
 ) {
 }
