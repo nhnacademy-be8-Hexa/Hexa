@@ -194,7 +194,7 @@
     flex-grow: 1;
     max-width: calc(100% - 200px); /* 세로 메뉴 너비를 제외한 너비 */
     overflow-x: auto; /* 콘텐츠 가로 스크롤 허용 */
-    background-color: #EFEDF6; /* 배경색 추가 */
+    /*background-color: #EFEDF6; !* 배경색 추가 *!*/
 }
 
 .modal {
@@ -226,5 +226,39 @@
 }
 .text-center {
     text-align: center;
+}
+
+/* 도서 관리 배경색 때문에 적용*/
+.container, .row, .col .container-fluid {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 부트스트랩 카드와 테이블의 배경색 통일 */
+.table, .card {
+    background-color: #FFFFFF; /* 카드와 테이블 배경 하얀색 */
+}
+
+/* Toast UI Editor 컨테이너 배경색 명시 */
+#editor {
+    margin: 20px auto; /* 상하 여백과 중앙 정렬 */
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    max-width: 1200px; /* 최대 너비 설정 */
+    box-sizing: border-box; /* padding 포함 크기 계산 */
+}
+
+/* Toast UI Editor 내부 컨텐츠 배경 */
+.toastui-editor-contents {
+    background-color: #FFFFFF; /* 흰색 */
+}
+
+/* Toast UI Editor Markdown 에디터 */
+.toastui-editor-defaultUI .toastui-editor-main {
+    background-color: #FFFFFF; /* 흰색 */
+}
+
+/* 추가적으로 필요한 경우 Preview 영역 배경 조정 */
+.toastui-editor-ww-mode .toastui-editor {
+    background-color: #FFFFFF; /* 흰색 */
 }
 

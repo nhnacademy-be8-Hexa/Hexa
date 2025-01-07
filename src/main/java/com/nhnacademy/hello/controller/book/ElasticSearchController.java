@@ -42,8 +42,7 @@ public class ElasticSearchController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", size);
-        model.addAttribute("searchBooks", searchBooks);
-
+        
         return "book/bookSearch";
     }
 

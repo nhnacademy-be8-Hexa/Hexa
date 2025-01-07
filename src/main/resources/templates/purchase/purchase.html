@@ -55,8 +55,9 @@
     <!-- 장바구니 항목 테이블 -->
     <table class="table table-bordered">
         <thead>
-        <tr>
+        <tr class="table-secondary">
             <th>책 제목</th>
+            <th>포장 가능 여부</th>
             <th>가격 (원)</th>
             <th>수량</th>
             <th>합계 (원)</th>
@@ -68,10 +69,16 @@
             <td>
                 <a th:href="@{'/book/' + ${book.bookId}}" th:text="${book.bookTitle}"></a>
             </td>
-            <td th:text="${#numbers.formatDecimal(book.bookPrice, 0, 0)}"></td>
             <td>
-                <!-- 로컬스토리지의 수량을 JavaScript로 로드 -->
-                <span class="quantity"></span>
+                <!-- 포장 가능 여부 표시 -->
+                <span th:text="${book.bookWrappable() ? '포장 가능' : '포장 불가능'}"
+                      th:classappend="${book.bookWrappable() ? 'text-primary' : 'text-danger'}"></span>
+            </td>
+            <td th:data-price="${book.bookPrice}" id="book-price-${book.bookId}">
+                <span th:text="${book.bookPrice}"></span>
+            </td>
+            <td>
+                <span class="quantity">0</span>
             </td>
             <td th:data-price="${book.bookPrice}">
                 <span class="total-price">0</span>
@@ -79,6 +86,25 @@
         </tr>
         </tbody>
     </table>
+
+<!--    포장지 선택-->
+    <div class="form-group">
+        <label for="wrapping-paper-select" class="font-weight-bold h5">
+            포장지 선택
+            <span th:if="${not isWrappable}" style="color: red; font-size: small;">포장 불가능한 상품이 포함되어 있습니다.</span>
+        </label>
+        <select id="wrapping-paper-select" class="form-control"
+                th:disabled="${not isWrappable}" >
+            <option value="-1" data-price="0">선택하지 않음 (0원)</option>
+            <!-- 포장지 옵션들 -->
+            <option th:each="paper : ${wrappingPaperList}"
+                    th:value="${paper.wrappingPaperId}"
+                    th:id="'wrapping-paper-' + ${paper.wrappingPaperId}"
+                    th:data-price="${paper.wrappingPaperPrice}"
+                    th:text="${paper.wrappingPaperName} + ' (' + paper.wrappingPaperPrice + '원)'">
+            </option>
+        </select>
+    </div>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -184,6 +210,12 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+    /*]]>*/
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var isWrappable = /*[[${isWrappable}]]*/ true;
     /*]]>*/
 </script>
 
@@ -308,51 +340,65 @@
         }).open();
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
-        // 로컬스토리지에서 cart 데이터를 가져옴
-        const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+    // 비로그인 사용자: 임시 주소 표시 함수
+    function displayTemporaryAddress(address) {
+        // 존재 여부 확인 후 업데이트
+        var recipientNameDisplay = document.getElementById('recipientNameDisplay');
+        var postCode = document.getElementById('postCode');
+        var addressDisplay = document.getElementById('addressDisplay');
+        var addressDetailsDisplay = document.getElementById('addressDetailsDisplay');
 
-        let totalPrice = 0;
+        if (recipientNameDisplay && postCode && addressDisplay && addressDetailsDisplay) {
+            recipientNameDisplay.textContent = address.addressName;
+            postCode.textContent = address.zoneCode; // 'zoneCode'로 수정됨
+            addressDisplay.textContent = address.address;
+            addressDetailsDisplay.textContent = address.addressDetail;
+        }
+    }
 
-        // 서버에서 전달된 buynow_quantity가 있는지 확인
-        const buynowQuantityElement = document.getElementById("buynow-quantity");
-        const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
-            ? parseInt(buynowQuantityElement.value, 10) : null;
+    // 배송지 추가 버튼 클릭 시 새 배송지 추가 모달 열기
+    function goToAddAddress() {
+        openAddAddressModal();
+    }
 
-        // 테이블의 각 행을 순회하며 데이터 업데이트
-        document.querySelectorAll("#cart-items tr").forEach(row => {
-            const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
-            const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
-            const quantityElement = row.querySelector(".quantity");
-            const totalPriceElement = row.querySelector(".total-price");
+    // 특정 wrappingPaperId에 대한 가격 포맷팅
+    function formatWrappingPaperPrice(wrappingPaperId) {
+        const option = document.getElementById(`wrapping-paper-${wrappingPaperId}`);
+        if (option) {
+            const price = parseInt(option.getAttribute("data-price"), 10);
+            option.textContent = `${option.textContent.split('(')[0]} (${price.toLocaleString()}원)`;
+        }
+    }
 
-            // 수량 결정: buynow_quantity가 우선, 없으면 로컬스토리지 값
-            let quantity;
-            if (buynowQuantity !== null) {
-                quantity = buynowQuantity; // 바로 구매일 경우
-            } else {
-                // 장바구니에서 수량을 가져옴
-                const cartItem = cartItems.find(item => parseInt(item.bookId, 10) === bookId); // bookId를 숫자로 변환 후 비교
-                quantity = cartItem ? parseInt(cartItem.quantity, 10) : 1; // 기본값 1
-            }
-
-            // 수량이 NaN인 경우 1로 설정
-            if (isNaN(quantity)) {
-                quantity = 1;
-            }
-
-            // 수량 및 합계 업데이트
-            quantityElement.textContent = quantity;
-            const total = price * quantity;
-            totalPriceElement.textContent = total.toLocaleString();
-
-            // 총 가격 계산
-            totalPrice += total;
+    // 초기 포매팅 처리
+    function initializeWrappingPaperFormatting() {
+        const options = document.querySelectorAll("option[id^='wrapping-paper-']");
+        options.forEach(option => {
+            const price = parseInt(option.getAttribute("data-price"), 10);
+            option.textContent = `${option.textContent.split('(')[0]} (${price.toLocaleString()}원)`;
         });
+    }
 
-        // 총 가격 업데이트
-        document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+    // 책 가격 포맷팅 함수
+    function formatBookPrice(bookId) {
+        const bookPriceElement = document.getElementById(`book-price-${bookId}`);
+        if (bookPriceElement) {
+            const price = parseInt(bookPriceElement.getAttribute("data-price"), 10);
+            bookPriceElement.querySelector("span").textContent = price.toLocaleString(); // 천 단위 구분자 추가
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const overlay = document.getElementById("loading-overlay");
+
+        // 포장지 가격 표시 포매팅
+        initializeWrappingPaperFormatting();
+
+        // 페이지 로드 후 모든 책 가격 포맷팅
+        document.querySelectorAll("td[id^='book-price-']").forEach((bookPriceElement) => {
+            const bookId = bookPriceElement.id.split('-')[2];
+            formatBookPrice(bookId);
+        });
 
         // 비로그인 사용자: 로컬스토리지에 임시 주소가 있는지 확인하고 표시
         if (!isLoggedIn) {
@@ -361,6 +407,83 @@
                 displayTemporaryAddress(tempAddress);
             }
         }
+
+
+        // 로컬스토리지에서 수량 가져오기 및 총 가격 계산
+        // 로컬스토리지에서 cart 데이터를 가져옴
+        const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // 포장지 선택 필드 데이터
+        const wrappingPaperSelect = document.getElementById("wrapping-paper-select");
+
+
+        let totalPrice = 0;
+
+        // 서버에서 전달된 buynow_quantity가 있는지 확인
+        const buynowQuantityElement = document.getElementById("buynow-quantity");
+        const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
+            ? parseInt(buynowQuantityElement.value, 10) : null;
+
+        // 동적 총액 계산 함수
+        const calculateTotalPrice = () => {
+            overlay.style.display = "block";
+
+            totalPrice = 0;
+
+            // 도서 목록 테이블의 각 행을 순회하며 가격 더하기
+            document.querySelectorAll("#cart-items tr").forEach(row => {
+                const bookId = parseInt(row.dataset.bookId, 10); // 데이터 ID
+                const price = parseInt(row.querySelector("[data-price]").dataset.price, 10); // 책 가격
+                const quantityElement = row.querySelector(".quantity");
+                const totalPriceElement = row.querySelector(".total-price");
+
+                // 수량 결정: buynow_quantity가 우선, 없으면 로컬스토리지 값
+                let quantity;
+                if (buynowQuantity !== null) {
+                    quantity = buynowQuantity; // 바로 구매일 경우
+                } else {
+                    // 장바구니에서 수량을 가져옴
+                    const cartItem = cartItems.find(item => parseInt(item.bookId, 10) === bookId); // bookId를 숫자로 변환 후 비교
+                    quantity = cartItem ? parseInt(cartItem.quantity, 10) : 1; // 기본값 1
+                }
+
+                // 수량이 NaN인 경우 1로 설정
+                if (isNaN(quantity)) {
+                    quantity = 1;
+                }
+
+                // 수량 및 합계 업데이트
+                quantityElement.textContent = quantity;
+                const total = price * quantity;
+                totalPriceElement.textContent = total.toLocaleString();
+
+                // 총 가격 계산
+                totalPrice += total;
+            });
+
+            // 포장지 가격 추가
+            const selectedOption = wrappingPaperSelect.options[wrappingPaperSelect.selectedIndex];
+            const wrappingPrice = parseInt(selectedOption.dataset.price, 10) || 0; // 선택된 포장지 가격
+            totalPrice += wrappingPrice;
+
+            // 총 가격 업데이트
+            document.getElementById("total-price").textContent = totalPrice.toLocaleString();
+
+            overlay.style.display = "none";
+        }
+
+        // 초기 페이지 로딩 시 가격 계산 실행
+        calculateTotalPrice();
+
+        // 포장지 선택 시 가격 재계산
+        wrappingPaperSelect.addEventListener("change", () => {
+            if(isWrappable === false) {
+                alert("포장할 수 없는 상품이 포함되어 있습니다!");
+                // 선택 안함으로 되돌리기
+                wrappingPaperSelect.value = "-1";
+            }
+            calculateTotalPrice();
+        });
 
 
         // toss payments
@@ -385,10 +508,20 @@
         document.getElementById("payment-button").addEventListener("click", async () => {
 
             try{
+                // 배송 정보 읽기
+                const zoneCode = document.getElementById("postCode").textContent.trim();
+                const address = document.getElementById("addressDisplay").textContent.trim();
+                const addressDetail = document.getElementById("addressDetailsDisplay").textContent.trim();
+
+                // 주소 값 확인
+                if (!zoneCode || !address || !addressDetail) {
+                    alert("주소를 설정해주세요.");
+                    return; // 결제 요청 중단
+                }
+
                 // 결제 정보 설정
                 // 주문 정보 구성
                 const orderId = `order-${Date.now()}`; // 고유한 주문 번호 (예: timestamp)
-                console.log(orderId);
 
                 // 장바구니 테이블에서 책 제목 추출
                 const bookTitles = Array.from(document.querySelectorAll("#cart-items tr"))
@@ -409,7 +542,16 @@
                     paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
                 }
 
-                await payment.requestPayment({
+                // 화면에 표시된 책 정보 가져오기
+                const books = Array.from(document.querySelectorAll("#cart-items tr")).map(row => {
+                    const bookId = parseInt(row.dataset.bookId, 10);
+                    const quantity = parseInt(row.querySelector(".quantity").textContent, 10);
+
+                    return { bookId, quantity };
+                });
+
+                // 결제 요청 데이터
+                const paymentRequest = {
                     method: "CARD", // 카드 결제
                     amount: {
                         currency: "KRW",
@@ -417,8 +559,6 @@
                     },
                     orderId: orderId, // 고유 주문번호
                     orderName: orderName,
-                    successUrl: window.location.origin + "/success", // 결제 요청이 성공하면 리다이렉트되는 URL
-                    failUrl: window.location.origin + "/fail", // 결제 요청이 실패하면 리다이렉트되는 URL
                     ...paymentData,
                     // 카드 결제에 필요한 정보
                     card: {
@@ -427,11 +567,49 @@
                         useCardPoint: false,
                         useAppCardOnly: false,
                     },
+                };
+
+                // 결제 요청
+                const result = await payment.requestPayment(paymentRequest);
+
+                // 서버에 데이터 저장 중 로딩 오버레이
+                overlay.style.display = "block";
+
+                // 결제 승인, 데이터 저장
+                const response = await fetch('/purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentKey: result.paymentKey,
+                        orderId: result.orderId,
+                        amount: result.amount.value,
+                        books: books,
+                        zoneCode: zoneCode,
+                        address: address,
+                        addressDetail: addressDetail,
+                        wrappingPaperId: wrappingPaperSelect.value
+                    }),
                 });
 
+                if (!response.ok) {
+                    const errorMessage = await response.text(); // 서버에서 보낸 에러 메시지 받기
+                    throw new Error(`서버 오류: ${errorMessage}`);
+                }
+
+                // GET /purchase/success
+                const successUrl = `/purchase/success?orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
+                window.location.href = successUrl;
+
             } catch(error){
-                console.log("결제 중 문제 발생", error);
-                alert("결제 진행 중 문제가 발생했습니다.");
+                console.error("결제 에러", error);
+
+                // 에러 메시지와 코드를 fail 페이지로 전달
+                const failUrl = `/purchase/fail?errorCode=${encodeURIComponent(error.code)}&errorMessage=${encodeURIComponent(error.message)}`;
+                window.location.href = failUrl;
+            } finally {
+                overlay.style.display = "none";
             }
 
         });
@@ -439,30 +617,35 @@
 
     });
 
-    // 비로그인 사용자: 임시 주소 표시 함수
-    function displayTemporaryAddress(address) {
-        // 존재 여부 확인 후 업데이트
-        var recipientNameDisplay = document.getElementById('recipientNameDisplay');
-        var postCode = document.getElementById('postCode');
-        var addressDisplay = document.getElementById('addressDisplay');
-        var addressDetailsDisplay = document.getElementById('addressDetailsDisplay');
-
-        if (recipientNameDisplay && postCode && addressDisplay && addressDetailsDisplay) {
-            recipientNameDisplay.textContent = address.addressName;
-            postCode.textContent = address.zoneCode; // 'zoneCode'로 수정됨
-            addressDisplay.textContent = address.address;
-            addressDetailsDisplay.textContent = address.addressDetail;
-        }
-    }
-
-    // 배송지 추가 버튼 클릭 시 새 배송지 추가 모달 열기
-    function goToAddAddress() {
-        openAddAddressModal();
-    }
-
 
 
 </script>
 
 </body>
+
+<!-- 결제 처리 중 로딩 오버레이 -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="spinner"></div>
+        <p style="color: white;">잠시만 기다려주세요...</p>
+    </div>
+</div>
+
+<!-- 로딩 스피너 스타일 -->
+<style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
 </html>

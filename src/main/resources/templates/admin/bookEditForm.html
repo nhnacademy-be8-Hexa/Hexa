@@ -88,59 +88,58 @@
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
-
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:inline="javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-            const editorContainer = document.querySelector('#editor');
-            const hiddenContent = document.querySelector('#content');
-
-            if (!editorContainer) {
-                console.error('Editor container not found.');
-                return;
-            }
-
-            const initialContent = hiddenContent.value;
-
-            const editor = new toastui.Editor({
-                el: editorContainer,
-                height: '500px',
-                initialEditType: 'markdown',
-                previewStyle: 'vertical',
-                initialValue: initialContent,
-                hooks: {
-                    addImageBlobHook: (blob, callback) => {
-                        const formData = new FormData();
-                        formData.append('image', blob);
-
-                        fetch('/upload-image', {
-                            method: 'POST',
-                            body: formData,
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.url) {
-                                    callback(data.url, 'Image');
-                                } else {
-                                    alert('이미지 업로드 실패');
-                                    callback('', 'Image upload failed');
-                                }
-                            })
-                            .catch(err => {
-                                console.error('Error uploading image:', err);
-                                callback('', 'Image upload failed');
-                            });
-                    }
-                }
-            });
-
-            const form = document.getElementById('bookEditForm');
-            form.addEventListener('submit', function () {
-                hiddenContent.value = editor.getMarkdown();
-            });
-        });
-    </script>
 </div>
 </body>
 </html>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const editorContainer = document.querySelector('#editor');
+        const hiddenContent = document.querySelector('#content');
+
+        if (!editorContainer) {
+            console.error('Editor container not found.');
+            return;
+        }
+
+        const initialContent = hiddenContent.value;
+
+        const editor = new toastui.Editor({
+            el: editorContainer,
+            height: '500px',
+            initialEditType: 'markdown',
+            previewStyle: 'vertical',
+            initialValue: initialContent,
+            hooks: {
+                addImageBlobHook: (blob, callback) => {
+                    const formData = new FormData();
+                    formData.append('image', blob);
+
+                    fetch('/upload-image', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.url) {
+                                callback(data.url, 'Image');
+                            } else {
+                                alert('이미지 업로드 실패');
+                                callback('', 'Image upload failed');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error uploading image:', err);
+                            callback('', 'Image upload failed');
+                        });
+                }
+            }
+        });
+
+        const form = document.getElementById('bookEditForm');
+        form.addEventListener('submit', function () {
+            hiddenContent.value = editor.getMarkdown();
+        });
+    });
+</script>

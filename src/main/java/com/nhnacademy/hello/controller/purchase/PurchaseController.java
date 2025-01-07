@@ -1,25 +1,30 @@
 package com.nhnacademy.hello.controller.purchase;
 
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.member.MemberDTO;
-import com.nimbusds.openid.connect.sdk.claims.Address;
+import com.nhnacademy.hello.dto.order.OrderRequestDTO;
+import com.nhnacademy.hello.dto.order.OrderStatusDTO;
+import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
+import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
+import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +37,16 @@ public class PurchaseController {
     private final AddressAdapter addressAdapter;
     private final MemberAdapter memberAdapter;
 
+    // 주문 정보
+    private final OrderAdapter orderAdapter;
+    private final WrappingPaperAdapter wrappingPaperAdapter;
+    private final OrderStatusAdapter orderStatusAdapter;
+
     @Value("${toss.client.key}")
     private String tossClientKey;
+
+    @Value("${toss.secret.key}")
+    private String tossSecretKey;
 
     @GetMapping("/purchase")
     public String purchaseCartItem(
@@ -70,6 +83,20 @@ public class PurchaseController {
         if(quantity != null && quantity > 0) {
             model.addAttribute("buynow_quantity", quantity);
         }
+
+        // 포장지 목록 전달
+        List<WrappingPaperDTO> wrappingPaperList = wrappingPaperAdapter.getAllWrappingPapers();
+        model.addAttribute("wrappingPaperList", wrappingPaperList);
+
+        // 포장 가능 여부 계산해서 전달
+        boolean isWrappable = true;
+        for(BookDTO bookDTO : bookList) {
+            if(!bookDTO.bookWrappable()){
+                isWrappable = false;
+                break;
+            }
+        }
+        model.addAttribute("isWrappable", isWrappable);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
@@ -151,4 +178,92 @@ public class PurchaseController {
             return ResponseEntity.ok(response);
         }
     }
+
+    // 결제 정보 저장
+    @PostMapping("/purchase")
+    public ResponseEntity<?> purchase(
+            @RequestBody PurchaseDTO purchaseDTO
+    ){
+
+        // toss에 결제 승인 요청
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .header("Authorization", "Basic " + tossSecretKey)
+                .header("Content-Type", "application/json")
+                .method("POST", HttpRequest.BodyPublishers.ofString("{\"paymentKey\":\"" + purchaseDTO.paymentKey() + "\",\"orderId\":\"" + purchaseDTO.orderId() + "\",\"amount\":" + purchaseDTO.amount() + "}"))
+                .build();
+
+        try {
+            HttpResponse<?> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 성공적인 응답
+            if (response.statusCode() != 200) {
+                // 토스에서 반환한 에러 메시지
+                return ResponseEntity
+                        .status(response.statusCode())
+                        .body(response.body());
+            }
+
+        } catch (IOException | InterruptedException e) {
+            // 시스템 예외
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("결제 처리 중 내부 오류가 발생했습니다.");
+        }
+
+        // 'WAIT' 주문 상태의 아이디 검색
+        Long statusId = 1L;
+        for(OrderStatusDTO dto : orderStatusAdapter.getAllOrderStatus()){
+            if(dto.orderStatus().equals("WAIT")){
+                statusId = dto.orderStatusId();
+                break;
+            }
+        }
+
+        // order 저장
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
+                AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
+                purchaseDTO.amount(),
+                purchaseDTO.wrappingPaperId() <= 0 ? null : purchaseDTO.wrappingPaperId(),
+                statusId,
+                purchaseDTO.zoneCode(),
+                purchaseDTO.address(),
+                purchaseDTO.addressDetail()
+        );
+
+        orderAdapter.createOrder(
+                orderRequestDTO,
+                purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
+                purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
+                null
+                );
+
+        return ResponseEntity.ok("결제 성공.");
+    }
+
+    // 결제 성공 페이지
+    @GetMapping("/purchase/success")
+    public String purchaseSuccess(
+            @RequestParam("orderName") String orderName,
+            @RequestParam("amount") Double amount,
+            Model model
+    ) {
+        model.addAttribute("orderName", orderName);
+        model.addAttribute("totalPrice", new DecimalFormat("#,###").format(amount));
+        return "purchase/success";
+    }
+
+    //결제 실패 페이지
+    @GetMapping("/purchase/fail")
+    public String purchaseFail(
+            @RequestParam("errorCode") String errorCode,
+            @RequestParam("errorMessage") String errorMessage,
+            Model model
+    ) {
+        model.addAttribute("errorCode", errorCode);
+        model.addAttribute("errorMessage", errorMessage);
+        return "purchase/fail";
+    }
+
 }
+
