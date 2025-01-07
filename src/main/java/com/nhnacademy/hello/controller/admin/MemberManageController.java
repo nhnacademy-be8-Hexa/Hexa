@@ -27,26 +27,29 @@ public class MemberManageController {
                              @RequestParam(required = false) String search,
                              Model model) {
         List<MemberDTO> members;
+        int totalPages;
 
         try {
             // FeignClient를 통해 페이징 및 검색 조건으로 회원 목록 조회
             members = memberAdapter.getMembers(page - 1, pageSize, search);
 
-            // 전체 페이지 수 계산 (페이지 당 회원 수는 pageSize)
-            int totalCount = members.size(); // 실제 totalCount는 별도 API에서 가져올 수 있습니다.
-            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            // 전체 페이지 수 계산 (현재는 mock 값 사용, 실제 전체 회원 수 API 사용 가능)
+            int totalCount = members.size(); // 실제 totalCount를 가져오는 API가 있다면 교체
+            totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
             model.addAttribute("members", members);
-            model.addAttribute("currentPage", page);
+            model.addAttribute("currentPage", page); // 요청된 page 값을 모델에 전달
             model.addAttribute("pageSize", pageSize);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("search", search);
         } catch (Exception e) {
             model.addAttribute("error", "회원 데이터를 불러오는 중 오류가 발생했습니다.");
+            model.addAttribute("members", List.of());
         }
 
         return "admin/memberManage"; // 멤버 관리 페이지
     }
+
 
     // 특정 회원 상세 조회
     @GetMapping("/{memberId}")
