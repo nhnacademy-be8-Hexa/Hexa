@@ -95,7 +95,10 @@ public class BookManageController {
                 sortByView,
                 sortBySellCount,
                 sortByLikeCount,
-                latest
+                latest,
+                null,
+                null,
+                null
         );
 
         // 모델에 데이터 추가

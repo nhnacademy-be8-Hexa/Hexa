@@ -42,7 +42,13 @@ public interface BookAdapter {
             //좋아요수에 의한 정렬
             @RequestParam(required = false) Boolean sortByLikeCount,
             //출간일 최신순으로 정렬
-            @RequestParam(required = false) Boolean latest
+            @RequestParam(required = false) Boolean latest,
+            //도서명 내림차순
+            @RequestParam(required = false) Boolean sortByBookTitleDesc,
+            //도서명 오름차순
+            @RequestParam(required = false) Boolean sortByBookTitleAsc,
+            //리뷰순
+            @RequestParam(required = false) Boolean sortByReviews
     );
 
     // 도서 아이디리스트를 이용한 도서 목록 조회
