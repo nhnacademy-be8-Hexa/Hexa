@@ -55,25 +55,27 @@
                 <a href="/newarrivals" class="category-item">신작</a>
 
 
-                <!-- 드롭다운 카테고리 -->
                 <div class="dropdown">
                     <a href="#" class="category-item">카테고리</a>
                     <div class="dropdown-menu">
                         <!-- 1차 카테고리 동적 렌더링 -->
                         <div th:each="category : ${categories}" class="dropdown-item">
-                            <a th:href="@{'/categories/' + ${category.categoryId} + '/books'}"
+                            <a th:href="@{'/categories/books?categoryId=' + ${category.categoryId}}"
                                class="category-link"
                                th:text="${category.categoryName}">카테고리명</a>
+
                             <!-- 2차 카테고리가 있는 경우만 렌더링 -->
                             <div th:if="${category.subCategories != null and !category.subCategories.isEmpty()}"
                                  class="sub-dropdown-menu">
                                 <a th:each="subCategory : ${category.subCategories}"
-                                   th:href="@{'/categories/' + ${subCategory.categoryId} + '/books'}"
+                                   th:href="@{'/categories/books?categoryId=' + ${subCategory.categoryId}}"
                                    th:text="${subCategory.categoryName}" class="sub-category-link">서브카테고리명</a>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </nav>
     </header>

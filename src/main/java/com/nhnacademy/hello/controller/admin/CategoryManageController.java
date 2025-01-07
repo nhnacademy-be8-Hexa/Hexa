@@ -6,8 +6,8 @@ import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.category.SecondCategoryRequestDTO;
 import jakarta.validation.Valid;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -47,7 +47,8 @@ public class CategoryManageController {
         }
 
         List<CategoryDTO> categories = categoryAdapter.getCategories().getBody();
-        List<Long> categoriesWithSubCategories = findCategoriesIdsWithSubCategories(Objects.requireNonNull(categories));
+        List<Long> categoriesWithSubCategories =
+                findCategoriesIdsWithSubCategories(categories != null ? categories : Collections.emptyList());
         List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllPagedCategories(adjustedPage, size).getBody();
         List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
