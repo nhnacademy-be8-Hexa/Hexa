@@ -1,68 +1,42 @@
 package com.nhnacademy.hello.controller.point;
 
-
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
-import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
+import com.nhnacademy.hello.common.util.AuthInfoUtils;
+import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.point.PointDetailsDTO;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/members/{memberId}/pointDetails")
+@Controller
 @RequiredArgsConstructor
-@Slf4j
 public class PointDetailsController {
+
     private final PointDetailsAdapter pointDetailsAdapter;
+    private final MemberAdapter memberAdapter;
 
     /**
-     * 포인트 상세 정보 생성
+     * 포인트 내역 페이지를 반환하는 메소드
      *
-     * @param memberId 회원 ID
-     * @param createPointDetailDTO 포인트 상세 정보
-     * @return 생성된 포인트 상세 정보
+     * @param model 뷰에 전달할 모델
+     * @return 포인트 내역 페이지 뷰
      */
-    @PostMapping
-    public ResponseEntity<PointDetailsDTO> createPointDetails(
-            @PathVariable String memberId,
-            @RequestBody @Valid CreatePointDetailDTO createPointDetailDTO) {
-        return pointDetailsAdapter.createPointDetails(memberId, createPointDetailDTO);
-    }
+    @GetMapping("/mypage/points")
+    public String pointsPage(Model model) {
 
-    /**
-     * 회원 포인트 합계 조회
-     *
-     * @param memberId 회원 ID
-     * @return 회원 포인트 합계
-     */
-    @GetMapping("/sum")
-    public ResponseEntity<Long> getPointSum(@PathVariable String memberId) {
-        return pointDetailsAdapter.sumPoint(memberId);
-    }
+        String username = AuthInfoUtils.getUsername();
+        MemberDTO member = memberAdapter.getMember(username);
+        Long sum = pointDetailsAdapter.sumPoint(username).getBody();
+        List<PointDetailsDTO> pointDetails = pointDetailsAdapter.getPointDetails(username, 0, 10, "date,desc").getBody();
 
-    /**
-     * 회원 포인트 상세 정보 조회
-     *
-     * @param memberId 회원 ID
-     * @param page 페이지 번호
-     * @param size 페이지 크기
-     * @param sort 정렬 기준 (예: "date,desc")
-     * @return 포인트 상세 정보 목록
-     */
+        model.addAttribute("member", member);
+        model.addAttribute("sum", sum);
+        model.addAttribute("pointDetails", pointDetails);
 
-    @GetMapping
-    public ResponseEntity<List<PointDetailsDTO>> getPointDetails(
-            @PathVariable String memberId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "date,desc") String sort) {
-        ResponseEntity<List<PointDetailsDTO>> pointDetails = pointDetailsAdapter.getPointDetails(memberId, page, size, sort);
-        log.warn(pointDetails.toString());
-        return pointDetails;
+        return "member/points";
     }
 }

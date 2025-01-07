@@ -1,48 +1,99 @@
 package com.nhnacademy.hello.controller.point;
 
 import com.nhnacademy.hello.common.feignclient.PointPolicyAdapter;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.util.AuthInfoUtils;
+import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.point.PointPolicyDTO;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/pointPolicies")
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/admin/point")
 public class PointPolicyController {
 
     private final PointPolicyAdapter pointPolicyAdapter;
+    private final MemberAdapter memberAdapter;
 
-    public PointPolicyController(PointPolicyAdapter pointPolicyAdapter) {
-        this.pointPolicyAdapter = pointPolicyAdapter;
-    }
-
-    // 모든 포인트 정책 조회
+    /**
+     * 포인트 정책 관리 페이지
+     */
     @GetMapping
-    public ResponseEntity<List<PointPolicyDTO>> getAllPointPolicies(){
-        return pointPolicyAdapter.getAllPointPolicies();
+    public String adminPointPolicyPage(Model model) {
+        if (!AuthInfoUtils.isLogin()) {
+            return "redirect:/login";
+        }
+
+        MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
+
+        if (!"ADMIN".equals(memberDTO.memberRole())) {
+            return "redirect:/index";
+        }
+
+        List<PointPolicyDTO> policies = pointPolicyAdapter.getAllPointPolicies().getBody();
+
+        model.addAttribute("member", memberDTO);
+        model.addAttribute("policies", policies);
+
+        return "admin/point"; // 관리 페이지로 이동
     }
 
-    // 포인트 정책 생성
+    /**
+     * 포인트 정책 생성 페이지
+     */
+    @GetMapping("/create")
+    public String createPointPolicyForm(Model model) {
+        model.addAttribute("pointPolicyDTO", new PointPolicyDTO("", 0)); // 기본값을 넣어준다
+        return "admin/createPointPolicy";
+    }
+
+    /**
+     * 포인트 정책 생성
+     */
     @PostMapping
-    public ResponseEntity<PointPolicyDTO> createPointPolicy(@RequestBody @Valid PointPolicyDTO pointPolicyDTO){
-        return pointPolicyAdapter.createPointPolicy(pointPolicyDTO);
+    public String createPointPolicy(@RequestParam("pointPolicyName") String pointPolicyName,
+                                    @RequestParam("pointDelta") Integer pointDelta, Model model) {
+        PointPolicyDTO pointPolicyDTO = new PointPolicyDTO(pointPolicyName, pointDelta);
+        pointPolicyAdapter.createPointPolicy(pointPolicyDTO); // 포인트 정책 생성
+        return "redirect:/admin/point"; // 생성 후 목록으로 리다이렉트
     }
 
-    // 포인트 정책 수정
-    @PutMapping
-    public ResponseEntity<PointPolicyDTO> updatePointPolicy(@RequestBody @Valid PointPolicyDTO pointPolicyDTO){
-        PointPolicyDTO updatedPolicyDTO = new PointPolicyDTO(
-                pointPolicyDTO.pointPolicyName(),
-                pointPolicyDTO.pointDelta()
-        );
-        return pointPolicyAdapter.updatePointPolicy(updatedPolicyDTO);
+    /**
+     * 포인트 정책 수정 페이지
+     */
+    @GetMapping("/edit/{pointPolicyName}")
+    public String editPointPolicyForm(@PathVariable String pointPolicyName, Model model) {
+        PointPolicyDTO pointPolicy = pointPolicyAdapter.getAllPointPolicies().getBody()
+                .stream()
+                .filter(policy -> policy.pointPolicyName().equals(pointPolicyName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 정책을 찾을 수 없습니다."));
+        model.addAttribute("pointPolicyDTO", pointPolicy);
+        return "admin/editPointPolicy";
     }
 
-    // 포인트 정책 삭제
-    @DeleteMapping("/{pointPolicyName}")
-    public ResponseEntity<Void> deletePointPolicy(@PathVariable String pointPolicyName){
-        return pointPolicyAdapter.deletePointPolicy(pointPolicyName);
+    /**
+     * 포인트 정책 수정
+     */
+    @PostMapping("/edit")
+    public String updatePointPolicy(@RequestParam("pointPolicyName") String pointPolicyName,
+                                    @RequestParam("pointDelta") Integer pointDelta) {
+        PointPolicyDTO updatedPolicyDTO = new PointPolicyDTO(pointPolicyName, pointDelta);
+        pointPolicyAdapter.updatePointPolicy(updatedPolicyDTO);
+        return "redirect:/admin/point"; // 수정 후 목록으로 리다이렉트
+    }
+
+    /**
+     * 포인트 정책 삭제
+     */
+    @PostMapping("/delete/{pointPolicyName}")
+    public String deletePointPolicy(@PathVariable String pointPolicyName) {
+        pointPolicyAdapter.deletePointPolicy(pointPolicyName);
+        return "redirect:/admin/point"; // 삭제 후 목록으로 리다이렉트
     }
 }
