@@ -2,7 +2,7 @@ package com.nhnacademy.hello.controller.book;
 
 
 import com.nhnacademy.hello.common.feignclient.ElasticSearchAdapter;
-import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.SearchBookDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,8 +35,8 @@ public class ElasticSearchController {
             page = totalPages;
         }
 
-        List<BookDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
-        List<BookDTO> searchBooksWithImages = setImagePaths(searchBooks);
+        List<SearchBookDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
+        List<SearchBookDTO> searchBooksWithImages = setImagePaths(searchBooks);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
         model.addAttribute("search", search);
         model.addAttribute("currentPage", page);
@@ -49,13 +49,13 @@ public class ElasticSearchController {
     /**
      * 도서 리스트에 이미지 경로를 설정하는 메소드
      */
-    private List<BookDTO> setImagePaths(List<BookDTO> searchBooks) {
+    private List<SearchBookDTO> setImagePaths(List<SearchBookDTO> searchBooks) {
         return searchBooks.stream().map(book -> {
             String imageName = "bookThumbnail_" + book.bookId();
             List<String> imagePaths = imageStore.getImage(imageName);
             String imagePath = (imagePaths != null && !imagePaths.isEmpty()) ?
                     imagePaths.get(0) : "/images/default-book.jpg"; // 기본 이미지 경로로 수정
-            return new BookDTO(
+            return new SearchBookDTO(
                     book.bookId(),
                     book.bookTitle(),
                     book.bookDescription(),
