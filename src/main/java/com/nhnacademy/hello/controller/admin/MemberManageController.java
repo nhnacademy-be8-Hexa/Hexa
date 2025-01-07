@@ -76,6 +76,10 @@ public class MemberManageController {
             model.addAttribute("ratings", ratings);
             model.addAttribute("memberStatuses", memberStatuses);
 
+            // 추가로 lastLoginAt과 createdAt 전달
+            model.addAttribute("memberCreatedAt", member.memberCreatedAt());
+            model.addAttribute("memberLastLoginAt", member.memberLastLoginAt());
+
             return "admin/memberUpdateForm";
         } catch (Exception e) {
             model.addAttribute("error", "회원 정보를 불러오는 중 오류가 발생했습니다.");
