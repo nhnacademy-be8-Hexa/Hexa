@@ -94,7 +94,10 @@ public class CategoryController {
                 sortByView,
                 sortBySellCount,
                 sortByLikeCount,
-                latest
+                latest,
+                null,
+                null,
+                null
         );
 
 
