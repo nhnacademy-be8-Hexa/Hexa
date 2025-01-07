@@ -5,6 +5,7 @@ import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
@@ -45,6 +46,7 @@ public class PurchaseController {
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
     private final PointDetailsAdapter pointDetailsAdapter;
+    private final DeliveryAdapter deliveryAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -233,12 +235,12 @@ public class PurchaseController {
                 purchaseDTO.addressDetail()
         );
 
-        orderAdapter.createOrder(
+        Long savedOrderId = orderAdapter.createOrder(
                 orderRequestDTO,
                 purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
                 purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
                 null
-                );
+                ).getBody();
 
         // 포인트 사용 처리
         if(purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0){
@@ -257,6 +259,15 @@ public class PurchaseController {
             );
             pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
         }
+
+        // 배송 정보 저장
+        DeliveryRequestDTO deliveryRequestDTO = new DeliveryRequestDTO(
+                savedOrderId,
+                3000,
+                purchaseDTO.deliveryDate(),
+                purchaseDTO.deliveryDate().minusDays(1)
+        );
+        deliveryAdapter.createDelivery(deliveryRequestDTO);
 
         // ------------------------------------------------------------------------
 
