@@ -84,7 +84,9 @@
                     <!-- 이전 버튼 -->
                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{'/admin/members'(page=${currentPage - 1}, search=${search})}">&laquo;</a>
+                           th:href="@{'/admin/members'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1}, search=${search})}">
+                            &laquo;
+                        </a>
                     </li>
 
                     <!-- 페이지 번호 -->
@@ -97,7 +99,9 @@
                     <!-- 다음 버튼 -->
                     <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{'/admin/members'(page=${currentPage + 1}, search=${search})}">&raquo;</a>
+                           th:href="@{'/admin/members'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}">
+                            &raquo;
+                        </a>
                     </li>
                 </ul>
             </nav>

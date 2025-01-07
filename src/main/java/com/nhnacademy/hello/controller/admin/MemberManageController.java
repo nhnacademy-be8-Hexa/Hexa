@@ -35,9 +35,10 @@ public class MemberManageController {
             ResponseEntity<Long> response = memberAdapter.getMemberCount(search);
             long totalCount = response.getBody() != null ? response.getBody() : 0; // null일 경우 0으로 처리
             int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            int currentPage = page > 0 ? page : 1; // 0 이하일 경우 기본값 설정
 
             model.addAttribute("members", members);
-            model.addAttribute("currentPage", page); // 요청된 page 값을 모델에 전달
+            model.addAttribute("currentPage", currentPage);
             model.addAttribute("pageSize", pageSize);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("search", search);
