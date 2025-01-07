@@ -27,37 +27,6 @@
 
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <h1>배송</h1>
-
-    <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
-    <div class="card p-3">
-        <!-- 주소 별칭 -->
-        <div class="mb-2">
-            <strong>주소 별칭:</strong>
-            <span id="recipientNameDisplay"></span>
-        </div>
-        <!-- 우편번호 -->
-        <div class="mb-2">
-            <strong>배송지 우편번호:</strong>
-            <span id="postCode"></span>
-        </div>
-        <!-- 주소 -->
-        <div class="mb-2">
-            <strong>배송지 주소:</strong>
-            <span id="addressDisplay"></span>
-        </div>
-        <!-- 상세주소 -->
-        <div class="mb-2">
-            <strong>배송지 상세주소:</strong>
-            <span id="addressDetailsDisplay"></span>
-        </div>
-        <!-- 로그인 상태에 따른 버튼 표시 -->
-        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
-        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
-    </div>
-
-    <hr>
-
     <h1>주문</h1>
 
     <!-- 장바구니 항목 테이블 -->
@@ -136,6 +105,34 @@
         <label for="delivery-date" class="font-weight-bold h5">배송일 선택</label>
         <input type="date" id="delivery-date" class="form-control" required>
         <small class="text-muted">하루 뒤 부터 선택 가능합니다.</small>
+    </div>
+
+    <h1 class="mt-4">배송지</h1>
+    <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
+    <div class="card p-3">
+        <!-- 주소 별칭 -->
+        <div class="mb-2">
+            <strong>주소 별칭:</strong>
+            <span id="recipientNameDisplay"></span>
+        </div>
+        <!-- 우편번호 -->
+        <div class="mb-2">
+            <strong>배송지 우편번호:</strong>
+            <span id="postCode"></span>
+        </div>
+        <!-- 주소 -->
+        <div class="mb-2">
+            <strong>배송지 주소:</strong>
+            <span id="addressDisplay"></span>
+        </div>
+        <!-- 상세주소 -->
+        <div class="mb-2">
+            <strong>배송지 상세주소:</strong>
+            <span id="addressDetailsDisplay"></span>
+        </div>
+        <!-- 로그인 상태에 따른 버튼 표시 -->
+        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
+        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
     </div>
 
     <!--    배송비 표시-->
