@@ -100,7 +100,36 @@
         </div>
     </div>
 
-<!--   배송일 지정 필드-->
+<!--    비회원 정보 입력 필드-->
+    <div class="container mt-4" th:if="${not isLoggedIn}">
+        <!-- 비회원 정보 상자 -->
+        <div class="p-4 bg-light border rounded">
+            <h3 class="text-center mb-4">비회원 정보</h3>
+
+            <!-- 입력 필드들 -->
+            <div class="form-group">
+                <label for="guest_order_number">전화 번호</label>
+                <input type="text" id="guest_order_number" name="guest_order_number" class="form-control"
+                       placeholder="10~11자리 번호 입력" minlength="10" maxlength="11" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guest_order_email">이메일</label>
+                <input type="email" id="guest_order_email" name="guest_order_email" class="form-control"
+                       placeholder="이메일 주소 입력" maxlength="320" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guest_order_password">비밀번호</label>
+                <input type="password" id="guest_order_password" name="guest_order_password" class="form-control"
+                       placeholder="4~20자리 비밀번호 입력" minlength="4" maxlength="20" required>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--   배송일 지정 필드-->
     <div class="form-group mt-4">
         <label for="delivery-date" class="font-weight-bold h5">배송일 선택</label>
         <input type="date" id="delivery-date" class="form-control" required>
@@ -528,34 +557,35 @@
             calculateTotalPrice();
         });
 
+        if(pointInput) {
+            const maxPoint = parseInt(pointInput.getAttribute("max"), 10);
+            const minPoint = parseInt(pointInput.getAttribute("min"), 10);
 
-        const maxPoint = parseInt(pointInput.getAttribute("max"), 10);
-        const minPoint = parseInt(pointInput.getAttribute("min"), 10);
+            // 입력 필드가 갱신될 때마다 실행
+            pointInput.addEventListener("input", () => {
+                let currentValue = parseInt(pointInput.value, 10);
 
-        // 입력 필드가 갱신될 때마다 실행
-        pointInput.addEventListener("input", () => {
-            let currentValue = parseInt(pointInput.value, 10);
+                // 입력값이 숫자가 아닌 경우 0으로 설정
+                if (isNaN(currentValue)) {
+                    currentValue = 0;
+                }
 
-            // 입력값이 숫자가 아닌 경우 0으로 설정
-            if (isNaN(currentValue)) {
-                currentValue = 0;
-            }
+                // 최소값보다 작은 경우 최소값으로 설정
+                if (currentValue < minPoint) {
+                    currentValue = minPoint;
+                }
 
-            // 최소값보다 작은 경우 최소값으로 설정
-            if (currentValue < minPoint) {
-                currentValue = minPoint;
-            }
+                // 최대값보다 큰 경우 최대값으로 설정
+                if (currentValue > maxPoint) {
+                    currentValue = maxPoint;
+                }
 
-            // 최대값보다 큰 경우 최대값으로 설정
-            if (currentValue > maxPoint) {
-                currentValue = maxPoint;
-            }
+                // 값 업데이트
+                pointInput.value = currentValue;
 
-            // 값 업데이트
-            pointInput.value = currentValue;
-
-            calculateTotalPrice();
-        });
+                calculateTotalPrice();
+            });
+        }
 
         // 배송일 지정 필드 설정
         // 내일부터 날짜를 계산
@@ -596,6 +626,45 @@
         document.getElementById("payment-button").addEventListener("click", async () => {
 
             try{
+                // 비회원 정보 검증
+                const guestData = {};
+                if(!isLoggedIn) {
+                    const guestOrderNumber = document.querySelector("#guest_order_number").value;
+                    const guestEmail = document.querySelector("#guest_order_email").value;
+                    const guestPassword = document.querySelector("#guest_order_password").value;
+
+                    if(!guestOrderNumber || !guestEmail || !guestPassword) {
+                        alert("비회원 정보를 입력해주세요.");
+                        return;
+                    }
+
+                    // 주문 번호 유효성 검사
+                    if (guestOrderNumber.length < 10 || guestOrderNumber.length > 11) {
+                        alert("전화번호는 10~11자로 입력해주세요.");
+                        return;
+                    }
+
+                    // 이메일 유효성 검사
+                    if (!guestEmail.includes("@") || guestEmail.length > 320) {
+                        alert("유효한 이메일 주소를 입력해주세요.");
+                        return;
+                    }
+
+                    // 비밀번호 유효성 검사
+                    if (guestPassword.length < 4 || guestPassword.length > 20) {
+                        alert("비밀번호는 4~20자로 입력해주세요.");
+                        return;
+                    }
+
+
+                    guestData.guestOrderNumber = guestOrderNumber;
+                    guestData.guestEmail = guestEmail;
+                    guestData.guestPassword = guestPassword;
+
+                }
+
+
+
                 // 배송 정보 읽기
                 const zoneCode = document.getElementById("postCode").textContent.trim();
                 const address = document.getElementById("addressDisplay").textContent.trim();
@@ -694,6 +763,7 @@
                         wrappingPaperId: wrappingPaperSelect.value,
                         usingPoint: isNaN(pointValue) ? 0 : pointValue,
                         deliveryDate: formattedDeliveryDate,
+                        ...guestData,
                     }),
                 });
 
