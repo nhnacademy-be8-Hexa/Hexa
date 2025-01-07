@@ -23,15 +23,4 @@ public class FeignConfig {
     public FeignClientJwtInterceptor feignClientJwtInterceptor(HttpServletRequest request) {
         return new FeignClientJwtInterceptor(request, jwtProperties);
     }
-
-    // 직렬화 문제로 추가
-    @Bean
-    public Decoder feignDecoder(ObjectFactory<HttpMessageConverters> messageConverters) {
-        return new SpringDecoder(messageConverters);
-    }
-
-    @Bean
-    public Encoder feignEncoder(ObjectFactory<HttpMessageConverters> messageConverters) {
-        return new SpringEncoder(messageConverters);
-    }
 }
