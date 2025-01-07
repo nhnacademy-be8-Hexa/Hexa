@@ -81,18 +81,30 @@ public class MemberManageController {
 
 
 
-    // 멤버 정보 수정 (상태 변경 포함)
+    // 멤버 정보 수정 (등급, 상태 포함)
     @PostMapping("/{memberId}")
     public String updateMember(@PathVariable String memberId,
-                               @ModelAttribute @Valid MemberUpdateDTO memberUpdateDTO) {
-        // 멤버 정보를 수정
-        ResponseEntity<MemberDTO> response = memberAdapter.updateMember(memberId, memberUpdateDTO);
+                               @ModelAttribute @Valid MemberUpdateDTO memberUpdateDTO,
+                               Model model) {
+        try {
+            // 멤버 정보 수정
+            memberAdapter.updateMember(memberId, memberUpdateDTO);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
+            // 상태 업데이트
+            if (memberUpdateDTO.statusId() != null) {
+                memberAdapter.updateMemberStatus(Long.parseLong(memberUpdateDTO.statusId()), memberUpdateDTO);
+            }
+
+            // 등급 업데이트
+            if (memberUpdateDTO.ratingId() != null) {
+                memberAdapter.updateRating(Long.parseLong(memberUpdateDTO.ratingId()), memberUpdateDTO);
+            }
+
             return "redirect:/admin/members"; // 수정 성공 시 목록 페이지로 이동
+        } catch (Exception e) {
+            model.addAttribute("error", "회원 정보를 저장하는 중 오류가 발생했습니다.");
+            return "admin/memberUpdateForm";
         }
-
-        return "error"; // 실패 시 에러 페이지
     }
 
     // 특정 회원 상태 변경 요청 (탈퇴 처리)
