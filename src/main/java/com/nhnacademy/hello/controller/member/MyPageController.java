@@ -68,7 +68,6 @@ public class MyPageController {
                 member.memberEmail(),
                 member.memberBirthAt(),
                 null,
-                null,
                 null
         );
 
@@ -203,7 +202,6 @@ public class MyPageController {
     @GetMapping("/mypage/delete")
     public String memberDelete(HttpServletRequest request , HttpServletResponse response) {
         MemberUpdateDTO updateDTO = new MemberUpdateDTO(
-                null,
                 null,
                 null,
                 null,
