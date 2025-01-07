@@ -11,6 +11,7 @@ import com.nhnacademy.hello.dto.member.MemberRegisterDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/register")
@@ -69,12 +71,16 @@ public class MemberRegisterController {
 
         memberAdapter.createMember(requestDTO);
 
-        // welcomeCoupon 발급
-        CouponPolicyDTO couponPolicy = couponPolicyAdapter.getPolicyByEventType("welcome"); // welcome 쿠폰 정책 찾기
-        CouponRequestDTO couponRequest = new CouponRequestDTO(couponPolicy.couponPolicyId(),
-                "welcome!", "ALL", null, ZonedDateTime.now().plusDays(30)); // 쿠폰 생성 값
-        List<CouponDTO> coupon = couponAdapter.createCoupons(1,couponRequest); // 쿠폰 생성
-        couponMemberAdapter.createMemberCoupon(registerDTO.memberId(), coupon.getFirst().couponId()); // 쿠폰 배부
+        try {
+            // welcomeCoupon 발급
+            CouponPolicyDTO couponPolicy = couponPolicyAdapter.getPolicyByEventType("welcome"); // welcome 쿠폰 정책 찾기
+            CouponRequestDTO couponRequest = new CouponRequestDTO(couponPolicy.couponPolicyId(),
+                    "welcome!", "ALL", null, ZonedDateTime.now().plusDays(30)); // 쿠폰 생성 값
+            List<CouponDTO> coupon = couponAdapter.createCoupons(1, couponRequest); // 쿠폰 생성
+            couponMemberAdapter.createMemberCoupon(registerDTO.memberId(), coupon.getFirst().couponId()); // 쿠폰 배부
+        }catch (Exception e){
+            log.error("쿠폰 발급 오류", e);
+        }
 
         return "redirect:/";
     }
