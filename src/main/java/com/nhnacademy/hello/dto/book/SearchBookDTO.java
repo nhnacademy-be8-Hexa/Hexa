@@ -1,6 +1,6 @@
 package com.nhnacademy.hello.dto.book;
 
-public record BookSearchDTO(
+public record SearchBookDTO(
         Long bookId,
         String bookTitle,
         String bookDescription,
@@ -8,12 +8,13 @@ public record BookSearchDTO(
         Long bookIsbn,
         int bookOriginPrice,
         int bookPrice,
-        Boolean bookWrappable,
+        boolean bookWrappable,
         int bookView,
         int bookAmount,
         Long bookSellCount,
-        String publisherName,
-        String bookStatus,
+        PublisherRequestDTO publisher,
+        BookStatusRequestDTO bookStatus,
         String imagePath
 ) {
+
 }
