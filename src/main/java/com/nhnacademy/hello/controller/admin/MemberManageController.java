@@ -61,27 +61,31 @@ public class MemberManageController {
         return "admin/memberDetail";
     }
 
-    // 멤버 수정 페이지
     @GetMapping("/update/{memberId}")
     public String getUpdateForm(@PathVariable String memberId, Model model) {
-        MemberDTO member = memberAdapter.getMember(memberId);
+        try {
+            MemberDTO member = memberAdapter.getMember(memberId);
 
-        if (member == null) { // 멤버가 존재하지 않을 경우 예외 처리
-            model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
-            return "admin/memberManage"; // 목록 페이지로 리다이렉트
+            if (member == null) {
+                model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
+                return "admin/memberManage"; // 목록 페이지로 리다이렉트
+            }
+
+            // 등급 및 상태 데이터 가져오기
+            List<RatingDTO> ratings = memberAdapter.getRatings();
+            List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
+
+            model.addAttribute("member", member);
+            model.addAttribute("ratings", ratings);
+            model.addAttribute("memberStatuses", memberStatuses);
+
+            return "admin/memberUpdateForm";
+        } catch (Exception e) {
+            model.addAttribute("error", "회원 정보를 불러오는 중 오류가 발생했습니다.");
+            return "admin/memberManage";
         }
-
-        // FeignClient를 통해 등급 및 상태 목록을 가져오기
-        List<RatingDTO> ratings = memberAdapter.getRatings();
-        List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
-
-        // 동적으로 가져온 데이터 전달
-        model.addAttribute("member", member);
-        model.addAttribute("ratings", ratings);
-        model.addAttribute("memberStatuses", memberStatuses);
-
-        return "admin/memberUpdateForm";
     }
+
 
 
 
