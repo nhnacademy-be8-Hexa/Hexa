@@ -2,10 +2,7 @@ package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.common.config.FeignConfig;
 import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.member.LoginRequest;
-import com.nhnacademy.hello.dto.member.MemberDTO;
-import com.nhnacademy.hello.dto.member.MemberRequestDTO;
-import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
+import com.nhnacademy.hello.dto.member.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -45,4 +42,12 @@ public interface MemberAdapter {
     @GetMapping("/api/members/count")
     public ResponseEntity<Long> getMemberCount(
             @RequestParam(required = false) String search);
+
+    // 회원 등급 가져오기
+    @GetMapping("/api/ratings")
+    public List<RatingDTO> getRatings() ;
+
+    // 회원 상태 가져오기
+    @GetMapping("/api/memberStatus")
+    public List<MemberStatusDTO> getMemberStatus();
 }
