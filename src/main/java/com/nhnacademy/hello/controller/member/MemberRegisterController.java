@@ -1,6 +1,12 @@
 package com.nhnacademy.hello.controller.member;
 
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponPolicyAdapter;
+import com.nhnacademy.hello.dto.coupon.CouponDTO;
+import com.nhnacademy.hello.dto.coupon.CouponPolicyDTO;
+import com.nhnacademy.hello.dto.coupon.CouponRequestDTO;
 import com.nhnacademy.hello.dto.member.MemberRegisterDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
 import jakarta.validation.Valid;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +31,9 @@ public class MemberRegisterController {
 
     private final MemberAdapter memberAdapter;
     private final PasswordEncoder passwordEncoder;
+    private final CouponMemberAdapter couponMemberAdapter;
+    private final CouponPolicyAdapter couponPolicyAdapter;
+    private final CouponAdapter couponAdapter;
 
     @GetMapping
     public String registerForm() {
@@ -58,6 +68,13 @@ public class MemberRegisterController {
         );
 
         memberAdapter.createMember(requestDTO);
+
+        // welcomeCoupon 발급
+        CouponPolicyDTO couponPolicy = couponPolicyAdapter.getPolicyByEventType("welcome"); // welcome 쿠폰 정책 찾기
+        CouponRequestDTO couponRequest = new CouponRequestDTO(couponPolicy.couponPolicyId(),
+                "welcome!", "ALL", null, ZonedDateTime.now().plusDays(30)); // 쿠폰 생성 값
+        List<CouponDTO> coupon = couponAdapter.createCoupons(1,couponRequest); // 쿠폰 생성
+        couponMemberAdapter.createMemberCoupon(registerDTO.memberId(), coupon.getFirst().couponId()); // 쿠폰 배부
 
         return "redirect:/";
     }
