@@ -92,19 +92,6 @@
             </select>
         </div>
 
-
-        <!-- Member Role -->
-        <div class="mb-3">
-            <label for="memberRole" class="form-label">Member Role</label>
-            <select class="form-select" id="memberRole" name="memberRole" required>
-                <option th:each="role : ${roles}"
-                        th:value="${role}"
-                        th:selected="${member.memberRole == role}"
-                        th:text="${role}">
-                </option>
-            </select>
-        </div>
-
         <!-- Buttons -->
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Save Changes</button>

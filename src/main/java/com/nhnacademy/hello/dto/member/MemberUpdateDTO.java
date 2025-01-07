@@ -14,7 +14,6 @@ public record MemberUpdateDTO(
         @Length(max = 320, message = "이메일은 320자 이하이어야 합니다.")
         String memberEmail,
         LocalDate memberBirthAt,
-        String memberRole,
         String ratingId,
         String statusId
 ) {

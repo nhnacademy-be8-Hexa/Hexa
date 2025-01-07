@@ -74,13 +74,11 @@ public class MemberManageController {
         // FeignClient를 통해 등급 및 상태 목록을 가져오기
         List<RatingDTO> ratings = memberAdapter.getRatings();
         List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
-        List<String> roles = List.of("ADMIN", "MEMBER"); // 권한은 고정값
 
         // 동적으로 가져온 데이터 전달
         model.addAttribute("member", member);
         model.addAttribute("ratings", ratings);
         model.addAttribute("memberStatuses", memberStatuses);
-        model.addAttribute("roles", roles);
 
         return "admin/memberUpdateForm";
     }
@@ -127,7 +125,6 @@ public class MemberManageController {
                     null,    // 이메일
                     null,    // 생일
                     null,    // 등급
-                    null,
                     "3"      // 탈퇴 상태 ID
             );
             memberAdapter.updateMember(memberId, updateDTO); // PUT 요청 전송
