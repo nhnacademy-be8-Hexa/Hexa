@@ -1,6 +1,7 @@
 package com.nhnacademy.hello.controller.member;
 
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponPolicyAdapter;
@@ -9,6 +10,7 @@ import com.nhnacademy.hello.dto.coupon.CouponPolicyDTO;
 import com.nhnacademy.hello.dto.coupon.CouponRequestDTO;
 import com.nhnacademy.hello.dto.member.MemberRegisterDTO;
 import com.nhnacademy.hello.dto.member.MemberRequestDTO;
+import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ public class MemberRegisterController {
     private final CouponMemberAdapter couponMemberAdapter;
     private final CouponPolicyAdapter couponPolicyAdapter;
     private final CouponAdapter couponAdapter;
+    private final PointDetailsAdapter pointDetailsAdapter;
 
     @GetMapping
     public String registerForm() {
@@ -81,6 +84,16 @@ public class MemberRegisterController {
         }catch (Exception e){
             log.error("쿠폰 발급 오류", e);
         }
+
+        memberAdapter.createMember(requestDTO);
+
+        CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                5000,
+                "회원가입 포인트 지급"
+        );
+        pointDetailsAdapter.createPointDetails(registerDTO.memberId(), createPointDetailDTO);
+
+
 
         return "redirect:/";
     }
