@@ -90,7 +90,7 @@
                     </li>
 
                     <!-- 페이지 번호 -->
-                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                    <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
                         th:classappend="${i == currentPage} ? 'active'">
                         <a class="page-link" th:text="${i}"
                            th:href="@{'/admin/members'(page=${i}, search=${search})}"></a>
