@@ -84,32 +84,26 @@
                     <p class="text-danger">페이지 정보를 가져오는 데 문제가 발생했습니다. 다시 시도해 주세요.</p>
                 </div>
                 <div th:if="${currentPage != null && totalPages != null}">
-                    <!-- 페이징 네비게이션 -->
-                    <nav aria-label="Page navigation example" class="mt-4">
-                        <ul class="pagination justify-content-center">
+                    <nav>
+                        <ul class="pagination">
                             <!-- 이전 버튼 -->
-                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                            <li th:classappend="${currentPage == 1} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="@{'/admin/members'(page=${currentPage > 1 ? currentPage - 1 : 1}, search=${search})}"
-                                   aria-label="Previous">
-                                    &laquo;
-                                </a>
+                                   th:href="@{'/admin/members'(page=${currentPage - 1}, pageSize=${pageSize}, search=${search})}">&laquo;</a>
                             </li>
 
                             <!-- 페이지 번호 -->
-                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            <li th:each="i : ${#numbers.sequence(1, totalPages)}"
                                 th:classappend="${i == currentPage} ? 'active'">
-                                <a class="page-link" th:text="${i}"
-                                   th:href="@{'/admin/members'(page=${i}, search=${search})}"></a>
+                                <a class="page-link"
+                                   th:href="@{'/admin/members'(page=${i}, pageSize=${pageSize}, search=${search})}"
+                                   th:text="${i}"></a>
                             </li>
 
                             <!-- 다음 버튼 -->
-                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                            <li th:classappend="${currentPage == totalPages} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="@{'/admin/members'(page=${currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}"
-                                   aria-label="Next">
-                                    &raquo;
-                                </a>
+                                   th:href="@{'/admin/members'(page=${currentPage + 1}, pageSize=${pageSize}, search=${search})}">&raquo;</a>
                             </li>
                         </ul>
                     </nav>

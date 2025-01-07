@@ -20,34 +20,31 @@ import java.util.List;
 public class MemberManageController {
     private final MemberAdapter memberAdapter;
 
-    // 멤버 전체 조회
+    // 멤버 전체 조회 (페이징 및 검색 처리)
     @GetMapping
     public String getMembers(@RequestParam(defaultValue = "1") int page,
+                             @RequestParam(defaultValue = "10") int pageSize,
                              @RequestParam(required = false) String search,
                              Model model) {
         List<MemberDTO> members;
-        int totalPages = 1; // 기본값
 
         try {
-            if (search != null && !search.trim().isEmpty()) {
-                // 특정 아이디로 검색
-                members = memberAdapter.getMembers(page - 1, search.trim());
-            } else {
-                // 전체 회원 조회
-                members = memberAdapter.getMembers(page - 1, null);
-            }
+            // FeignClient를 통해 페이징 및 검색 조건으로 회원 목록 조회
+            members = memberAdapter.getMembers(page - 1, pageSize, search);
 
-            // 전체 페이지 수 계산 (여기서는 더미 값 사용)
-            totalPages = Math.max(1, (int) Math.ceil(members.size() / 10.0)); // 예제용
+            // 전체 페이지 수 계산 (페이지 당 회원 수는 pageSize)
+            int totalCount = members.size(); // 실제 totalCount는 별도 API에서 가져올 수 있습니다.
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+            model.addAttribute("members", members);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("pageSize", pageSize);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("search", search);
         } catch (Exception e) {
             model.addAttribute("error", "회원 데이터를 불러오는 중 오류가 발생했습니다.");
-            members = List.of(); // 빈 목록 반환
         }
 
-        model.addAttribute("members", members);
-        model.addAttribute("currentPage", page); // 기본값: 1
-        model.addAttribute("totalPages", totalPages); // 기본값: 1
-        model.addAttribute("search", search); // 검색어 유지
         return "admin/memberManage"; // 멤버 관리 페이지
     }
 
