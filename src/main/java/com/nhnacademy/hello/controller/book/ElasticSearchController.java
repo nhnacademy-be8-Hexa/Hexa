@@ -2,7 +2,7 @@ package com.nhnacademy.hello.controller.book;
 
 
 import com.nhnacademy.hello.common.feignclient.ElasticSearchAdapter;
-import com.nhnacademy.hello.dto.book.BookSearchDTO;
+import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,27 +35,27 @@ public class ElasticSearchController {
             page = totalPages;
         }
 
-        List<BookSearchDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
-        List<BookSearchDTO> searchBooksWithImages = setImagePaths(searchBooks);
+        List<BookDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
+        List<BookDTO> searchBooksWithImages = setImagePaths(searchBooks);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
         model.addAttribute("search", search);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", size);
-        
+
         return "book/bookSearch";
     }
 
     /**
      * 도서 리스트에 이미지 경로를 설정하는 메소드
      */
-    private List<BookSearchDTO> setImagePaths(List<BookSearchDTO> searchBooks) {
+    private List<BookDTO> setImagePaths(List<BookDTO> searchBooks) {
         return searchBooks.stream().map(book -> {
             String imageName = "bookThumbnail_" + book.bookId();
             List<String> imagePaths = imageStore.getImage(imageName);
             String imagePath = (imagePaths != null && !imagePaths.isEmpty()) ?
                     imagePaths.get(0) : "/images/default-book.jpg"; // 기본 이미지 경로로 수정
-            return new BookSearchDTO(
+            return new BookDTO(
                     book.bookId(),
                     book.bookTitle(),
                     book.bookDescription(),
@@ -67,7 +67,7 @@ public class ElasticSearchController {
                     book.bookView(),
                     book.bookAmount(),
                     book.bookSellCount(),
-                    book.publisherName(),
+                    book.publisher(),
                     book.bookStatus(),
                     imagePath
             );
