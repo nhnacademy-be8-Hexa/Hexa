@@ -26,16 +26,14 @@ public class MemberManageController {
                              @RequestParam(defaultValue = "10") int pageSize,
                              @RequestParam(required = false) String search,
                              Model model) {
-        List<MemberDTO> members;
-        int totalPages;
-
         try {
             // FeignClient를 통해 페이징 및 검색 조건으로 회원 목록 조회
-            members = memberAdapter.getMembers(page - 1, pageSize, search);
+            List<MemberDTO> members = memberAdapter.getMembers(page - 1, pageSize, search);
 
-            // 전체 페이지 수 계산 (현재는 mock 값 사용, 실제 전체 회원 수 API 사용 가능)
-            int totalCount = members.size(); // 실제 totalCount를 가져오는 API가 있다면 교체
-            totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            // 전체 회원 수 조회 API 호출
+            ResponseEntity<Long> response = memberAdapter.getMemberCount(search);
+            long totalCount = response.getBody() != null ? response.getBody() : 0; // null일 경우 0으로 처리
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
             model.addAttribute("members", members);
             model.addAttribute("currentPage", page); // 요청된 page 값을 모델에 전달
