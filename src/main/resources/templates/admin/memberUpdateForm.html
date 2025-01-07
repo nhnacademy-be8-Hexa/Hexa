@@ -75,24 +75,27 @@
             <label for="memberStatus" class="form-label">Member Status</label>
             <select class="form-select" id="memberStatus" name="memberStatus" required>
                 <option th:each="status : ${memberStatuses}"
-                        th:value="${status}"
-                        th:selected="${member.memberStatus == status}"
-                        th:text="${status}">
+                        th:value="${status.statusId}"
+                        th:selected="${member.memberStatus?.statusId == status.statusId}"
+                        th:text="${status.statusName}"> <!-- 이름만 표시 -->
                 </option>
             </select>
         </div>
 
+
+        <!-- Rating -->
         <!-- Rating -->
         <div class="mb-3">
             <label for="rating" class="form-label">Rating</label>
             <select class="form-select" id="rating" name="rating" required>
                 <option th:each="rating : ${ratings}"
-                        th:value="${rating}"
-                        th:selected="${member.rating == rating}"
-                        th:text="${rating}">
+                        th:value="${rating.ratingId}"
+                        th:selected="${member.rating?.ratingId == rating.ratingId}"
+                        th:text="${rating.ratingName}"> <!-- 이름만 표시 -->
                 </option>
             </select>
         </div>
+
 
         <!-- Member Role -->
         <div class="mb-3">
