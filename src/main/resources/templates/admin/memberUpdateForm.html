@@ -74,9 +74,9 @@
         <div class="mb-3">
             <label for="memberStatus" class="form-label">Member Status</label>
             <select class="form-select" id="memberStatus" name="memberStatus" required>
-                <option th:selected="${member.memberStatus == 'ACTIVE'}" value="ACTIVE">Active</option>
-                <option th:selected="${member.memberStatus == 'DORMANT'}" value="DORMANT">Dormant</option>
-                <option th:selected="${member.memberStatus == 'WITHDRAWN'}" value="WITHDRAWN">Withdrawn</option>
+                <option th:selected="${member.memberStatus == 'ACTIVE'}" value="ACTIVE">활성</option>
+                <option th:selected="${member.memberStatus == 'DORMANT'}" value="DORMANT">휴면</option>
+                <option th:selected="${member.memberStatus == 'WITHDRAWN'}" value="WITHDRAWN">탈퇴</option>
             </select>
         </div>
 
@@ -84,10 +84,10 @@
         <div class="mb-3">
             <label for="rating" class="form-label">Rating</label>
             <select class="form-select" id="rating" name="rating" required>
-                <option th:selected="${member.rating == 'NORMAL'}" value="NORMAL">Normal</option>
-                <option th:selected="${member.rating == 'ROYAL'}" value="ROYAL">Royal</option>
-                <option th:selected="${member.rating == 'GOLD'}" value="GOLD">Gold</option>
-                <option th:selected="${member.rating == 'PLATINUM'}" value="PLATINUM">Platinum</option>
+                <option th:selected="${member.rating == 'NORMAL'}" value="NORMAL">보통</option>
+                <option th:selected="${member.rating == 'ROYAL'}" value="ROYAL">로얄</option>
+                <option th:selected="${member.rating == 'GOLD'}" value="GOLD">골드</option>
+                <option th:selected="${member.rating == 'PLATINUM'}" value="PLATINUM">플래티넘</option>
             </select>
         </div>
 
