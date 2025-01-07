@@ -5,6 +5,8 @@ import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
@@ -22,11 +24,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -47,6 +44,7 @@ public class PurchaseController {
     private final OrderStatusAdapter orderStatusAdapter;
     private final PointDetailsAdapter pointDetailsAdapter;
     private final DeliveryAdapter deliveryAdapter;
+    private final BookStatusAdapter bookStatusAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -213,6 +211,36 @@ public class PurchaseController {
 
 
         // 데이터 변동-----------------------------------------------------------------
+
+        // '수량부족' 책 상태 아이디 조회
+        Long bookStatusId = 2L;
+        List<BookStatusRequestDTO> bookStatusList = bookStatusAdapter.getBookStatus();
+        for(BookStatusRequestDTO bookStatusRequestDTO : bookStatusList) {
+            if(bookStatusRequestDTO.bookStatus().equals("수량부족")){
+                bookStatusId = bookStatusRequestDTO.bookStatusId();
+                break;
+            }
+        }
+
+        // 책들 판매 처리
+        for(PurchaseBookDTO book : purchaseDTO.books()){
+            // 책 판매량 증가, 재고 감소
+            bookAdapter.incrementBookSellCount(book.bookId(), book.quantity());
+
+            // 해당 책의 갯수가 5개 이하가 되면 수량 부족 상태로 전환.
+            if(bookAdapter.getBook(book.bookId()).bookAmount() < 5){
+                bookAdapter.updateBook(book.bookId(),
+                        new BookUpdateRequestDTO(
+                                null,
+                                null,
+                                null,
+                                null,
+                                bookStatusId.toString()
+                        )
+                );
+
+            }
+        }
 
         // order 저장
 
