@@ -47,7 +47,15 @@ public interface MemberAdapter {
     @GetMapping("/api/ratings")
     public List<RatingDTO> getRatings() ;
 
+    // 회원 등급 수정
+    @PutMapping("/api/ratings/{ratingId}")
+    public ResponseEntity<RatingDTO> updateRating(@PathVariable Long ratingId, @RequestBody MemberUpdateDTO memberUpdateDTO);
+
     // 회원 상태 가져오기
     @GetMapping("/api/memberStatus")
     public List<MemberStatusDTO> getMemberStatus();
+
+    // 회원 상태 수정
+    @PutMapping("/api/memberStatus/{memberStatusId}")
+    public ResponseEntity<MemberStatusDTO> updateMemberStatus(@PathVariable Long memberStatusId, @RequestBody MemberUpdateDTO memberUpdateDTO);
 }
