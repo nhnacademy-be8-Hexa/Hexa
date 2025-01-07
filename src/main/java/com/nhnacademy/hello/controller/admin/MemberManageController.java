@@ -61,6 +61,19 @@ public class MemberManageController {
         return "admin/memberDetail";
     }
 
+    // MemberDTO를 MemberUpdateDTO로 변환
+    private MemberUpdateDTO convertToUpdateDTO(MemberDTO member) {
+        return new MemberUpdateDTO(
+                null,  // 패스워드는 수정하지 않으므로 null로 설정
+                member.memberName(),
+                member.memberNumber(),
+                member.memberEmail(),
+                member.memberBirthAt(),
+                member.rating() != null ? String.valueOf(member.rating().ratingId()) : null,
+                member.memberStatus() != null ? String.valueOf(member.memberStatus().statusId()) : null
+        );
+    }
+
     @GetMapping("/update/{memberId}")
     public String getUpdateForm(@PathVariable String memberId, Model model) {
         try {
@@ -68,14 +81,16 @@ public class MemberManageController {
 
             if (member == null) {
                 model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
-                return "admin/memberManage"; // 목록 페이지로 리다이렉트
+                return "admin/memberManage";
             }
 
-            // 등급 및 상태 데이터 가져오기
             List<RatingDTO> ratings = memberAdapter.getRatings();
             List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
 
-            model.addAttribute("member", member);
+            // MemberUpdateDTO로 변환
+            MemberUpdateDTO updateDTO = convertToUpdateDTO(member);
+
+            model.addAttribute("member", updateDTO);  // UpdateDTO 전달
             model.addAttribute("ratings", ratings);
             model.addAttribute("memberStatuses", memberStatuses);
 
@@ -87,15 +102,15 @@ public class MemberManageController {
     }
 
 
-
-
-
     // 멤버 정보 수정 (등급, 상태 포함)
     @PostMapping("/{memberId}")
     public String updateMember(@PathVariable String memberId,
                                @ModelAttribute @Valid MemberUpdateDTO memberUpdateDTO,
                                Model model) {
         try {
+            // 로그 추가
+            System.out.println("Updating member: " + memberId + " with data: " + memberUpdateDTO);
+
             // 멤버 정보 수정
             memberAdapter.updateMember(memberId, memberUpdateDTO);
 
@@ -111,10 +126,12 @@ public class MemberManageController {
 
             return "redirect:/admin/members"; // 수정 성공 시 목록 페이지로 이동
         } catch (Exception e) {
+            e.printStackTrace(); // 상세 예외 로그 확인
             model.addAttribute("error", "회원 정보를 저장하는 중 오류가 발생했습니다.");
             return "admin/memberUpdateForm";
         }
     }
+
 
     // 특정 회원 상태 변경 요청 (탈퇴 처리)
     @PutMapping("/{memberId}")
