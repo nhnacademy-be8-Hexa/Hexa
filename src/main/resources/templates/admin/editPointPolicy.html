@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포인트 정책 수정</title>
+  <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <div class="container mt-4">
+    <h1>포인트 정책 수정</h1>
+
+    <form th:action="@{/admin/point/edit}" method="post">
+      <!-- pointPolicyName은 수정이 불가능하므로 hidden 필드로 전송 -->
+      <input type="hidden" name="pointPolicyName" th:value="${pointPolicyDTO.pointPolicyName}" />
+
+      <div class="mb-3">
+        <label for="policyName" class="form-label">정책 이름</label>
+        <!-- 사용자에게 정책 이름을 보여주기만 하며 수정할 수 없음 -->
+        <input type="text" class="form-control" id="policyName" th:value="${pointPolicyDTO.pointPolicyName}" readonly required>
+      </div>
+      <div class="mb-3">
+        <label for="policyDelta" class="form-label">포인트 증감</label>
+        <!-- pointDelta 값은 수정 가능 -->
+        <input type="number" class="form-control" id="policyDelta" th:value="${pointPolicyDTO.pointDelta}" name="pointDelta" required>
+      </div>
+      <button type="submit" class="btn btn-primary">수정</button>
+    </form>
+  </div>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>
