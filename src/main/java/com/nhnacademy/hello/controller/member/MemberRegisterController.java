@@ -85,15 +85,15 @@ public class MemberRegisterController {
             log.error("쿠폰 발급 오류", e);
         }
 
-        memberAdapter.createMember(requestDTO);
-
-        CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+        try {
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
                 5000,
                 "회원가입 포인트 지급"
-        );
-        pointDetailsAdapter.createPointDetails(registerDTO.memberId(), createPointDetailDTO);
-
-
+            );
+            pointDetailsAdapter.createPointDetails(registerDTO.memberId(), createPointDetailDTO);
+        }catch (Exception e){
+            log.error("포인트 지급 오류", e);
+        }
 
         return "redirect:/";
     }
