@@ -8,6 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 
+    <style>
+        .list-group-item::before {
+            content: "# ";
+            font-weight: bold; /* 필요에 따라 스타일 조정 */
+            margin-right: 5px; /* 기호와 텍스트 간 간격 조정 */
+            color: red;
+        }
+    </style>
+
 
 </head>
 <body>
@@ -83,10 +92,7 @@
                 <div class="d-flex">
                     <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
                     <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin/bookManage" class="btn btn-outline-primary ms-2">도서 정보 수정</a>
-                    <a sec:authorize="hasRole('ADMIN')" href="/admin/tagManage" class="btn btn-outline-dark ms-2" >태그 정보 수정</a>
-
-
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId()})}"  class="btn btn-outline-dark ms-2" >태그 선택</a>
                 </div>
 
             </div>
@@ -94,18 +100,13 @@
 
 
         <!-- 태그 섹션 -->
-        <div class="row mt-4">
-            <div class="col-md-8">
-
-                <ul class="list-group mb-3">
-                    <li class="list-group-item" th:each="tag : ${tags}">
+                <ul >
+                    <li class="list-group-item" th:each="tag : ${assignedTags}">
                         <span th:text="${tag.tagName()}">태그 이름</span>
 
                     </li>
                 </ul>
 
-            </div>
-        </div>
 
         <!-- 책 설명 -->
         <div class="row mt-4 justify-content-center">

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "hexa-gateway", contextId = "bookTagAdapter")
+@FeignClient(name = "hexa-gateway", contextId = "bookTagAdapter",path = "/api")
 public interface BooKTagAdapter {
 
     @PostMapping("/admin/books/{bookId}/tags/{tagId}")
