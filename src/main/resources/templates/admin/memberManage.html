@@ -46,8 +46,9 @@
                         <th>회원 연락처</th>
                         <th>이메일</th>
                         <th>생일</th>
-                        <th>권한</th>
+                        <th>권한</th> <!-- 회원 권한 -->
                         <th>등급</th>
+                        <th>상태</th> <!-- 회원 상태 추가 -->
                         <th>수정</th>
                         <th>삭제</th>
                     </tr>
@@ -58,12 +59,12 @@
                         <td>
                             <a th:href="@{'/admin/members/' + ${member.memberId}}" th:text="${member.memberName}"></a>
                         </td>
-
                         <td th:text="${member.memberNumber}"></td>
                         <td th:text="${member.memberEmail}"></td>
                         <td th:text="${member.memberBirthAt}"></td>
-                        <td th:text="${member.memberRole}"></td>
+                        <td th:text="${member.memberRole}"></td> <!-- 회원 역할 표시 -->
                         <td th:text="${member.rating?.ratingName}"></td>
+                        <td th:text="${member.memberStatus?.statusName}"></td> <!-- 회원 상태 표시 -->
                         <td>
                             <form th:action="@{'/admin/members/update/' + ${member.memberId}}" method="get" style="display: inline;">
                                 <button type="submit" class="btn btn-primary btn-sm">수정</button>
@@ -78,6 +79,7 @@
                     </tbody>
                 </table>
             </div>
+
             <!-- 페이징 네비게이션 -->
             <nav aria-label="Page navigation example" class="mt-4">
                 <ul class="pagination justify-content-center">
