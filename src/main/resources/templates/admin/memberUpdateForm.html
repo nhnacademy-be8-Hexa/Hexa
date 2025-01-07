@@ -70,28 +70,24 @@
             <input type="text" class="form-control" id="memberLastLoginAt" name="memberLastLoginAt" th:value="${member.memberLastLoginAt}" readonly>
         </div>
 
-        <!-- Member Status -->
         <div class="mb-3">
             <label for="memberStatus" class="form-label">Member Status</label>
-            <select class="form-select" id="memberStatus" name="memberStatus" required>
+            <select class="form-select" id="memberStatus" name="statusId">
                 <option th:each="status : ${memberStatuses}"
                         th:value="${status.statusId}"
                         th:selected="${member.memberStatus?.statusId == status.statusId}"
-                        th:text="${status.statusName}"> <!-- 이름만 표시 -->
+                        th:text="${status.statusName}">
                 </option>
             </select>
         </div>
 
-
-        <!-- Rating -->
-        <!-- Rating -->
         <div class="mb-3">
             <label for="rating" class="form-label">Rating</label>
-            <select class="form-select" id="rating" name="rating" required>
+            <select class="form-select" id="rating" name="ratingId">
                 <option th:each="rating : ${ratings}"
                         th:value="${rating.ratingId}"
                         th:selected="${member.rating?.ratingId == rating.ratingId}"
-                        th:text="${rating.ratingName}"> <!-- 이름만 표시 -->
+                        th:text="${rating.ratingName}">
                 </option>
             </select>
         </div>
