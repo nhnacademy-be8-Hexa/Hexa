@@ -79,7 +79,6 @@ public class LoginController {
                                 null,
                                 null,
                                 null,
-                                null,
                                 "2" // 'DORMANT' 상태 ID
                         )
                 );
@@ -182,7 +181,6 @@ public class LoginController {
             try {
                 memberAdapter.loginMember(memberId);
                 memberAdapter.updateMember(memberId, new MemberUpdateDTO(
-                        null,
                         null,
                         null,
                         null,
