@@ -10,7 +10,8 @@ public record PurchaseDTO(
         String zoneCode,
         String address,
         String addressDetail,
-        Long wrappingPaperId
+        Long wrappingPaperId,
+        Integer usingPoint
 ) {
 }
 

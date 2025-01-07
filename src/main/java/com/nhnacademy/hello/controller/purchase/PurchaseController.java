@@ -8,6 +8,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
+import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class PurchaseController {
     private final OrderAdapter orderAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
+    private final PointDetailsAdapter pointDetailsAdapter;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -97,6 +99,15 @@ public class PurchaseController {
             }
         }
         model.addAttribute("isWrappable", isWrappable);
+
+        // 포인트 전달 (비회원은 0으로)
+        Long havingPoint = 0L;
+        if(isLoggedIn){
+            String memberId = principal.getName();
+            ResponseEntity<Long> pointSumResponse = pointDetailsAdapter.sumPoint(memberId);
+            havingPoint = pointSumResponse.getBody();
+        }
+        model.addAttribute("havingPoint", havingPoint);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);
@@ -220,6 +231,8 @@ public class PurchaseController {
             }
         }
 
+        // 데이터 변동-----------------------------------------------------------------
+
         // order 저장
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
@@ -237,6 +250,26 @@ public class PurchaseController {
                 purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
                 null
                 );
+
+        // 포인트 사용 처리
+        if(purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0){
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                    purchaseDTO.usingPoint() * (-1),
+                    "주문"
+            );
+            pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
+        }
+
+        // 포인트 적립 처리
+        if(AuthInfoUtils.isLogin()){
+            CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
+                    (int)(purchaseDTO.amount() * 0.01 * memberAdapter.getMember(AuthInfoUtils.getUsername()).rating().ratingPercent()) ,
+                    "주문 포인트 적립"
+            );
+            pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
+        }
+
+        // ------------------------------------------------------------------------
 
         return ResponseEntity.ok("결제 성공.");
     }

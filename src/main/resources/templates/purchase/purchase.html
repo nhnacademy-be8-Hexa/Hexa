@@ -12,6 +12,14 @@
     <!-- toss payments sdk -->
     <script src="https://js.tosspayments.com/v2/standard"></script>
 
+    <style>
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -105,6 +113,24 @@
             </option>
         </select>
     </div>
+
+<!--    포인트 사용-->
+    <div th:if="${isLoggedIn}" class="form-group">
+        <label for="point-input" class="font-weight-bold h5">포인트 사용</label>
+        <div class="input-group">
+            <input type="number"
+                   id="point-input"
+                   class="form-control"
+                   placeholder="사용할 포인트 입력"
+                   min="0"
+                   th:max="${havingPoint}"
+                   value="0">
+            <div class="input-group-append">
+                <span class="input-group-text" th:text="'현재 포인트: ' + ${havingPoint} + 'P'"></span>
+            </div>
+        </div>
+    </div>
+
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -391,6 +417,9 @@
     document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("loading-overlay");
 
+        // 포인트 입력 필드
+        const pointInput = document.getElementById("point-input");
+
         // 포장지 가격 표시 포매팅
         initializeWrappingPaperFormatting();
 
@@ -466,6 +495,12 @@
             const wrappingPrice = parseInt(selectedOption.dataset.price, 10) || 0; // 선택된 포장지 가격
             totalPrice += wrappingPrice;
 
+            // 포인트 가격 감소
+            if (pointInput && pointInput.value) {
+                totalPrice -= parseInt(pointInput.value, 10) || 0;
+            }
+
+
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
 
@@ -482,6 +517,35 @@
                 // 선택 안함으로 되돌리기
                 wrappingPaperSelect.value = "-1";
             }
+            calculateTotalPrice();
+        });
+
+
+        const maxPoint = parseInt(pointInput.getAttribute("max"), 10);
+        const minPoint = parseInt(pointInput.getAttribute("min"), 10);
+
+        // 입력 필드가 갱신될 때마다 실행
+        pointInput.addEventListener("input", () => {
+            let currentValue = parseInt(pointInput.value, 10);
+
+            // 입력값이 숫자가 아닌 경우 0으로 설정
+            if (isNaN(currentValue)) {
+                currentValue = 0;
+            }
+
+            // 최소값보다 작은 경우 최소값으로 설정
+            if (currentValue < minPoint) {
+                currentValue = minPoint;
+            }
+
+            // 최대값보다 큰 경우 최대값으로 설정
+            if (currentValue > maxPoint) {
+                currentValue = maxPoint;
+            }
+
+            // 값 업데이트
+            pointInput.value = currentValue;
+
             calculateTotalPrice();
         });
 
@@ -576,6 +640,9 @@
                 overlay.style.display = "block";
 
                 // 결제 승인, 데이터 저장
+
+                const pointValue = pointInput ? parseInt(pointInput.value, 10) : 0;
+
                 const response = await fetch('/purchase', {
                     method: 'POST',
                     headers: {
@@ -589,7 +656,8 @@
                         zoneCode: zoneCode,
                         address: address,
                         addressDetail: addressDetail,
-                        wrappingPaperId: wrappingPaperSelect.value
+                        wrappingPaperId: wrappingPaperSelect.value,
+                        usingPoint: isNaN(pointValue) ? 0 : pointValue,
                     }),
                 });
 
