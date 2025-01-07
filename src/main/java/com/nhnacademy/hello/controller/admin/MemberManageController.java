@@ -81,4 +81,19 @@ public class MemberManageController {
 
         return "error"; // 실패 시 에러 페이지
     }
+
+    // 특정 회원 상태 변경 요청 (탈퇴 처리)
+    @PatchMapping("/{memberId}")
+    @ResponseBody
+    public ResponseEntity<Void> deactivateMember(@PathVariable String memberId) {
+        try {
+            MemberUpdateDTO updateDTO = new MemberUpdateDTO(
+                    null, null, null, null, null, null, "탈퇴"
+            );
+            memberAdapter.updateMember(memberId, updateDTO);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 }
