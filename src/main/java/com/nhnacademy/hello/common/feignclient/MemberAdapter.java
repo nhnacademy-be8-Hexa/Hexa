@@ -41,4 +41,8 @@ public interface MemberAdapter {
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String search);
 
+    // 전체 회원 수 조회 (검색 조건 포함)
+    @GetMapping("/api/members/count")
+    public ResponseEntity<Long> getMemberCount(
+            @RequestParam(required = false) String search);
 }
