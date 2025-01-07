@@ -70,25 +70,38 @@
             <input type="text" class="form-control" id="memberLastLoginAt" name="memberLastLoginAt" th:value="${member.memberLastLoginAt}" readonly>
         </div>
 
-        <!-- Member Status -->
         <div class="mb-3">
             <label for="memberStatus" class="form-label">Member Status</label>
-            <select class="form-select" id="memberStatus" name="memberStatus" required>
-                <option th:selected="${member.memberStatus == 'ACTIVE'}" value="ACTIVE">활성</option>
-                <option th:selected="${member.memberStatus == 'DORMANT'}" value="DORMANT">휴면</option>
-                <option th:selected="${member.memberStatus == 'WITHDRAWN'}" value="WITHDRAWN">탈퇴</option>
+            <select class="form-select" id="memberStatus" name="statusId">
+                <option th:each="status : ${memberStatuses}"
+                        th:value="${status.statusId}"
+                        th:selected="${member.memberStatus?.statusId == status.statusId}"
+                        th:text="${status.statusName}">
+                </option>
             </select>
         </div>
 
-        <!-- Rating -->
         <div class="mb-3">
             <label for="rating" class="form-label">Rating</label>
-            <select class="form-select" id="rating" name="rating" required>
-                <option th:selected="${member.rating == 'NORMAL'}" value="NORMAL">보통</option>
-                <option th:selected="${member.rating == 'ROYAL'}" value="ROYAL">로얄</option>
-                <option th:selected="${member.rating == 'GOLD'}" value="GOLD">골드</option>
-                <option th:selected="${member.rating == 'PLATINUM'}" value="PLATINUM">플래티넘</option>
-                <option th:selected="${member.rating == 'CHALLENGER'}" value="CHALLENGER">챌린저</option>
+            <select class="form-select" id="rating" name="ratingId">
+                <option th:each="rating : ${ratings}"
+                        th:value="${rating.ratingId}"
+                        th:selected="${member.rating?.ratingId == rating.ratingId}"
+                        th:text="${rating.ratingName}">
+                </option>
+            </select>
+        </div>
+
+
+        <!-- Member Role -->
+        <div class="mb-3">
+            <label for="memberRole" class="form-label">Member Role</label>
+            <select class="form-select" id="memberRole" name="memberRole" required>
+                <option th:each="role : ${roles}"
+                        th:value="${role}"
+                        th:selected="${member.memberRole == role}"
+                        th:text="${role}">
+                </option>
             </select>
         </div>
 
