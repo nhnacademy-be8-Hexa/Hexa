@@ -2,6 +2,7 @@ package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.dto.member.MemberDTO;
+import com.nhnacademy.hello.dto.member.MemberStatusDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,4 +82,27 @@ public class MemberManageController {
 
         return "error"; // 실패 시 에러 페이지
     }
+
+    // 특정 회원 상태 변경 요청 (탈퇴 처리)
+    @PutMapping("/{memberId}")
+    @ResponseBody
+    public ResponseEntity<Void> deactivateMember(@PathVariable String memberId) {
+        try {
+            // MemberUpdateDTO를 사용하여 상태를 "탈퇴"로 변경
+            MemberUpdateDTO updateDTO = new MemberUpdateDTO(
+                    null,    // 비밀번호
+                    null,    // 이름
+                    null,    // 연락처
+                    null,    // 이메일
+                    null,    // 생일
+                    null,    // 등급
+                    "3"      // 탈퇴 상태 ID
+            );
+            memberAdapter.updateMember(memberId, updateDTO); // PUT 요청 전송
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 }
