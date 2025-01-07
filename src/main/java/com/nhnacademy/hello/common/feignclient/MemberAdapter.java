@@ -34,8 +34,11 @@ public interface MemberAdapter {
     @PutMapping("/api/members/{memberId}/login")
     public ResponseEntity<Void> loginMember(@PathVariable String memberId);
 
+    // 회원 목록 조회 (페이징 및 검색)
     @GetMapping("/api/members")
-    public List<MemberDTO> getMembers(
-            @RequestParam(defaultValue  = "0") int page, @RequestParam(required = false) String search);
+    List<MemberDTO> getMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String search);
 
 }
