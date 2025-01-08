@@ -1,14 +1,11 @@
 package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
-import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.category.SecondCategoryRequestDTO;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 public class CategoryManageController {
     private final CategoryAdapter categoryAdapter;
+    private static final int PAGE_SIZE = 9;
 
     public CategoryManageController(CategoryAdapter categoryAdapter) {
         this.categoryAdapter = categoryAdapter;
@@ -33,34 +31,36 @@ public class CategoryManageController {
     public String categoryList(
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
             Model model) {
-        final int size = 9;
+
 
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
         Long totalCategories = categoryAdapter.getTotal().getBody();
 
-        int totalPages = (int) Math.ceil((double) totalCategories / size);
+        int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
 
         if (page > totalPages && totalPages != 0) {
             adjustedPage = totalPages - 1;
             page = totalPages;
         }
 
-        List<CategoryDTO> categories = categoryAdapter.getCategories().getBody();
-        List<Long> categoriesWithSubCategories = findCategoriesIdsWithSubCategories(Objects.requireNonNull(categories));
-        List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllPagedCategories(adjustedPage, size).getBody();
+        List<Long> categoryIdsWithSubCategories = categoryAdapter.findCategoryIdsWithSubCategories().getBody();
+
+        List<PagedCategoryDTO> pagedCategories =
+                categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
         List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
+
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-        
+
         model.addAttribute("unPagedCategories", unPagedCategories);
-        model.addAttribute("categoriesWithSubCategories", categoriesWithSubCategories);
+        model.addAttribute("pagedCategories", pagedCategories);
+        model.addAttribute("categoryIdsWithSubCategories", categoryIdsWithSubCategories);
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
-        model.addAttribute("pagedCategories", pagedCategories);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", size);
+        model.addAttribute("size", PAGE_SIZE);
 
         return "admin/categoryManageForm";
     }
@@ -84,13 +84,6 @@ public class CategoryManageController {
     public String deleteCategory(@PathVariable Long categoryId) {
         categoryAdapter.deleteCategory(categoryId);
         return "redirect:/admin/categoryManage";
-    }
-
-    public List<Long> findCategoriesIdsWithSubCategories(List<CategoryDTO> allCategories) {
-        return allCategories.stream()
-                .filter(category -> !category.getSubCategories().isEmpty())
-                .map(CategoryDTO::getCategoryId)
-                .collect(Collectors.toList());
     }
 
 }

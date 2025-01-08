@@ -4,15 +4,17 @@ import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.common.util.SetImagePathsUtils;
+import com.nhnacademy.hello.common.feignclient.tag.BooKTagAdapter;
+import com.nhnacademy.hello.common.feignclient.tag.TagAdapter;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-
 import com.nhnacademy.hello.dto.review.ReviewDTO;
 import com.nhnacademy.hello.dto.review.ReviewRequestDTO;
+import com.nhnacademy.hello.dto.tag.TagDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class BookController {
     private final ReviewAdapter reviewAdapter;
     private final ImageStore imageStore;
     private final SetImagePathsUtils setImagePathsUtils;
+    private final TagAdapter tagAdapter;
+    private final BooKTagAdapter bookTagAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -90,8 +94,18 @@ public class BookController {
         model.addAttribute("isReview", isReview);
         model.addAttribute("reviewRequestDTO", reviewRequestDTO);
         model.addAttribute("memberId", memberId);
+        //책의 태그
+        List<TagDTO> assignedTags = bookTagAdapter.getTagsByBook(bookId).getBody();
+        if (assignedTags == null) {
+            assignedTags = List.of();
+        }
+
+
+        model.addAttribute("assignedTags", assignedTags);
+        model.addAttribute("bookId", bookId);
 
         return "book/bookDetail";
+
     }
 
     @PostMapping("/book/{bookId}/reviews")

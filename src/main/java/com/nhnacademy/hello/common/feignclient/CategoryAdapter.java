@@ -57,6 +57,16 @@ public interface CategoryAdapter {
             @PathVariable("bookId") Long bookId
     );
 
+    /**
+     * 모든 카테고리에서 서브카테고리가 존재하는 카테고리들의 ID를 반환
+     *
+     * @return 서브카테고리가 있는 카테고리들의 ID 목록
+     */
+    @GetMapping("/ids")
+    ResponseEntity<List<Long>> findCategoryIdsWithSubCategories();
+
+    @GetMapping("/ids/{categoryId}")
+    ResponseEntity<List<Long>> extractCategoryIds(@PathVariable Long categoryId);
 
     @GetMapping("/paged")
     ResponseEntity<List<PagedCategoryDTO>> getAllPagedCategories(
@@ -64,11 +74,11 @@ public interface CategoryAdapter {
             @RequestParam("size") int size
     );
 
-    @GetMapping("/total")
-    ResponseEntity<Long> getTotal();
-
     @GetMapping("/unPaged")
     ResponseEntity<List<PagedCategoryDTO>> getAllUnPagedCategories();
+
+    @GetMapping("/total")
+    ResponseEntity<Long> getTotal();
 
     /**
      * 카테고리 삭제

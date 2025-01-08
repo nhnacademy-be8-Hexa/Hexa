@@ -5,6 +5,10 @@ import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
+import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
+import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
@@ -17,15 +21,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -45,6 +45,10 @@ public class PurchaseController {
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final OrderStatusAdapter orderStatusAdapter;
     private final PointDetailsAdapter pointDetailsAdapter;
+    private final DeliveryAdapter deliveryAdapter;
+    private final BookStatusAdapter bookStatusAdapter;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -212,6 +216,36 @@ public class PurchaseController {
 
         // 데이터 변동-----------------------------------------------------------------
 
+        // '수량부족' 책 상태 아이디 조회
+        Long bookStatusId = 2L;
+        List<BookStatusRequestDTO> bookStatusList = bookStatusAdapter.getBookStatus();
+        for(BookStatusRequestDTO bookStatusRequestDTO : bookStatusList) {
+            if(bookStatusRequestDTO.bookStatus().equals("수량부족")){
+                bookStatusId = bookStatusRequestDTO.bookStatusId();
+                break;
+            }
+        }
+
+        // 책들 판매 처리
+        for(PurchaseBookDTO book : purchaseDTO.books()){
+            // 책 판매량 증가, 재고 감소
+            bookAdapter.incrementBookSellCount(book.bookId(), book.quantity());
+
+            // 해당 책의 갯수가 5개 이하가 되면 수량 부족 상태로 전환.
+            if(bookAdapter.getBook(book.bookId()).bookAmount() < 5){
+                bookAdapter.updateBook(book.bookId(),
+                        new BookUpdateRequestDTO(
+                                null,
+                                null,
+                                null,
+                                null,
+                                bookStatusId.toString()
+                        )
+                );
+
+            }
+        }
+
         // order 저장
 
         // 'WAIT' 주문 상태의 아이디 검색
@@ -233,12 +267,12 @@ public class PurchaseController {
                 purchaseDTO.addressDetail()
         );
 
-        orderAdapter.createOrder(
+        Long savedOrderId = orderAdapter.createOrder(
                 orderRequestDTO,
                 purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
                 purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
                 null
-                );
+                ).getBody();
 
         // 포인트 사용 처리
         if(purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0){
@@ -256,6 +290,26 @@ public class PurchaseController {
                     "주문 포인트 적립 : " + payment.orderName()
             );
             pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
+        }
+
+        // 배송 정보 저장
+        DeliveryRequestDTO deliveryRequestDTO = new DeliveryRequestDTO(
+                savedOrderId,
+                3000,
+                purchaseDTO.deliveryDate(),
+                purchaseDTO.deliveryDate().minusDays(1)
+        );
+        deliveryAdapter.createDelivery(deliveryRequestDTO);
+
+        // 비회원 정보 저장
+        if(!AuthInfoUtils.isLogin()){
+            GuestOrderRequestDTO guestOrderRequestDTO = new GuestOrderRequestDTO(
+                    savedOrderId,
+                    passwordEncoder.encode(purchaseDTO.guestPassword()),
+                    purchaseDTO.guestOrderNumber(),
+                    purchaseDTO.guestEmail()
+            );
+            orderAdapter.createGuestOrder(guestOrderRequestDTO);
         }
 
         // ------------------------------------------------------------------------

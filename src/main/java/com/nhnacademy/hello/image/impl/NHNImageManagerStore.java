@@ -2,7 +2,9 @@ package com.nhnacademy.hello.image.impl;
 
 import com.nhnacademy.hello.common.util.ImageNameSeperator;
 import com.nhnacademy.hello.exception.NHNImageManagerException;
+import com.nhnacademy.hello.exception.imagemanager.*;
 import com.nhnacademy.hello.image.ImageStore;
+import com.nhnacademy.hello.image.tool.FileExtensionVaildation;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,9 +48,28 @@ public class NHNImageManagerStore implements ImageStore {
     private static final String FILES_PARAM = "files";
     private static final String PARAMS_PARAM = "params";
 
+       /*
+        다중 파일 업로드
+
+        아래의 예시 요청에 맞게 함수를 구성하였습니다.
+
+        curl -X POST 'https://api-image.nhncloudservice.com/image/v2.0/appkeys/{appKey}/images' \
+        -H 'Authorization: {secretKey}' \
+        -F 'params={"basepath": "/myfolder/banner", "overwrite": true, "operationIds":["100x100"]}' \
+        -F 'files=@left.png' \
+        -F 'files=@right.png'
+
+
+     */
+
     @Override
     public boolean saveImages(List<MultipartFile> files, String fileName) {
+
+        FileExtensionVaildation fileExtensionVaildation = new FileExtensionVaildation(files);
+        fileExtensionVaildation.vaildate(); // 확장자 이상하면 FileExtensitonException 발생
+
         String fileSaveURL = apiUrl + IMAGE_ENDPOINT;
+
         RestTemplate restTemplate = new RestTemplate();
 
         // JSON 파라미터 생성 (nhn cloud 에 저장시 루트기준 path 랑 파일 같으면 덮어쓸지 여부)
@@ -58,6 +79,8 @@ public class NHNImageManagerStore implements ImageStore {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add(PARAMS_PARAM, paramsJson);
 
+
+        // 파일 이름을 fileName + number 순으로 이름을 변경 + 파일을 이진타입으로 변환
         // 파일 이름을 fileName + number 순으로 바꿔서 http body 에 넣음
         for (int count = 0; count < files.size(); count++) {
             MultipartFile file = files.get(count);
@@ -68,6 +91,9 @@ public class NHNImageManagerStore implements ImageStore {
 
             body.add(FILES_PARAM, resource);
         }
+//        List<ByteArrayResource> fileCovertResult = FileNameAndBinaryChanger(files,fileName);
+
+
 
         // 헤더 설정 (Authorization : 개인 키 값)
         HttpHeaders headers = new HttpHeaders();
@@ -81,19 +107,35 @@ public class NHNImageManagerStore implements ImageStore {
             ResponseEntity<String> response = sendPostRequest(fileSaveURL, entity);
             return response.getStatusCode() == HttpStatus.OK;
         } catch (Exception e) {
-            throw new NHNImageManagerException("image store error", e);
+            throw new NHNImageManagerStoreException("NHN Image Manager 에 파일을 저장하지 못했습니다.");
         }
     }
 
+
+    /*
+
+        다중 파일 삭제
+
+        아래의 예시 요청에 맞게 함수를 구성하였습니다.
+
+        curl -X DELETE 'https://api-image.nhncloudservice.com/image/v2.0/appkeys/{appKey}/images/async?
+        fileIds=5fa8ce52-d066-490c-85dd-f8cef181dd28,96f726bd-93e4-4f7c-ad55-56e85aa323a8' \
+        -H 'Authorization: {secretKey}'
+
+     */
+
+
     @Override
     public boolean deleteImages(String fileName) {
+
+        // 해당 이미지 이름을 가진 이미지 id 들을 모두 가져옴
         List<String> imageIds = getImageIdsToNames(fileName);
 
         if (imageIds.isEmpty()) {
             return false;  // 이미지가 없으면 삭제 불가
         }
 
-        // 이미지 지우는 요청을 수행할 url 생성
+        // 이미지 지우는 요청을 수행할 기본 url 생성
         String deleteUrl = buildDeleteUrl(imageIds);
 
         // 헤더 설정
@@ -112,9 +154,22 @@ public class NHNImageManagerStore implements ImageStore {
             ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
-            throw new NHNImageManagerException("image delete error", e);
+            throw new NHNImageManagerDeleteException("NHN Image Manager 에 파일을 삭제하지 못했습니다.");
         }
     }
+
+
+
+    /*
+        폴더 내 파일 목록 조회
+
+        아래의 예시 요청에 맞게 함수를 구성하고 , 결과 값에서 url 부분만 List<String> 형태로 반환하게 작성하였습니다.
+
+        curl -X GET 'https://api-image.nhncloudservice.com/image/v2.0/appkeys/{appKey}/folders?basepath=/myfolder&name=ex1' \
+        -H 'Authorization: {secretKey}'
+
+     */
+
 
     @Override
     public List<String> getImage(String fileName) {
@@ -129,16 +184,20 @@ public class NHNImageManagerStore implements ImageStore {
             ResponseEntity<String> responseEntity = sendGetRequest(getImageUrl, headers);
             return processGetImageResponse(responseEntity.getBody());
         } catch (Exception e) {
-            throw new NHNImageManagerException("image search error", e);
+            throw new NHNImageManagerSearchException("NHN Image Manager 검색 중 오류가 발생했습니다.");
         }
     }
 
+
+
+    // 파일 하나하나를 이진 데이터로 바꾸고 이름을 바꾸는 함수
     private ByteArrayResource createFileResource(MultipartFile file, ImageNameSeperator imageNameSeperator) {
         byte[] fileByte;
+
         try {
             fileByte = file.getBytes();
         } catch (IOException e) {
-            throw new NHNImageManagerException("file read error", e);
+            throw new FileCovertBinaryException("파일을 이진 데이터로 변화하는데 에러가 발생했습니다.");
         }
 
         return new ByteArrayResource(fileByte) {
@@ -149,23 +208,26 @@ public class NHNImageManagerStore implements ImageStore {
         };
     }
 
+    //  해당 url 로 post method send 요청을 보내는 함수
     private ResponseEntity<String> sendPostRequest(String url, HttpEntity<?> entity) {
         RestTemplate restTemplate = new RestTemplate();
         try {
             return restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         } catch (Exception e) {
-            throw new NHNImageManagerException("POST request error", e);
+            throw new SendPostRequestException("Post request 요청을 보내던 중 에러가 발생했습니다");
         }
     }
 
+    //  해당 url 로 get method send 요청을 보내는 함수
     private ResponseEntity<String> sendGetRequest(String url, HttpHeaders headers) {
         RestTemplate restTemplate = new RestTemplate();
         try {
             return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
         } catch (Exception e) {
-            throw new NHNImageManagerException("GET request error", e);
+            throw new SendGetRequestException("Get request 요청을 보내던 중 에러가 발생했습니다");
         }
     }
+
     // nhn cloud 에서 이미지 이름으로 검색한 이미지의 정보들(json 객체)을 가져와 url 부분만 리스트 형태로 반환
     private List<String> processGetImageResponse(String responseBody) {
         try {
@@ -181,15 +243,26 @@ public class NHNImageManagerStore implements ImageStore {
                     imageUrls.add(file.getString("url"));
                 }
             } else {
-                imageUrls.add("No files found or request failed.");
+                throw new FileNotFoundException("파일을 찾을 수 없습니다.");
             }
 
             return imageUrls;
         } catch (JSONException e) {
-            throw new NHNImageManagerException("JSON response error", e);
+            throw new JsonResponseException("응답받은 JSON 형식이 알맞지 않습니다");
         }
     }
+
     // 이미지 이름을 nhn cloud 에서 검색 한 후 이미지의 id를 가져오는 함수
+
+    /*
+    폴더 내 파일 목록 조회
+
+    아래의 예시 요청에 맞게 함수를 구성하고 , 결과 값에서  이미지 id 부분만 List<String> 형태로 가져올 수 있도록 작성하였습니다.
+
+    curl -X GET 'https://api-image.nhncloudservice.com/image/v2.0/appkeys/{appKey}/folders?basepath=/myfolder&name=ex1' \
+    -H 'Authorization: {secretKey}'
+
+ */
     private List<String> getImageIdsToNames(String filename) {
         String getImageUrl = apiUrl + FOLDER_ENDPOINT + "?basepath=" + storeFolder + "&name=" + filename;
 
@@ -202,7 +275,7 @@ public class NHNImageManagerStore implements ImageStore {
             ResponseEntity<String> responseEntity = sendGetRequest(getImageUrl, headers);
             return extractImageIdsFromResponse(responseEntity.getBody());
         } catch (Exception e) {
-            throw new NHNImageManagerException("이미지 ID 조회 중 오류가 발생했습니다.", e);
+            throw new NHNImageManagerSearchException("이미지 ID 조회 중 오류가 발생했습니다.");
         }
     }
 
@@ -221,15 +294,16 @@ public class NHNImageManagerStore implements ImageStore {
                     imageIds.add(file.getString("id"));
                 }
             } else {
-                throw new NHNImageManagerException("image not found");
+                throw new ImageNotFoundException("해당하는 이미지를 찾을 수 없습니다");
             }
 
             return imageIds;
         } catch (JSONException e) {
-            throw new NHNImageManagerException("JSON extract error", e);
+            throw new JsonResponseException("응답받은 JSON 형식이 알맞지 않습니다");
         }
     }
 
+    // 지울 이미지 주소 반환
     private String buildDeleteUrl(List<String> imageIds) {
         String fileIdsParam = String.join(",", imageIds);
         return String.format("%s?fileIds=%s", apiUrl + "/images/async", fileIdsParam);

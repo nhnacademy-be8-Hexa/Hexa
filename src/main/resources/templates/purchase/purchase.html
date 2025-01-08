@@ -27,37 +27,6 @@
 
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <h1>배송</h1>
-
-    <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
-    <div class="card p-3">
-        <!-- 주소 별칭 -->
-        <div class="mb-2">
-            <strong>주소 별칭:</strong>
-            <span id="recipientNameDisplay"></span>
-        </div>
-        <!-- 우편번호 -->
-        <div class="mb-2">
-            <strong>배송지 우편번호:</strong>
-            <span id="postCode"></span>
-        </div>
-        <!-- 주소 -->
-        <div class="mb-2">
-            <strong>배송지 주소:</strong>
-            <span id="addressDisplay"></span>
-        </div>
-        <!-- 상세주소 -->
-        <div class="mb-2">
-            <strong>배송지 상세주소:</strong>
-            <span id="addressDetailsDisplay"></span>
-        </div>
-        <!-- 로그인 상태에 따른 버튼 표시 -->
-        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
-        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
-    </div>
-
-    <hr>
-
     <h1>주문</h1>
 
     <!-- 장바구니 항목 테이블 -->
@@ -115,7 +84,7 @@
     </div>
 
 <!--    포인트 사용-->
-    <div th:if="${isLoggedIn}" class="form-group">
+    <div th:if="${isLoggedIn}" class="form-group mt-4">
         <label for="point-input" class="font-weight-bold h5">포인트 사용</label>
         <div class="input-group">
             <input type="number"
@@ -131,6 +100,72 @@
         </div>
     </div>
 
+<!--    비회원 정보 입력 필드-->
+    <div class="container mt-4" th:if="${not isLoggedIn}">
+        <!-- 비회원 정보 상자 -->
+        <div class="p-4 bg-light border rounded">
+            <h3 class="text-center mb-4">비회원 정보</h3>
+
+            <!-- 입력 필드들 -->
+            <div class="form-group">
+                <label for="guest_order_number">전화 번호</label>
+                <input type="text" id="guest_order_number" name="guest_order_number" class="form-control"
+                       placeholder="01012345678" minlength="10" maxlength="11" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guest_order_email">이메일</label>
+                <input type="email" id="guest_order_email" name="guest_order_email" class="form-control"
+                       placeholder="email@example.com" maxlength="320" required>
+            </div>
+
+            <div class="form-group">
+                <label for="guest_order_password">비밀번호</label>
+                <input type="password" id="guest_order_password" name="guest_order_password" class="form-control"
+                       placeholder="4~20자리 비밀번호 입력" minlength="4" maxlength="20" required>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--   배송일 지정 필드-->
+    <div class="form-group mt-4">
+        <label for="delivery-date" class="font-weight-bold h5">배송일 선택</label>
+        <input type="date" id="delivery-date" class="form-control" required>
+        <small class="text-muted">하루 뒤 부터 선택 가능합니다.</small>
+    </div>
+
+    <h1 class="mt-4">배송지</h1>
+    <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
+    <div class="card p-3">
+        <!-- 주소 별칭 -->
+        <div class="mb-2">
+            <strong>주소 별칭:</strong>
+            <span id="recipientNameDisplay"></span>
+        </div>
+        <!-- 우편번호 -->
+        <div class="mb-2">
+            <strong>배송지 우편번호:</strong>
+            <span id="postCode"></span>
+        </div>
+        <!-- 주소 -->
+        <div class="mb-2">
+            <strong>배송지 주소:</strong>
+            <span id="addressDisplay"></span>
+        </div>
+        <!-- 상세주소 -->
+        <div class="mb-2">
+            <strong>배송지 상세주소:</strong>
+            <span id="addressDetailsDisplay"></span>
+        </div>
+        <!-- 로그인 상태에 따른 버튼 표시 -->
+        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
+        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
+    </div>
+
+    <!--    배송비 표시-->
+    <h5 class="mt-4">배송비 3000원</h5>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -500,6 +535,8 @@
                 totalPrice -= parseInt(pointInput.value, 10) || 0;
             }
 
+            // 배송비 추가
+            totalPrice += 3000;
 
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
@@ -520,37 +557,54 @@
             calculateTotalPrice();
         });
 
+        if(pointInput) {
+            const maxPoint = parseInt(pointInput.getAttribute("max"), 10);
+            const minPoint = parseInt(pointInput.getAttribute("min"), 10);
 
-        const maxPoint = parseInt(pointInput.getAttribute("max"), 10);
-        const minPoint = parseInt(pointInput.getAttribute("min"), 10);
+            // 입력 필드가 갱신될 때마다 실행
+            pointInput.addEventListener("input", () => {
+                let currentValue = parseInt(pointInput.value, 10);
 
-        // 입력 필드가 갱신될 때마다 실행
-        pointInput.addEventListener("input", () => {
-            let currentValue = parseInt(pointInput.value, 10);
+                // 입력값이 숫자가 아닌 경우 0으로 설정
+                if (isNaN(currentValue)) {
+                    currentValue = 0;
+                }
 
-            // 입력값이 숫자가 아닌 경우 0으로 설정
-            if (isNaN(currentValue)) {
-                currentValue = 0;
-            }
+                // 최소값보다 작은 경우 최소값으로 설정
+                if (currentValue < minPoint) {
+                    currentValue = minPoint;
+                }
 
-            // 최소값보다 작은 경우 최소값으로 설정
-            if (currentValue < minPoint) {
-                currentValue = minPoint;
-            }
+                // 최대값보다 큰 경우 최대값으로 설정
+                if (currentValue > maxPoint) {
+                    currentValue = maxPoint;
+                }
 
-            // 최대값보다 큰 경우 최대값으로 설정
-            if (currentValue > maxPoint) {
-                currentValue = maxPoint;
-            }
+                // 값 업데이트
+                pointInput.value = currentValue;
 
-            // 값 업데이트
-            pointInput.value = currentValue;
+                calculateTotalPrice();
+            });
+        }
 
-            calculateTotalPrice();
-        });
+        // 배송일 지정 필드 설정
+        // 내일부터 날짜를 계산
+        const deliveryDateInput = document.getElementById("delivery-date");
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // 내일
+
+        // YYYY-MM-DD 형식으로 변환
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDate = `${yyyy}-${mm}-${dd}`;
+
+        // 최소 날짜, 기본값 설정
+        deliveryDateInput.value = minDate;
+        deliveryDateInput.min = minDate;
 
 
-        // toss payments
+        // toss payments --------------------------------------------------------------------
         // ------  SDK 초기화 ------
         // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
         const clientKey = "[[${clientKey}]]";
@@ -572,6 +626,48 @@
         document.getElementById("payment-button").addEventListener("click", async () => {
 
             try{
+                // 비회원 정보 검증
+                const guestData = {};
+                if(!isLoggedIn) {
+                    const guestOrderNumber = document.querySelector("#guest_order_number").value;
+                    const guestEmail = document.querySelector("#guest_order_email").value;
+                    const guestPassword = document.querySelector("#guest_order_password").value;
+
+                    if(!guestOrderNumber || !guestEmail || !guestPassword) {
+                        alert("비회원 정보를 입력해주세요.");
+                        return;
+                    }
+
+                    // 주문 번호 유효성 검사
+                    const phoneRegex = /^\d{10,11}$/; // 10자리 또는 11자리 숫자만 허용
+                    if (!phoneRegex.test(guestOrderNumber)) {
+                        alert("전화번호는 10~11자리 숫자만 입력해주세요.");
+                        return;
+                    }
+
+                    // 이메일 유효성 검사
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailRegex.test(guestEmail) || guestEmail.length > 320) {
+                        alert("유효한 이메일 주소를 입력해주세요 (최대 320자).");
+                        return;
+                    }
+
+
+                    // 비밀번호 유효성 검사
+                    if (guestPassword.length < 4 || guestPassword.length > 20) {
+                        alert("비밀번호는 4~20자로 입력해주세요.");
+                        return;
+                    }
+
+
+                    guestData.guestOrderNumber = guestOrderNumber;
+                    guestData.guestEmail = guestEmail;
+                    guestData.guestPassword = guestPassword;
+
+                }
+
+
+
                 // 배송 정보 읽기
                 const zoneCode = document.getElementById("postCode").textContent.trim();
                 const address = document.getElementById("addressDisplay").textContent.trim();
@@ -599,11 +695,14 @@
 
                 const paymentData = {};
 
-                // member가 있을 경우에만 해당 필드를 추가
+                // 로그인 여부에 따라 정보 저장
                 if ( isLoggedIn ) {
                     paymentData.customerEmail = "[[${member?.memberEmail ?: ""}]]";
                     paymentData.customerName = "[[${member?.memberName ?: ""}]]";
                     paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
+                } else {
+                    paymentData.customerEmail = guestData.guestEmail;
+                    paymentData.customerMobilePhone = guestData.guestOrderNumber;
                 }
 
                 // 화면에 표시된 책 정보 가져오기
@@ -641,7 +740,18 @@
 
                 // 결제 승인, 데이터 저장
 
+                // 포인트 사용량
                 const pointValue = pointInput ? parseInt(pointInput.value, 10) : 0;
+
+                // 배송일 지정
+                const deliveryDate = new Date(deliveryDateInput.value);
+
+                // 시간을 00:00:00으로 설정 (필요 시 다른 시간으로 설정 가능)
+                deliveryDate.setHours(0, 0, 0, 0);
+
+                // LocalDateTime 포맷으로 변환 (yyyy-MM-ddTHH:mm:ss)
+                const formattedDeliveryDate = deliveryDate.toISOString().split('.')[0]; // ISO 형식에서 초단위까지만 사용
+
 
                 const response = await fetch('/purchase', {
                     method: 'POST',
@@ -658,6 +768,8 @@
                         addressDetail: addressDetail,
                         wrappingPaperId: wrappingPaperSelect.value,
                         usingPoint: isNaN(pointValue) ? 0 : pointValue,
+                        deliveryDate: formattedDeliveryDate,
+                        ...guestData,
                     }),
                 });
 

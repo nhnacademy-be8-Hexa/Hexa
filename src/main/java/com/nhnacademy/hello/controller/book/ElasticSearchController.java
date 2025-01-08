@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/search")
@@ -38,6 +39,7 @@ public class ElasticSearchController {
         List<SearchBookDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
         List<SearchBookDTO> searchBooksWithImages = setImagePaths(searchBooks);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
+        model.addAttribute("searchResultsCount", searchBooksWithImages.size());
         model.addAttribute("search", search);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);

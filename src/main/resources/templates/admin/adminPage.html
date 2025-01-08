@@ -84,77 +84,56 @@
 
                                     <div class="table-responsive">
                                         <table class="table card-table admin-page-table" id="shipping-status-table">
-                                            <tr data-completed="true">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
-                                                    </label>
-                                                </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Extend the data model.</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">August 04, 2021</td>
+                                            <thead>
+                                            <tr>
+                                                <th>주문 ID</th>
+                                                <th>회원 ID</th>
+                                                <th>총액</th>
+                                                <th>주문 일자</th>
+                                                <th>우편번호</th>
+                                                <th>주소</th>
+                                                <th>주문 상태</th>
+                                                <th>상세보기</th>
                                             </tr>
-                                            <tr data-completed="false">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
-                                                    </label>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="order : ${orders}">
+                                                <td th:text="${order.orderId}"></td>
+                                                <td th:text="${order.member.memberId}"></td>
+                                                <td th:text="${order.orderPrice}"></td>
+                                                <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                                <td th:text="${order.zoneCode}"></td>
+                                                <td th:text="${order.address}"></td>
+                                                <td th:text="${order.orderStatus.orderStatus}"></td>
+                                                <td>
+                                                    <a th:href="@{'/admin/orders/' + ${order.orderId}}" class="btn btn-primary btn-sm">상세 보기</a>
                                                 </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Verify the event flow.</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">January 03, 2019</td>
                                             </tr>
-                                            <tr data-completed="false">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
-                                                    </label>
-                                                </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Database backup and maintenance</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">December 28, 2018</td>
-                                            </tr>
-                                            <tr data-completed="true">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
-                                                    </label>
-                                                </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Identify the implementation team.</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">November 07, 2020</td>
-                                            </tr>
-                                            <tr data-completed="false">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox">
-                                                    </label>
-                                                </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Define users and workflow</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">November 23, 2021</td>
-                                            </tr>
-                                            <tr data-completed="true">
-                                                <td class="w-1 pe-4">
-                                                    <label>
-                                                        <input type="checkbox" class="form-check-input m-0 align-middle admin-page-task-checkbox" checked>
-                                                    </label>
-                                                </td>
-                                                <td class="w-100 ps-4">
-                                                    <a href="#" class="text-reset admin-page-task-link">Check Pull Requests</a>
-                                                </td>
-                                                <td class="text-nowrap text-secondary ps-4">January 14, 2021</td>
-                                            </tr>
+                                            </tbody>
                                         </table>
                                     </div>
+
+                                    <!-- 페이징 -->
+                                    <nav class="mt-4">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                                <a class="page-link" th:href="@{'/admin/orders?page=' + (${currentPage - 1})}" aria-label="이전">
+                                                    &laquo;
+                                                </a>
+                                            </li>
+                                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                                th:classappend="${i == currentPage} ? 'active'">
+                                                <a class="page-link" th:href="@{'/admin/orders?page=' + ${i}}" th:text="${i + 1}"></a>
+                                            </li>
+                                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                                <a class="page-link" th:href="@{'/admin/orders?page=' + (${currentPage + 1})}" aria-label="다음">
+                                                    &raquo;
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
-
                             <div class="col-md-12 col-lg-10">
                                 <div class="card mb-4">
                                     <div class="card-header">

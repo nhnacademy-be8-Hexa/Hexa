@@ -15,7 +15,7 @@ import java.util.List;
 public interface OrderAdapter {
 
     @PostMapping("/api/orders")
-    public ResponseEntity<Void> createOrder(
+    public ResponseEntity<Long> createOrder(
             @Valid @RequestBody OrderRequestDTO orderRequestDTO,
             @RequestParam List<Long> bookIds,
             @RequestParam List<Integer> amounts,
@@ -46,20 +46,32 @@ public interface OrderAdapter {
             @PathVariable Long bookId);
 
 
+    // 현재 주문의 주문자가 지금 접속중인 멤버아이디와 같나
+    @GetMapping("api/orders/{orderId}/{memberId}")
+    public ResponseEntity<Boolean> existsOrderIdAndMember_MemberId(
+            @PathVariable Long orderId,
+            @PathVariable String memberId);
+
+    // 특정 멤버의 주문 숫자 (페이징 처리에 필요)
+    @GetMapping("api/orders/count/{memberId}")
+    public ResponseEntity<Long> countAllByMember_MemberId (@PathVariable String memberId);
+
+
+
     // 게스트 ------------------------------------------------
-    @PostMapping
+    @PostMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> createGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTO);
 
-    @GetMapping
+    @GetMapping("/api/guestOrders")
     public List<GuestOrderDTO> getAllGuestOrders(
             @RequestParam(defaultValue = "0") int page);
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/api/guestOrders/{orderId}")
     public GuestOrderDTO getGuestOrder(
             @PathVariable Long orderId);
 
-    @PutMapping
+    @PutMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> updateGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTOs);
 }
