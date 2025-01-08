@@ -1,9 +1,11 @@
 package com.nhnacademy.hello.controller.order;
 
-import com.nhnacademy.hello.common.feignclient.*;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderBookAdapter;
+import com.nhnacademy.hello.common.feignclient.WrappingPaperAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
-import com.nhnacademy.hello.dto.delivery.DeliveryDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +30,6 @@ public class MyOrderController {
     private final OrderBookAdapter orderBookAdapter;
     private final CouponAdapter couponAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
-    private final DeliveryAdapter deliveryAdapter;
     private final Long SIZE = 10L;
 
     @GetMapping("/mypage/orders")
@@ -87,15 +87,8 @@ public class MyOrderController {
         String wrappingPaperName = (order != null && order.wrappingPaper() != null && order.wrappingPaper().wrappingPaperName() != null) ?   order.wrappingPaper().wrappingPaperName() : null;
         Integer wrappingPaperPrice = (order != null && order.wrappingPaper() != null && order.wrappingPaper().wrappingPaperPrice() != null) ?  order.wrappingPaper().wrappingPaperPrice() : 0;
 
-        Integer deliveryCost = 0;
-        try
-        {
-            DeliveryDTO delivery = deliveryAdapter.getDelivery(orderId);
-            deliveryCost = delivery.deliveryAmount();
-        } catch (Exception  e) {}
 
-
-        long discountPrice = amountPrice-(paymentAmountBookPrice-wrappingPaperPrice-deliveryCost);
+        long discountPrice = amountPrice-(paymentAmountBookPrice-wrappingPaperPrice);
 
 
         model.addAttribute("member", member);
@@ -106,7 +99,6 @@ public class MyOrderController {
         model.addAttribute("paymentAmountBookPrice", paymentAmountBookPrice);
         model.addAttribute("wrappingPaperName", wrappingPaperName);
         model.addAttribute("wrappingPaperPrice", wrappingPaperPrice);
-        model.addAttribute("deliveryCost", deliveryCost);
 
 
         return "member/orderBooks";
