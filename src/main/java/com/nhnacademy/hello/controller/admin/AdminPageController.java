@@ -63,9 +63,12 @@ public class AdminPageController {
 
         // 주문 목록 및 상태 가져오기
         int startIndex = (page - 1) * pageSize; // 시작 인덱스 계산
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(startIndex, pageSize); // 수정된 메서드 호출
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(startIndex, pageSize);
         List<OrderDTO> orders = response.getBody();
-        if (orders != null && !orders.isEmpty()) {
+
+        if (orders == null || orders.isEmpty()) {
+            model.addAttribute("orders", List.of()); // 빈 리스트 처리
+        } else {
             orders = orders.stream()
                     .map(order -> {
                         if (order.member() == null) {
@@ -84,9 +87,8 @@ public class AdminPageController {
                     })
                     .toList();
             model.addAttribute("orders", orders);
-        } else {
-            model.addAttribute("orders", List.of());
         }
+
 
         List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
         model.addAttribute("statuses", statuses);
