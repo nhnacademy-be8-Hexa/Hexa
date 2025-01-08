@@ -18,13 +18,12 @@
 <body>
 
 <div class="container">
-    <!-- 헤더 포함 -->
-    <!--    <div th:replace="~{fragments/header :: header}"></div>-->
-    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div th:replace="~{fragments/searchHeader :: searchHeader}"></div>
 
     <!-- 검색 결과 -->
     <section>
-        <h2 class="section-title">검색 결과</h2>
+        <h2 class="section-title" th:text="${search} + ' 검색 결과 총 ' + ${searchResultsCount} + ' 건'"></h2>
 
         <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
         <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
