@@ -109,47 +109,45 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- 페이징 -->
-                        <div class="col-md-12 col-lg-10 mt-4">
-                            <nav aria-label="Page navigation example" class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                        <a class="page-link" th:href="@{'/admin'(page=${currentPage - 1})}">&laquo;</a>
-                                    </li>
-                                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                        th:classappend="${i == currentPage} ? 'active'">
-                                        <a class="page-link" th:text="${i + 1}" th:href="@{'/admin'(page=${i})}"></a>
-                                    </li>
-                                    <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
-                                        <a class="page-link" th:href="@{'/admin'(page=${currentPage + 1})}">&raquo;</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
-
-                        <!-- 반품 상태 관리 -->
-                        <div class="col-md-12 col-lg-10">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h3 class="card-title">반품 상태 관리</h3>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table card-table admin-page-table">
-                                        <thead>
-                                        <tr>
-                                            <th>작업명</th>
-                                            <th>상태</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <!-- 반품 상태 샘플 -->
-                                        <tr>
-                                            <td>반품 처리 요청</td>
-                                            <td>진행중</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                    </div>
+                    <!-- 페이징 -->
+                    <div class="mt-4">
+                        <nav aria-label="Page navigation example" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{'/admin'(page=${currentPage - 1})}">&laquo;</a>
+                                </li>
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${i == currentPage} ? 'active'">
+                                    <a class="page-link" th:text="${i + 1}" th:href="@{'/admin'(page=${i})}"></a>
+                                </li>
+                                <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                                    <a class="page-link" th:href="@{'/admin'(page=${currentPage + 1})}">&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <!-- 반품 상태 관리 -->
+                    <div class="col-md-12 col-lg-10 mt-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h3 class="card-title">반품 상태 관리</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table card-table admin-page-table">
+                                    <thead>
+                                    <tr>
+                                        <th>작업명</th>
+                                        <th>상태</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>반품 처리 요청</td>
+                                        <td>진행중</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -158,11 +156,10 @@
         </div>
     </div>
     <!-- Footer -->
-    <div th:replace="~{fragments/footer :: footer}" style="position: relative; bottom: 0;"></div>
+    <div th:replace="~{fragments/footer :: footer}" class="footer mt-auto"></div>
 </div>
 </body>
 </html>
-
 <!-- Libs JS -->
 <script src="/css/dist/apexcharts.min.js?1692870487" defer></script>
 <script src="/css/dist/jsvectormap.min.js?1692870487" defer></script>
