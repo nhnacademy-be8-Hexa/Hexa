@@ -108,15 +108,15 @@
 
             <!-- 입력 필드들 -->
             <div class="form-group">
-                <label for="guest_order_number">전화 번호</label>
-                <input type="text" id="guest_order_number" name="guest_order_number" class="form-control"
-                       placeholder="10~11자리 번호 입력" minlength="10" maxlength="11" required>
+                <label for="guest_phone_number">전화 번호</label>
+                <input type="text" id="guest_phone_number" name="guest_phone_number" class="form-control"
+                       placeholder="01012345678" minlength="10" maxlength="11" required>
             </div>
 
             <div class="form-group">
                 <label for="guest_order_email">이메일</label>
                 <input type="email" id="guest_order_email" name="guest_order_email" class="form-control"
-                       placeholder="이메일 주소 입력" maxlength="320" required>
+                       placeholder="email@example.com" maxlength="320" required>
             </div>
 
             <div class="form-group">
@@ -629,26 +629,29 @@
                 // 비회원 정보 검증
                 const guestData = {};
                 if(!isLoggedIn) {
-                    const guestOrderNumber = document.querySelector("#guest_order_number").value;
+                    const guestPhoneNumber = document.querySelector("#guest_phone_number").value;
                     const guestEmail = document.querySelector("#guest_order_email").value;
                     const guestPassword = document.querySelector("#guest_order_password").value;
 
-                    if(!guestOrderNumber || !guestEmail || !guestPassword) {
+                    if(!guestPhoneNumber || !guestEmail || !guestPassword) {
                         alert("비회원 정보를 입력해주세요.");
                         return;
                     }
 
                     // 주문 번호 유효성 검사
-                    if (guestOrderNumber.length < 10 || guestOrderNumber.length > 11) {
-                        alert("전화번호는 10~11자로 입력해주세요.");
+                    const phoneRegex = /^\d{10,11}$/; // 10자리 또는 11자리 숫자만 허용
+                    if (!phoneRegex.test(guestPhoneNumber)) {
+                        alert("전화번호는 10~11자리 숫자만 입력해주세요.");
                         return;
                     }
 
                     // 이메일 유효성 검사
-                    if (!guestEmail.includes("@") || guestEmail.length > 320) {
-                        alert("유효한 이메일 주소를 입력해주세요.");
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailRegex.test(guestEmail) || guestEmail.length > 320) {
+                        alert("유효한 이메일 주소를 입력해주세요 (최대 320자).");
                         return;
                     }
+
 
                     // 비밀번호 유효성 검사
                     if (guestPassword.length < 4 || guestPassword.length > 20) {
@@ -657,7 +660,7 @@
                     }
 
 
-                    guestData.guestOrderNumber = guestOrderNumber;
+                    guestData.guestPhoneNumber = guestPhoneNumber;
                     guestData.guestEmail = guestEmail;
                     guestData.guestPassword = guestPassword;
 
@@ -692,12 +695,17 @@
 
                 const paymentData = {};
 
-                // member가 있을 경우에만 해당 필드를 추가
+                // 로그인 여부에 따라 정보 저장
                 if ( isLoggedIn ) {
                     paymentData.customerEmail = "[[${member?.memberEmail ?: ""}]]";
                     paymentData.customerName = "[[${member?.memberName ?: ""}]]";
                     paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
+                } else {
+                    paymentData.customerEmail = guestData.guestEmail;
+                    paymentData.customerMobilePhone = guestData.guestPhoneNumber;
                 }
+
+                console.log(paymentData);
 
                 // 화면에 표시된 책 정보 가져오기
                 const books = Array.from(document.querySelectorAll("#cart-items tr")).map(row => {
