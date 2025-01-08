@@ -3,6 +3,7 @@ package com.nhnacademy.hello.image.impl;
 import com.nhnacademy.hello.common.util.ImageNameSeperator;
 import com.nhnacademy.hello.exception.LocalImageException;
 import com.nhnacademy.hello.image.ImageStore;
+import com.nhnacademy.hello.image.tool.FileExtensionVaildation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -26,33 +27,40 @@ public class LocalImageStore implements ImageStore {
     @Override
     public boolean saveImages(List<MultipartFile> files, String specifyFileName) {
         List<String> ImagesFileName = new ArrayList<String>();
+
+        FileExtensionVaildation fileExtensionVaildation = new FileExtensionVaildation(files);
+        fileExtensionVaildation.vaildate();
+
         int image_count = 0;
 
         for (MultipartFile file : files) {
-            try {
-                // 파일 이름 지정 (예: 고유한 이름이나 원본 파일 이름 등)
-                ImageNameSeperator imageNameSeperator = new ImageNameSeperator(Objects.requireNonNull(file.getOriginalFilename()));
-                imageNameSeperator.setFilename(specifyFileName + "-" + String.format("%03d", image_count));
+            // 파일 이름 지정 (예: 고유한 이름이나 원본 파일 이름 등)
+            ImageNameSeperator imageNameSeperator = new ImageNameSeperator(Objects.requireNonNull(file.getOriginalFilename()));
+            imageNameSeperator.setFilename(specifyFileName + "-" + String.format("%03d", image_count));
 
-                Path folderPath = Paths.get(System.getProperty("user.home") + dir);
+            Path folderPath = Paths.get(System.getProperty("user.home") + dir);
 
+
+            if (!Files.exists(folderPath)) {
                 try {
                     Files.createDirectory(folderPath);
-                } catch (FileAlreadyExistsException e) {
-                    // 이미 디렉토리가 있으면 그냥 넘어감
+                } catch (Exception e) {
                 }
-
-                Path filePath = Paths.get(System.getProperty("user.home") + dir, imageNameSeperator.FullName());
-                if (!Files.exists(filePath)) {
-                    Files.copy(file.getInputStream(), filePath);
-                }
-
-                image_count++;
-                ImagesFileName.add(imageNameSeperator.FullName());
-
-            } catch (IOException e) {
-                throw new LocalImageException("image store error", e);
             }
+
+
+            Path filePath = Paths.get(System.getProperty("user.home") + dir, imageNameSeperator.FullName());
+            if (!Files.exists(filePath)) {
+                try {
+                    Files.copy(file.getInputStream(), filePath);
+                } catch (IOException e) {
+                    throw new LocalImageException("file create error");
+                }
+            }
+
+            image_count++;
+            ImagesFileName.add(imageNameSeperator.FullName());
+
         }
 
         return true;
