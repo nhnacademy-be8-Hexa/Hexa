@@ -3,11 +3,13 @@ package com.nhnacademy.hello.controller.admin;
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderStatusAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
+import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,47 +23,36 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-public class  AdminPageController {
+public class AdminPageController {
     private final MemberAdapter memberAdapter;
     private final BookAdapter bookAdapter;
     private final OrderAdapter orderAdapter;
-
+    private final OrderStatusAdapter orderStatusAdapter;
 
     @GetMapping("/admin")
-    public String adminPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            Model model
-    ) {
+    public String adminPage(@RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "10") int pageSize,
+                            Model model) {
+        // 사용자 로그인 및 권한 확인
         if (!AuthInfoUtils.isLogin()) {
             return "redirect:/login";
         }
 
-        // 현재 로그인된 사용자 정보 조회
         MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
-
-        // 관리자인지 검사
         if (!"ADMIN".equals(memberDTO.memberRole())) {
             return "redirect:/index";
         }
-
         model.addAttribute("member", memberDTO);
 
         // 가장 많이 방문한 도서 Top 5 조회
-        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(
-                0, 5, "", null, null, null, null, true, null, null, null, null, null, null
-        );
-
-        // 각 도서의 저자 및 좋아요 수 가져오기
+        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null);
         Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
         Map<Long, Long> bookLikesMap = new HashMap<>();
 
         for (BookDTO book : mostVisitedBooks) {
-            // 저자 정보 가져오기
             List<AuthorDTO> authors = bookAdapter.getAuthors(book.bookId());
             bookAuthorsMap.put(book.bookId(), authors);
 
-            // 좋아요 수 가져오기
             Long likeCount = bookAdapter.getLikeCount(book.bookId()).getBody();
             bookLikesMap.put(book.bookId(), likeCount);
         }
@@ -70,19 +61,22 @@ public class  AdminPageController {
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
         model.addAttribute("bookLikesMap", bookLikesMap);
 
-        // 배송 상태 관리: 주문 목록 불러오기
+        // 주문 목록 및 상태 가져오기
         ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page);
         List<OrderDTO> orders = response.getBody();
+        model.addAttribute("orders", orders);
 
-        // 총 페이지 계산
-        int totalOrders = 100; // 실제 총 주문 수를 가져오는 API가 필요
+        List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
+        model.addAttribute("statuses", statuses);
+
+        // 총 주문 수 가져오기
+        ResponseEntity<Long> totalOrderCountResponse = orderAdapter.getTotalOrderCount();
+        Long totalOrders = totalOrderCountResponse.getBody();
         int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
 
-        model.addAttribute("orders", orders);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
 
-        return "admin/adminPage"; // 템플릿 파일 경로
+        return "admin/adminPage";
     }
-
 }
