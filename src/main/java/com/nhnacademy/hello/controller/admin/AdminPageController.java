@@ -64,17 +64,29 @@ public class AdminPageController {
         // 주문 목록 및 상태 가져오기
         ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page);
         List<OrderDTO> orders = response.getBody();
-        if (orders == null || orders.isEmpty()) {
-            model.addAttribute("orders", List.of()); // 빈 리스트를 추가
-        } else {
-            // member 필드가 null인 경우를 처리
-            orders.forEach(order -> {
-                if (order.member() == null) {
-                    throw new IllegalStateException("OrderDTO contains null member field for orderId: " + order.orderId());
-                }
-            });
+        if (orders != null && !orders.isEmpty()) {
+            orders = orders.stream()
+                    .map(order -> {
+                        if (order.member() == null) {
+                            return new OrderDTO(
+                                    order.orderId(),
+                                    order.orderPrice(),
+                                    order.orderedAt(),
+                                    order.wrappingPaper(),
+                                    order.orderStatus(),
+                                    order.zoneCode(),
+                                    order.address(),
+                                    order.addressDetail(),
+                                    new OrderDTO.MemberDTO("Unknown"));
+                        }
+                        return order;
+                    })
+                    .toList();
             model.addAttribute("orders", orders);
+        } else {
+            model.addAttribute("orders", List.of());
         }
+
 
         List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
         model.addAttribute("statuses", statuses);
