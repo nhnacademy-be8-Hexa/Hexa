@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -28,39 +31,31 @@ public class MemberManageController {
                              @RequestParam(required = false) String search,
                              Model model) {
         try {
-            // FeignClient를 통해 페이징 및 검색 조건으로 회원 목록 조회
             List<MemberDTO> members = memberAdapter.getMembers(page - 1, pageSize, search);
-
-            // 전체 회원 수 조회 API 호출
-            ResponseEntity<Long> response = memberAdapter.getMemberCount(search);
-            long totalCount = response.getBody() != null ? response.getBody() : 0; // null일 경우 0으로 처리
-            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
-            int currentPage = page > 0 ? page : 1; // 0 이하일 경우 기본값 설정
-
             model.addAttribute("members", members);
-            model.addAttribute("currentPage", currentPage);
-            model.addAttribute("pageSize", pageSize);
+
+            long totalCount = memberAdapter.getMemberCount(search).getBody();
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+            model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("search", search);
         } catch (Exception e) {
             model.addAttribute("error", "회원 데이터를 불러오는 중 오류가 발생했습니다.");
-            model.addAttribute("members", List.of());
         }
 
-        return "admin/memberManage"; // 멤버 관리 페이지
+        return "admin/memberManage";
     }
-
 
     // 특정 회원 상세 조회
     @GetMapping("/{memberId}")
     public String getMemberDetail(@PathVariable String memberId, Model model) {
         MemberDTO member = memberAdapter.getMember(memberId);
-
-        model.addAttribute("member",member);
-
+        model.addAttribute("member", member);
         return "admin/memberDetail";
     }
 
+    // 특정 회원 수정 폼
     @GetMapping("/update/{memberId}")
     public String getUpdateForm(@PathVariable String memberId, Model model) {
         try {
@@ -68,54 +63,73 @@ public class MemberManageController {
 
             if (member == null) {
                 model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
-                return "admin/memberManage"; // 목록 페이지로 리다이렉트
+                return "redirect:/admin/members"; // 목록 페이지로 리다이렉트
             }
 
-            // 등급 및 상태 데이터 가져오기
             List<RatingDTO> ratings = memberAdapter.getRatings();
             List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
 
-            model.addAttribute("member", member);
+            // MemberDTO를 MemberUpdateDTO로 변환
+            MemberUpdateDTO updateDTO = convertToUpdateDTO(member);
+
+            model.addAttribute("updateDTO", updateDTO);  // 수정용 DTO 전달
             model.addAttribute("ratings", ratings);
             model.addAttribute("memberStatuses", memberStatuses);
+
+            // 추가로 lastLoginAt과 createdAt 전달
+            model.addAttribute("memberCreatedAt", member.memberCreatedAt());
+            model.addAttribute("memberLastLoginAt", member.memberLastLoginAt());
 
             return "admin/memberUpdateForm";
         } catch (Exception e) {
             model.addAttribute("error", "회원 정보를 불러오는 중 오류가 발생했습니다.");
-            return "admin/memberManage";
+            return "redirect:/admin/members";
         }
     }
 
+    // MemberDTO를 MemberUpdateDTO로 변환하는 메소드
+    private MemberUpdateDTO convertToUpdateDTO(MemberDTO member) {
+        return new MemberUpdateDTO(
+                null,  // 패스워드는 수정하지 않으므로 null로 설정
+                member.memberName(),
+                member.memberNumber(),
+                member.memberEmail(),
+                member.memberBirthAt(),
+                member.rating() != null ? String.valueOf(member.rating().ratingId()) : null,
+                member.memberStatus() != null ? String.valueOf(member.memberStatus().statusId()) : null
+        );
+    }
 
-
-
-
-    // 멤버 정보 수정 (등급, 상태 포함)
-    @PostMapping("/{memberId}")
+    // 회원 수정 요청 처리
+    @PostMapping("/update/{memberId}")
     public String updateMember(@PathVariable String memberId,
-                               @ModelAttribute @Valid MemberUpdateDTO memberUpdateDTO,
+                               @Valid @ModelAttribute("updateDTO") MemberUpdateDTO memberUpdateDTO,
+                               BindingResult bindingResult,
                                Model model) {
+        if (bindingResult.hasErrors()) {
+            List<String> errors = new ArrayList<>();
+            for (ObjectError error : bindingResult.getAllErrors()) {
+                errors.add(error.getDefaultMessage());
+            }
+            model.addAttribute("errors", errors);
+
+            List<RatingDTO> ratings = memberAdapter.getRatings();
+            List<MemberStatusDTO> memberStatuses = memberAdapter.getMemberStatus();
+            model.addAttribute("ratings", ratings);
+            model.addAttribute("memberStatuses", memberStatuses);
+
+            return "redirect:/admin/members";
+        }
+
         try {
-            // 멤버 정보 수정
             memberAdapter.updateMember(memberId, memberUpdateDTO);
 
-            // 상태 업데이트
-            if (memberUpdateDTO.statusId() != null) {
-                memberAdapter.updateMemberStatus(Long.parseLong(memberUpdateDTO.statusId()), memberUpdateDTO);
-            }
-
-            // 등급 업데이트
-            if (memberUpdateDTO.ratingId() != null) {
-                memberAdapter.updateRating(Long.parseLong(memberUpdateDTO.ratingId()), memberUpdateDTO);
-            }
-
-            return "redirect:/admin/members"; // 수정 성공 시 목록 페이지로 이동
+            return "redirect:/admin/members";
         } catch (Exception e) {
             model.addAttribute("error", "회원 정보를 저장하는 중 오류가 발생했습니다.");
             return "admin/memberUpdateForm";
         }
     }
-
     // 특정 회원 상태 변경 요청 (탈퇴 처리)
     @PutMapping("/{memberId}")
     @ResponseBody

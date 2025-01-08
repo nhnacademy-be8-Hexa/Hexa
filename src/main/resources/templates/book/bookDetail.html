@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>BOOK Detail</title>
@@ -7,6 +7,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
+
+    <style>
+        .list-group-item::before {
+            content: "# ";
+            font-weight: bold; /* 필요에 따라 스타일 조정 */
+            margin-right: 5px; /* 기호와 텍스트 간 간격 조정 */
+            color: red;
+        }
+    </style>
 
 
 </head>
@@ -83,10 +92,21 @@
                 <div class="d-flex">
                     <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
                     <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId()})}"  class="btn btn-outline-dark ms-2" >태그 선택</a>
                 </div>
 
             </div>
         </div>
+
+
+        <!-- 태그 섹션 -->
+                <ul >
+                    <li class="list-group-item" th:each="tag : ${assignedTags}">
+                        <span th:text="${tag.tagName()}">태그 이름</span>
+
+                    </li>
+                </ul>
+
 
         <!-- 책 설명 -->
         <div class="row mt-4 justify-content-center">
@@ -153,6 +173,52 @@
             // 바로 구매 페이지로 이동
             window.location.href = purchaseUrl;
         });
+
+
+        document.getElementById('addTagButton').addEventListener('click', function () {
+            const tagName = document.getElementById('newTagName').value.trim();
+
+            if (!tagName) {
+                alert('태그 이름을 입력해주세요.');
+                return;
+            }
+
+            fetch('/tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: tagName })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('태그 추가에 실패했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(newTag => {
+                    const tagList = document.querySelector('.list-group');
+                    const newTagElement = document.createElement('li');
+                    newTagElement.className = 'list-group-item';
+                    newTagElement.innerHTML = `
+                    <span>${newTag.name}</span>
+                    <span th:if="${#authorization.expression('hasRole("ADMIN")')}" class="float-end">
+                            <a th:href="@{'/tags/edit/' + ${newTag.id}}" class="btn btn-sm btn-primary me-1">수정</a>
+                            <form th:action="@{'/tags/' + ${newTag.id}}" method="post" style="display:inline;">
+                            <input type="hidden" name="_method" value="delete" />
+                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                            </form>
+                        </span>
+            `;
+                    tagList.appendChild(newTagElement);
+                    document.getElementById('newTagName').value = ''; // 입력 필드 초기화
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
+
+
 
     </script>
 
