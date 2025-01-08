@@ -2,11 +2,16 @@ package com.nhnacademy.hello.controller.purchase;
 
 import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
+import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
+import com.nhnacademy.hello.dto.category.CategoryDTO;
+import com.nhnacademy.hello.dto.coupon.CouponDTO;
+import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
 import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
@@ -28,6 +33,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.text.DecimalFormat;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +54,9 @@ public class PurchaseController {
     private final PointDetailsAdapter pointDetailsAdapter;
     private final DeliveryAdapter deliveryAdapter;
     private final BookStatusAdapter bookStatusAdapter;
+    private final CouponMemberAdapter couponMemberAdapter;
+    private final CouponAdapter couponAdapter;
+    private final CategoryAdapter categoryAdapter;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -113,6 +123,48 @@ public class PurchaseController {
             havingPoint = pointSumResponse.getBody();
         }
         model.addAttribute("havingPoint", havingPoint);
+
+        // -----쿠폰-------------------------------
+        if(AuthInfoUtils.isLogin()){
+            // 내가 가진 쿠폰의 id 리스트 뽑기
+            List<CouponMemberDTO> couponMemberList = couponMemberAdapter.getMemberCoupons(AuthInfoUtils.getUsername());
+            List<Long> couponIdList = couponMemberList.stream().map(CouponMemberDTO::couponId).toList();
+
+            // 쿠폰 아이디 리스트로 코폰 dto 리스트 조회하기
+            List<CouponDTO> couponList = couponAdapter.getCouponsByActive(couponIdList, true);
+
+            // 각 도서 별, 사용할 수 있는 쿠폰 리스트 의 리스트
+            List<List<CouponDTO>> bookValidCouponList = new ArrayList<>();
+
+            // 모든 주문할 책에 대하여
+            for(BookDTO bookDTO : bookList) {
+
+                // 현재 책의 카테고리 리스트
+                List<CategoryDTO> categoryList = categoryAdapter.getAllCategoriesByBookId(bookDTO.bookId()).getBody();
+                List<Long> categoryIdList = categoryList.stream().map(CategoryDTO::getCategoryId).toList();
+
+                List<CouponDTO> validCouponList = new ArrayList<>();
+                // 내 쿠폰 중에서 사용가능한 쿠폰을 찾아서 담는다
+                for(CouponDTO couponDTO : couponList) {
+                    // ( 사용처가 ALL이거나,
+                    // BOOK 이고 타겟 아이디가 일치하거나,
+                    // CATEGORY 이고 타겟 아이디가 해당 책의 카테고리를 포함하거나) &&
+                    // 사용기한이 유효하다
+                    if( couponDTO.couponDeadline().isAfter(ZonedDateTime.now())
+                            && (    couponDTO.couponTarget().equals("ALL") ||
+                                    ( couponDTO.couponTarget().equals("BOOK") && couponDTO.couponTargetId().equals(bookDTO.bookId()) ) ||
+                                    ( couponDTO.couponTarget().equals("CATEGORY") && categoryIdList.contains(couponDTO.couponTargetId()) )
+                            )
+                    ) {
+                        validCouponList.add(couponDTO);
+                    }
+                }
+
+                bookValidCouponList.add(validCouponList);
+            }
+
+            model.addAttribute("bookValidCouponList", bookValidCouponList);
+        }
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);

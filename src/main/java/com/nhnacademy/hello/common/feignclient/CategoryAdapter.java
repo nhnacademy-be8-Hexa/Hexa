@@ -88,4 +88,8 @@ public interface CategoryAdapter {
      */
     @DeleteMapping("/{categoryId}")
     ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId);
+
+    // bookId로 해당 책의 카테고리 리스트 조회
+    @GetMapping("/books/{bookId}")
+    ResponseEntity<List<CategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
 }
