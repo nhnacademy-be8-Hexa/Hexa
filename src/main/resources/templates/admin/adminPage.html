@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
@@ -73,7 +73,6 @@
                         </div>
                         <!-- 주문 상태 관리 -->
                         <div class="col-md-12 col-lg-10">
-                            <div th:text="${orders != null && !orders.isEmpty() ? 'Orders loaded successfully' : 'Orders are empty'}"></div>
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <h3 class="card-title">배송 상태 관리</h3>
@@ -128,30 +127,6 @@
                             </ul>
                         </nav>
                     </div>
-                    <!-- 반품 상태 관리 -->
-                    <div class="col-md-12 col-lg-10 mt-4">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h3 class="card-title">반품 상태 관리</h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table card-table admin-page-table">
-                                    <thead>
-                                    <tr>
-                                        <th>작업명</th>
-                                        <th>상태</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>반품 처리 요청</td>
-                                        <td>진행중</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -161,6 +136,7 @@
 </div>
 </body>
 </html>
+
 
 <!-- Libs JS -->
 <script src="/css/dist/apexcharts.min.js?1692870487" defer></script>
