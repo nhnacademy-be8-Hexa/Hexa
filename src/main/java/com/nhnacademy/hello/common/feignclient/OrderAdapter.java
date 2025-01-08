@@ -74,6 +74,4 @@ public interface OrderAdapter {
     @PutMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> updateGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTOs);
-
-
 }
