@@ -870,7 +870,6 @@
                 }
 
                 const savedOrderData = await response.json();
-                console.log(savedOrderData);
 
                 // GET /purchase/success
                 const successUrl = `/purchase/success?orderId=${savedOrderData}&orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
