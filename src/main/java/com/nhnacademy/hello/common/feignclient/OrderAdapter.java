@@ -46,6 +46,18 @@ public interface OrderAdapter {
             @PathVariable Long bookId);
 
 
+    // 현재 주문의 주문자가 지금 접속중인 멤버아이디와 같나
+    @GetMapping("api/orders/{orderId}/{memberId}")
+    public ResponseEntity<Boolean> existsOrderIdAndMember_MemberId(
+            @PathVariable Long orderId,
+            @PathVariable String memberId);
+
+    // 특정 멤버의 주문 숫자 (페이징 처리에 필요)
+    @GetMapping("api/orders/count/{memberId}")
+    public ResponseEntity<Long> countAllByMember_MemberId (@PathVariable String memberId);
+
+
+
     // 게스트 ------------------------------------------------
     @PostMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> createGuestOrder(
