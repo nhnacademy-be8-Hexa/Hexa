@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
 <head>
     <meta charset="UTF-8">
     <title>BOOK Detail</title>
@@ -8,140 +8,282 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 
+    <!-- Toast UI Editor CSS (필요 시) -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+
     <style>
-        .list-group-item::before {
+        /* 태그 리스트 스타일 */
+        .tag-list .list-group-item::before {
             content: "# ";
-            font-weight: bold; /* 필요에 따라 스타일 조정 */
-            margin-right: 5px; /* 기호와 텍스트 간 간격 조정 */
+            font-weight: bold;
+            margin-right: 5px;
             color: red;
         }
     </style>
-
-
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
     <!-- 헤더 포함 -->
     <div th:replace="~{fragments/header :: header}"></div>
 
-        <div class="row">
-
-            <!-- 책 이미지 -->
-            <div class="col-md-4 text-center">
-                <img th:src="@{${thumbnailImage}}" alt="책 이미지" class="img-fluid" style="max-width: 70%; height: auto;">
-            </div>
-
-            <!-- 책 정보 -->
-            <div class="col-md-8">
-                <h2 th:text="${book.bookTitle}">책 제목</h2>
-
-                <!-- ISBN -->
-                <p class="text-muted mb-1" style="font-size: 0.9rem;" th:text="'ISBN: ' + ${book.bookIsbn}">ISBN 정보</p>
-
-                <!-- 출판사 -->
-                <p class="mb-1" th:text="'출판사: ' + ${book.publisher.publisherName}">출판사 정보</p>
-
-                <!-- 저자 -->
-                <p class="mb-1" th:text="'저자: ' + ${#strings.arrayJoin(authors, ', ')}">저자1, 저자2...</p>
-
-                <!-- 출간일 -->
-                <p class="mb-1" th:text="'출간일: ' + ${book.bookPubDate}">출간일 정보</p>
-
-                <!-- 상태 -->
-                <p class="text-muted mb-3" th:text="'상태: ' + ${book.bookStatus.bookStatus}" style="margin-top: 15px;">책 상태</p>
-
-                <!-- 가격 -->
-                <p class="mb-1">
-                    <span>정가:</span> <span th:text="${book.bookOriginPrice} + '원'">정가</span> /
-                    <span>판매가:</span> <span th:text="${book.bookPrice} + '원'">판매가</span>
-                </p>
-
-                <!-- 별점 및 리뷰 -->
-                <p>
-                    별점: ★★★☆☆ (리뷰 수: <span th:text="${reviewCount}">0</span>)
-                </p>
-
-<!--                좋아요 갯수 및 버튼 -->
-                <div class="d-flex align-items-center mb-3">
-                    <span class="me-3">
-                        좋아요 <span th:text="${likeCount}">0</span>
-                    </span>
-                    <form th:action="@{/book/{bookId}/like(bookId=${book.bookId})}" method="post">
-                        <button type="submit" class="btn btn-light">
-                            <i class="bi bi-heart-fill" style="color: red; background: transparent;"></i>
-                        </button>
-                    </form>
-                </div>
-
-
-
-                <!-- 도서 정보 -->
-                <span id="bookId" style="display: none;" th:text="${book.bookId}"></span>
-                <span id="bookTitle" style="display: none;" th:text="${book.bookTitle}"></span>
-                <span id="bookPrice" style="display: none;" th:text="${book.bookPrice}"></span>
-
-                <!-- 수량 입력 -->
-                <div class="mb-3">
-                    <label for="quantity" class="form-label">수량:</label>
-                    <input type="number" id="quantity" class="form-control w-25" min="1" max="10" value="1" required>
-                </div>
-
-                <!-- 버튼 -->
-                <div class="d-flex">
-                    <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
-                    <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
-                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId()})}"  class="btn btn-outline-dark ms-2" >태그 선택</a>
-                </div>
-
-            </div>
+    <!-- 성공 메시지 표시 (리뷰 작성 성공 시) -->
+    <div th:if="${param.success}">
+        <div class="alert alert-success mt-3" role="alert">
+            리뷰가 성공적으로 작성되었습니다.
         </div>
-
-
-        <!-- 태그 섹션 -->
-                <ul >
-                    <li class="list-group-item" th:each="tag : ${assignedTags}">
-                        <span th:text="${tag.tagName()}">태그 이름</span>
-
-                    </li>
-                </ul>
-
-
-        <!-- 책 설명 -->
-        <div class="row mt-4 justify-content-center">
-            <div class="col-md-8">
-                <div style="max-height: 400px; overflow-y: auto; padding: 15px; border: 1px solid #ddd; border-radius: 5px; text-align: center; margin: 0 auto;">
-                    <p th:utext="${book.bookDescription}" style="text-align: center;">
-                        책 설명이 여기에 표시됩니다.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 풋터 -->
-        <div th:replace="~{fragments/footer :: footer}"></div>
-
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 오류 메시지 표시 (리뷰 작성 실패 시) -->
+    <div th:if="${submissionError}">
+        <div class="alert alert-danger mt-3" role="alert">
+            <span th:text="${submissionError}"></span>
+        </div>
+    </div>
 
-    <script>
+    <div class="row mt-4">
+        <!-- 책 이미지 -->
+        <div class="col-md-4 text-center">
+            <img th:src="@{${thumbnailImage}}" alt="책 이미지" class="img-fluid" style="max-width: 70%; height: auto;">
+        </div>
 
-        // 장바구니 담기 버튼 클릭 이벤트
+        <!-- 책 정보 -->
+        <div class="col-md-8">
+            <h2 th:text="${book.bookTitle}">책 제목</h2>
+
+            <!-- ISBN -->
+            <p class="text-muted mb-1" style="font-size: 0.9rem;" th:text="'ISBN: ' + ${book.bookIsbn}">ISBN 정보</p>
+
+            <!-- 출판사 -->
+            <p class="mb-1" th:text="'출판사: ' + ${book.publisher.publisherName}">출판사 정보</p>
+
+            <!-- 저자 -->
+            <p class="mb-1" th:text="'저자: ' + ${#strings.arrayJoin(authors, ', ')}">저자1, 저자2...</p>
+
+            <!-- 출간일 -->
+            <p class="mb-1" th:text="'출간일: ' + ${book.bookPubDate}">출간일 정보</p>
+
+            <!-- 상태 -->
+            <p class="text-muted mb-3" th:text="'상태: ' + ${book.bookStatus.bookStatus}" style="margin-top: 15px;">책 상태</p>
+
+            <!-- 가격 -->
+            <p class="mb-1">
+                <span>정가:</span> <span th:text="${book.bookOriginPrice} + '원'">정가</span> /
+                <span>판매가:</span> <span th:text="${book.bookPrice} + '원'">판매가</span>
+            </p>
+
+            <!-- 별점 및 리뷰 -->
+            <p>
+                별점: ★★★☆☆ (리뷰 수: <span th:text="${totalCount}">0</span>개)
+            </p>
+
+            <!-- 좋아요 갯수 및 버튼 -->
+            <div class="d-flex align-items-center mb-3">
+                <span class="me-3">
+                    좋아요 <span th:text="${likeCount}">0</span>
+                </span>
+                <form th:action="@{/book/{bookId}/like(bookId=${book.bookId})}" method="post">
+                    <button type="submit" class="btn btn-light">
+                        <i class="bi bi-heart-fill" style="color: red; background: transparent;"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 도서 정보 -->
+            <span id="bookId" style="display: none;" th:text="${book.bookId}"></span>
+            <span id="bookTitle" style="display: none;" th:text="${book.bookTitle}"></span>
+            <span id="bookPrice" style="display: none;" th:text="${book.bookPrice}"></span>
+
+            <!-- 수량 입력 -->
+            <div class="mb-3">
+                <label for="quantity" class="form-label">수량:</label>
+                <input type="number" id="quantity" class="form-control w-25" min="1" max="10" value="1" required>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="d-flex">
+                <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
+                <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId})}"  class="btn btn-outline-dark ms-2" >태그 선택</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 태그 섹션 -->
+    <ul class="list-group mt-4 tag-list">
+        <li class="list-group-item" th:each="tag : ${assignedTags}">
+            <span th:text="${tag.tagName}">태그 이름</span>
+        </li>
+    </ul>
+
+    <!-- 책 설명 -->
+    <div class="row mt-4 justify-content-center">
+        <div class="col-md-8">
+            <div style="max-height: 400px; overflow-y: auto; padding: 15px; border: 1px solid #ddd; border-radius: 5px; text-align: center; margin: 0 auto;">
+                <p th:utext="${book.bookDescription}" style="text-align: center;">
+                    책 설명이 여기에 표시됩니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리뷰 섹션 -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>리뷰 (총 <span th:text="${totalCount}">0</span>개)</h3>
+
+            <!-- 리뷰 목록 -->
+            <div th:if="${#lists.isEmpty(reviews)}">
+                <p>작성된 리뷰가 없습니다.</p>
+            </div>
+            <div th:if="${!#lists.isEmpty(reviews)}">
+                <ul class="list-group mb-3">
+                    <li class="list-group-item" th:each="review : ${reviews}">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong th:text="${review.member.memberId}">작성자</strong>
+                                <span th:text="' · ' + ${review.reviewRating} + '점'">· 평점</span>
+                            </div>
+                            <!-- 사용자가 작성한 리뷰에만 '수정' 버튼 표시 -->
+                            <div th:if="${review.member.memberId == memberId}">
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-review-btn"
+                                        th:data-review-id="${review.reviewId}"
+                                        th:data-review-content="${#strings.escapeXml(review.reviewContent)}"
+                                        th:data-review-rating="${review.reviewRating}">
+                                    수정
+                                </button>
+                            </div>
+                        </div>
+                        <p th:utext="${review.reviewContent}">리뷰 내용</p>
+                        <div th:if="${review.reviewIsBlocked}">
+                            <span class="badge bg-danger">차단된 리뷰</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 페이징 컨트롤을 리뷰 목록 아래에 배치 -->
+            <div th:if="${totalPages > 0}">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <!-- 이전 페이지 -->
+                        <li class="page-item" th:classappend="${page <= 0} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/book/{bookId}(bookId=${book.bookId}, page=${page - 1}, size=${size})}"
+                               aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 번호 -->
+                        <li class="page-item"
+                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == page} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/book/{bookId}(bookId=${book.bookId}, page=${i}, size=${size})}"
+                               th:text="${i + 1}">1</a>
+                        </li>
+
+                        <!-- 다음 페이지 -->
+                        <li class="page-item" th:classappend="${page >= (totalPages - 1)} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/book/{bookId}(bookId=${book.bookId}, page=${page + 1}, size=${size})}"
+                               aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리뷰 작성 섹션 -->
+    <!-- 구매 여부와 로그인 여부를 모두 확인 -->
+    <div class="row mt-4" th:if="${memberId != null}">
+        <div class="col-md-12" th:if="${isOrder}">
+            <!-- 리뷰 작성 폼을 이미 작성하지 않은 경우에만 표시 -->
+            <div th:if="${!isReview}">
+                <h3>리뷰 작성</h3>
+                <form id="reviewCreateForm"
+                      th:object="${reviewRequestDTO}"
+                      th:action="@{/book/{bookId}/reviews(bookId=${book.bookId})}"
+                      method="post">
+
+                    <!-- 리뷰 ID (수정 시 사용, 기본적으로 비어있음) -->
+                    <input type="hidden" id="reviewId" name="reviewId" th:value="${null}" />
+
+                    <!-- 리뷰 내용 (Toast UI Editor) -->
+                    <div class="mb-3">
+                        <label for="reviewContentEditor" class="form-label">리뷰 내용:</label>
+                        <div id="reviewContentEditor"></div>
+                        <textarea id="reviewContent" name="reviewContent" style="display:none;"
+                                  th:field="*{reviewContent}"></textarea>
+                        <div class="text-danger" th:if="${#fields.hasErrors('reviewContent')}"
+                             th:errors="*{reviewContent}">리뷰 내용 오류</div>
+                    </div>
+
+                    <!-- 리뷰 평점 -->
+                    <div class="mb-3">
+                        <label for="reviewRating" class="form-label">평점:</label>
+                        <select id="reviewRating" name="reviewRating" class="form-select" th:field="*{reviewRating}" required>
+                            <option value="" disabled selected>평점을 선택하세요</option>
+                            <option th:each="i : ${#numbers.sequence(1, 5, 1)}" th:value="${i}" th:text="${i} + '점'">1점</option>
+                        </select>
+                        <div class="text-danger" th:if="${#fields.hasErrors('reviewRating')}"
+                             th:errors="*{reviewRating}">평점 오류</div>
+                    </div>
+
+                    <!-- 리뷰 제출 버튼 -->
+                    <button type="submit" class="btn btn-primary" id="submitReviewButton">리뷰 작성</button>
+                </form>
+            </div>
+
+            <!-- 리뷰를 이미 작성한 경우에는 수정 안내 메시지 표시 -->
+            <div th:if="${isReview}">
+                <p>이미 리뷰를 작성하셨습니다. 리뷰를 수정하려면 리뷰 목록에서 "수정" 버튼을 클릭하세요.</p>
+            </div>
+        </div>
+
+        <!-- 구매하지 않은 사용자에게는 리뷰 작성 불가 메시지 표시 -->
+        <!-- 이 부분은 기존에 "isOrder"가 false일 때 메시지를 표시하도록 이미 구현되어 있으므로 추가할 필요가 없습니다 -->
+    </div>
+
+    <!-- 로그인하지 않은 사용자에게는 리뷰 작성 폼을 표시하지 않도록, 대신 로그인하라는 메시지 표시 -->
+    <div class="row mt-4" th:if="${memberId == null}">
+        <div class="col-md-12">
+            <p>리뷰를 작성하려면 <a th:href="@{/login}">로그인</a>하세요.</p>
+        </div>
+    </div>
+
+    <!-- 풋터 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+</div>
+
+<!-- Toast UI Editor JS (필요 시) -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const bookId = [[${book.bookId}]];
+    document.addEventListener("DOMContentLoaded", function () {
+        // '장바구니 담기' 버튼 클릭 이벤트
         document.getElementById("addToCartButton").addEventListener("click", function () {
             // 현재 책 정보 가져오기
-            const bookId = document.getElementById("bookId").innerText;
-            const bookTitle = document.getElementById("bookTitle").innerText;
-            const bookPrice = document.getElementById("bookPrice").innerText;
+            const bookTitle = document.getElementById("bookTitle").innerText.trim();
+            const bookPrice = document.getElementById("bookPrice").innerText.trim();
             const quantity = document.getElementById("quantity").value;
 
             // 로컬스토리지에서 기존 장바구니 가져오기
             let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
             // 이미 담긴 책인지 확인
-            const alreadyInCart = cart.some(item => item.bookId === bookId);
+            const alreadyInCart = cart.some(item => item.bookId === bookId.toString());
             if (alreadyInCart) {
                 alert("이미 장바구니에 담긴 책입니다!");
                 return;
@@ -161,10 +303,10 @@
             alert("장바구니에 추가되었습니다!");
         });
 
+        // '바로 구매' 버튼 클릭 이벤트
         document.getElementById("buyNowButton").addEventListener("click", function(e) {
             e.preventDefault();  // 기본 링크 동작을 막음
 
-            const bookId = document.getElementById("bookId").innerText;
             const quantity = document.getElementById("quantity").value;
 
             // 구매 URL을 생성
@@ -174,10 +316,85 @@
             window.location.href = purchaseUrl;
         });
 
+        // 리뷰 작성 및 수정 기능
+        const reviewEditorContainer = document.querySelector('#reviewContentEditor');
+        const hiddenReviewContent = document.querySelector('#reviewContent');
+        const reviewIdField = document.querySelector('#reviewId');
+        const submitReviewButton = document.querySelector('#submitReviewButton');
 
+        let reviewEditor = null;
+        if (reviewEditorContainer) {
+            reviewEditor = new toastui.Editor({
+                el: reviewEditorContainer,
+                height: '300px',
+                initialEditType: 'markdown',
+                previewStyle: 'vertical',
+                hooks: {
+                    addImageBlobHook: (blob, callback) => {
+                        const formData = new FormData();
+                        formData.append('image', blob);
 
-    </script>
+                        fetch('/upload-review-image', { // 리뷰 이미지 업로드 엔드포인트로 변경
+                            method: 'POST',
+                            body: formData,
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.url) {
+                                    callback(data.url, 'Image');
+                                } else {
+                                    alert('이미지 업로드 실패');
+                                    callback('', 'Image upload failed');
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Error uploading image:', err);
+                                callback('', 'Image upload failed');
+                            });
+                    }
+                }
+            });
+        }
 
+        // 리뷰 작성 폼 제출 시 에디터 내용 동기화
+        const reviewForm = document.getElementById('reviewCreateForm');
+        if (reviewForm && reviewEditor) {
+            reviewForm.addEventListener('submit', function () {
+                hiddenReviewContent.value = reviewEditor.getMarkdown();
+            });
+        }
+
+        // '수정' 버튼 클릭 시 리뷰 수정 폼으로 전환
+        const editButtons = document.querySelectorAll('.edit-review-btn');
+        editButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const reviewId = this.getAttribute('data-review-id');
+                const reviewContent = this.getAttribute('data-review-content');
+                const reviewRating = this.getAttribute('data-review-rating');
+
+                // 리뷰 내용과 평점을 에디터에 로드
+                if (reviewEditor) {
+                    reviewEditor.setMarkdown(reviewContent);
+                } else {
+                    hiddenReviewContent.value = reviewContent;
+                }
+
+                // hidden 필드에 리뷰 ID 설정
+                reviewIdField.value = reviewId;
+
+                // 제출 버튼의 텍스트 변경
+                submitReviewButton.textContent = '리뷰 수정';
+
+                // 폼의 액션을 리뷰 수정 엔드포인트로 변경
+                reviewForm.action = '/book/' + bookId + '/reviews/' + reviewId;
+
+                // 스크롤을 리뷰 작성 폼으로 이동
+                reviewForm.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    });
+    /*]]>*/
+</script>
 
 </body>
 </html>
