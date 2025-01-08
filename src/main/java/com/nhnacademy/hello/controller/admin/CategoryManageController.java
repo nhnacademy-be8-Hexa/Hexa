@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 public class CategoryManageController {
     private final CategoryAdapter categoryAdapter;
+    private static final int PAGE_SIZE = 9;
 
     public CategoryManageController(CategoryAdapter categoryAdapter) {
         this.categoryAdapter = categoryAdapter;
@@ -33,13 +34,13 @@ public class CategoryManageController {
     public String categoryList(
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
             Model model) {
-        final int size = 9;
+
         
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
         Long totalCategories = categoryAdapter.getTotal().getBody();
 
-        int totalPages = (int) Math.ceil((double) totalCategories / size);
+        int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
 
         if (page > totalPages && totalPages != 0) {
             adjustedPage = totalPages - 1;
@@ -51,7 +52,8 @@ public class CategoryManageController {
         List<Long> categoriesWithSubCategories =
                 findCategoriesIdsWithSubCategories(categories != null ? categories : Collections.emptyList());
 
-        List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllPagedCategories(adjustedPage, size).getBody();
+        List<PagedCategoryDTO> pagedCategories =
+                categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
         List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
 
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
@@ -64,7 +66,7 @@ public class CategoryManageController {
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", size);
+        model.addAttribute("size", PAGE_SIZE);
 
         return "admin/categoryManageForm";
     }
