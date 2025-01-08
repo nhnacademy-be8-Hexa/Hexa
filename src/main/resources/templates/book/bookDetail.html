@@ -175,50 +175,6 @@
         });
 
 
-        document.getElementById('addTagButton').addEventListener('click', function () {
-            const tagName = document.getElementById('newTagName').value.trim();
-
-            if (!tagName) {
-                alert('태그 이름을 입력해주세요.');
-                return;
-            }
-
-            fetch('/tags', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: tagName })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('태그 추가에 실패했습니다.');
-                    }
-                    return response.json();
-                })
-                .then(newTag => {
-                    const tagList = document.querySelector('.list-group');
-                    const newTagElement = document.createElement('li');
-                    newTagElement.className = 'list-group-item';
-                    newTagElement.innerHTML = `
-                    <span>${newTag.name}</span>
-                    <span th:if="${#authorization.expression('hasRole("ADMIN")')}" class="float-end">
-                            <a th:href="@{'/tags/edit/' + ${newTag.id}}" class="btn btn-sm btn-primary me-1">수정</a>
-                            <form th:action="@{'/tags/' + ${newTag.id}}" method="post" style="display:inline;">
-                            <input type="hidden" name="_method" value="delete" />
-                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-                            </form>
-                        </span>
-            `;
-                    tagList.appendChild(newTagElement);
-                    document.getElementById('newTagName').value = ''; // 입력 필드 초기화
-                })
-                .catch(error => {
-                    alert(error.message);
-                });
-        });
-
-
 
     </script>
 
