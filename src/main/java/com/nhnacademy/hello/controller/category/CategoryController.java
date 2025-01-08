@@ -48,7 +48,6 @@ public class CategoryController {
             Model model
     ) {
 
-
         final int size = 18;
 
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
@@ -103,7 +102,7 @@ public class CategoryController {
 
         List<BookDTO> searchBooksWithImages = setImagePaths(books);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
-        model.addAttribute("search", search);
+        model.addAttribute("categoryId", categoryId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", size);
