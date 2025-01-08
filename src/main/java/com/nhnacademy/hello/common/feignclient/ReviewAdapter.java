@@ -27,6 +27,14 @@ public interface ReviewAdapter {
             @RequestParam("sort") String sort
     );
 
+
+    // 특정 주문에 특정 멤버가 주문한 도서가 있는지 확인
+    @GetMapping("/api/members/{memberId}/orders/books/{bookId}")
+    public ResponseEntity<Boolean> checkOrderBook(
+            @PathVariable String memberId,
+            @PathVariable Long bookId
+    );
+
     // 특정 회원의 리뷰 총계를 조회
     @GetMapping("/api/members/{memberId}/reviews/total")
     public ResponseEntity<Long> getTotalReviews(@PathVariable String memberId);
@@ -42,8 +50,7 @@ public interface ReviewAdapter {
             @PathVariable Long bookId,
             // 페이징
             @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") String sort
+            @RequestParam("size") int size
             );
 
     @DeleteMapping("/api/reviews/{reviewId}")
@@ -76,4 +83,16 @@ public interface ReviewAdapter {
     // 신고 5회 이상의 리뷰 목록 조회 페이징을 위한 총계
     @GetMapping("/api/reviews/highReport/total")
     public ResponseEntity<Long> getReviewsFromHighReportTotal();
+
+    @GetMapping("/api/books/{bookId}/reviews/total")
+    public ResponseEntity<Long> getTotalReviewsFromBook(
+            @PathVariable Long bookId
+    );
+
+    @GetMapping("/api/members/{memberId}/books/{bookId}/reviews")
+    public ResponseEntity<Boolean> checkReviews(
+            @PathVariable String memberId,
+            @PathVariable Long bookId
+    );
+
 }
