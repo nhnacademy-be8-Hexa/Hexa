@@ -77,4 +77,7 @@ public interface OrderAdapter {
 
     @GetMapping("/api/orders/count")
     public ResponseEntity<Long> getTotalOrderCount();
+    @GetMapping("/api/guestOrders/validate")
+    public ResponseEntity<String> getGuestOrderPassword(
+            @Valid @RequestBody GuestOrderValidateRequestDTO guestOrderValidateRequestDTO);
 }
