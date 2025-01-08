@@ -364,6 +364,18 @@ public class PurchaseController {
             orderAdapter.createGuestOrder(guestOrderRequestDTO);
         }
 
+        // 쿠폰 사용 처리
+        if(AuthInfoUtils.isLogin()){
+
+            for(Long couponId : purchaseDTO.selectedCouponIds()) {
+                if(couponId == -1){
+                    continue;
+                }
+                couponAdapter.useCoupon(couponId);
+            }
+
+        }
+
         // ------------------------------------------------------------------------
 
         return ResponseEntity.ok(savedOrderId);
