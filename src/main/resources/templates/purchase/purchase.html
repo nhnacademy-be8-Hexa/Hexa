@@ -50,7 +50,7 @@
             <td>
                 <!-- 포장 가능 여부 표시 -->
                 <span th:text="${book.bookWrappable() ? '포장 가능' : '포장 불가능'}"
-                      th:classappend="${book.bookWrappable() ? 'text-primary' : 'text-danger'}"></span>
+                      th:classappend="${book.bookWrappable() ? 'text-success' : 'text-danger'}"></span>
             </td>
             <td th:data-price="${book.bookPrice}" id="book-price-${book.bookId}">
                 <span th:text="${book.bookPrice}"></span>
