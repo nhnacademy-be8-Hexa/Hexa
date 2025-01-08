@@ -540,24 +540,18 @@
                 quantityElement.textContent = quantity;
                 let total = price * quantity;
 
-                console.log(total);
-
                 // 쿠폰 관련 로직 추가
                 const couponSelect = row.querySelector(`#coupon-select-${bookId}`);
-                console.log(couponSelect);
 
                 if (couponSelect) {
                     const selectedCouponId = parseInt(couponSelect.value, 10); // 선택된 쿠폰 ID
-                    console.log("Selected Coupon ID:", selectedCouponId);
 
                     if (!isNaN(selectedCouponId) && selectedCouponId !== -1) {
                         // bookValidCouponList에서 해당 행(index)에 해당하는 쿠폰 리스트 찾기
                         const couponList = bookValidCouponList[index]; // index를 사용하여 해당 행의 쿠폰 리스트 찾기
-                        console.log("Coupon List:", couponList);
 
                         // 쿠폰 리스트에서 선택된 쿠폰 객체 찾기
                         const selectedCoupon = couponList ? couponList.find(coupon => coupon.couponId === selectedCouponId) : null;
-                        console.log("Selected Coupon:", selectedCoupon);
 
                         if (selectedCoupon) {
 
@@ -651,7 +645,6 @@
             document.querySelectorAll("select.coupon-select").forEach(selectElement => {
                 selectElement.addEventListener("change", event => {
                     calculateTotalPrice();
-                    console.log("쿠폰 변경됨")
                 });
             });
         });
