@@ -40,7 +40,8 @@ public class MyOrderController {
 
         Long totalCount = orderAdapter.countAllByMember_MemberId(member.memberId()).getBody();
 
-        Long totalPage = (long) Math.ceil( (double)(totalCount/SIZE) );
+        Long totalPage = (totalCount + SIZE - 1) / SIZE;
+                //(long) Math.ceil( (double)(totalCount/SIZE) );
 
         if(page <=0 || totalPage<page){
             page=1;
