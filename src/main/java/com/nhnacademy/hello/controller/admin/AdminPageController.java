@@ -62,8 +62,7 @@ public class AdminPageController {
         model.addAttribute("bookLikesMap", bookLikesMap);
 
         // 주문 목록 및 상태 가져오기
-        int startIndex = (page - 1) * pageSize; // 시작 인덱스 계산
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(pageSize); // 수정된 메서드 호출
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 값 그대로 전달
         List<OrderDTO> orders = response.getBody();
 
         if (orders == null || orders.isEmpty()) {
