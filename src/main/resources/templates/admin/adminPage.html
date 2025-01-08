@@ -78,7 +78,7 @@
                                     <h3 class="card-title">배송 상태 관리</h3>
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table admin-page-table">
+                                    <table class="table admin-page-table" style="width: 80%">
                                         <thead>
                                         <tr>
                                             <th>주문 ID</th>
@@ -116,7 +116,7 @@
                                     <!-- 이전 버튼 -->
                                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                                         <a class="page-link"
-                                           th:href="@{'/admin/members'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1}, search=${search})}">
+                                           th:href="@{'/admin'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1}, search=${search})}">
                                             &laquo;
                                         </a>
                                     </li>
@@ -125,13 +125,13 @@
                                     <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
                                         th:classappend="${i == currentPage} ? 'active'">
                                         <a class="page-link" th:text="${i}"
-                                           th:href="@{'/admin/members'(page=${i}, search=${search})}"></a>
+                                           th:href="@{'/admin'(page=${i}, search=${search})}"></a>
                                     </li>
 
                                     <!-- 다음 버튼 -->
                                     <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                                         <a class="page-link"
-                                           th:href="@{'/admin/members'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}">
+                                           th:href="@{'/admin'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}">
                                             &raquo;
                                         </a>
                                     </li>
