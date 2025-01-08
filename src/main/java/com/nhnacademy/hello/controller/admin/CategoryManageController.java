@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 public class CategoryManageController {
     private final CategoryAdapter categoryAdapter;
+    private static final int PAGE_SIZE = 9;
 
     public CategoryManageController(CategoryAdapter categoryAdapter) {
         this.categoryAdapter = categoryAdapter;
@@ -33,13 +34,13 @@ public class CategoryManageController {
     public String categoryList(
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
             Model model) {
-        final int size = 9;
 
+        
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
         Long totalCategories = categoryAdapter.getTotal().getBody();
 
-        int totalPages = (int) Math.ceil((double) totalCategories / size);
+        int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
 
         if (page > totalPages && totalPages != 0) {
             adjustedPage = totalPages - 1;
@@ -47,21 +48,25 @@ public class CategoryManageController {
         }
 
         List<CategoryDTO> categories = categoryAdapter.getCategories().getBody();
+
         List<Long> categoriesWithSubCategories =
                 findCategoriesIdsWithSubCategories(categories != null ? categories : Collections.emptyList());
-        List<PagedCategoryDTO> pagedCategories = categoryAdapter.getAllPagedCategories(adjustedPage, size).getBody();
+
+        List<PagedCategoryDTO> pagedCategories =
+                categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
         List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
+
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-        
+
         model.addAttribute("unPagedCategories", unPagedCategories);
+        model.addAttribute("pagedCategories", pagedCategories);
         model.addAttribute("categoriesWithSubCategories", categoriesWithSubCategories);
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
-        model.addAttribute("pagedCategories", pagedCategories);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", size);
+        model.addAttribute("size", PAGE_SIZE);
 
         return "admin/categoryManageForm";
     }
@@ -87,11 +92,23 @@ public class CategoryManageController {
         return "redirect:/admin/categoryManage";
     }
 
+    /**
+     * 주어진 카테고리 목록에서 서브 카테고리가 존재하는 카테고리들의 ID를 반환하는 메서드.
+     *
+     * @param allCategories 모든 카테고리들의 리스트
+     * @return 서브 카테고리가 존재하는 카테고리들의 ID를 담은 리스트
+     */
     public List<Long> findCategoriesIdsWithSubCategories(List<CategoryDTO> allCategories) {
-        return allCategories.stream()
-                .filter(category -> !category.getSubCategories().isEmpty())
-                .map(CategoryDTO::getCategoryId)
-                .collect(Collectors.toList());
+        return allCategories.stream()  // 스트림을 생성하여 allCategories 리스트에서 처리 시작
+
+                // 서브 카테고리가 존재하는 카테고리만 필터링
+                .filter(category -> !category.getSubCategories().isEmpty())  // 서브 카테고리가 비어있지 않으면 해당 카테고리만 필터링
+
+                // 필터링된 카테고리에서 카테고리 ID를 추출
+                .map(CategoryDTO::getCategoryId)  // 각 카테고리에서 ID만 추출
+
+                // 최종 결과를 리스트로 수집하여 반환
+                .collect(Collectors.toList());  // 카테고리 ID들을 List로 수집하여 반환
     }
 
 }

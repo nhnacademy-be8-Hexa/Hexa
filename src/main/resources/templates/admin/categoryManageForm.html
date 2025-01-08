@@ -114,6 +114,7 @@
         </div>
     </div>
 
+
     <!-- 페이지 네비게이션 -->
     <nav aria-label="Page navigation example" th:if="${totalPages > 0}">
         <div class="pagination justify-content-center">
@@ -131,8 +132,7 @@
                   th:classappend="${i eq currentPage} ? 'active'">
                 <a class="page-link"
                    th:text="${i}"
-                   th:href="@{'/admin/categoryManage'(page=${i})}"
-                   style="background-color: #9E8DBF; color: white;">${i}</a>
+                   th:href="@{'/admin/categoryManage'(page=${i})}">${i}</a>
             </span>
 
             <!-- 다음 페이지 버튼 -->
