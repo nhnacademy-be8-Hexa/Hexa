@@ -30,7 +30,7 @@ public class MyOrderController {
     private final OrderBookAdapter orderBookAdapter;
     private final CouponAdapter couponAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
-    private final Long SIZE = 3L;
+    private final Long SIZE = 10L;
 
     @GetMapping("/mypage/orders")
     public String ordersPage(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, Model model) {
