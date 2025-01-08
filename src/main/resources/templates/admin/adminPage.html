@@ -73,6 +73,7 @@
                         </div>
                         <!-- 주문 상태 관리 -->
                         <div class="col-md-12 col-lg-10">
+                            <div th:text="${orders != null && !orders.isEmpty() ? 'Orders loaded successfully' : 'Orders are empty'}"></div>
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <h3 class="card-title">배송 상태 관리</h3>
@@ -160,6 +161,7 @@
 </div>
 </body>
 </html>
+
 <!-- Libs JS -->
 <script src="/css/dist/apexcharts.min.js?1692870487" defer></script>
 <script src="/css/dist/jsvectormap.min.js?1692870487" defer></script>
