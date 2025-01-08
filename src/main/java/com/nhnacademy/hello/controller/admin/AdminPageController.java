@@ -64,7 +64,11 @@ public class AdminPageController {
         // 주문 목록 및 상태 가져오기
         ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page);
         List<OrderDTO> orders = response.getBody();
-        model.addAttribute("orders", orders);
+        if (orders == null || orders.isEmpty()) {
+            model.addAttribute("orders", List.of()); // 빈 리스트를 추가
+        } else {
+            model.addAttribute("orders", orders);
+        }
 
         List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
         model.addAttribute("statuses", statuses);
@@ -72,7 +76,7 @@ public class AdminPageController {
         // 총 주문 수 가져오기
         ResponseEntity<Long> totalOrderCountResponse = orderAdapter.getTotalOrderCount();
         Long totalOrders = totalOrderCountResponse.getBody();
-        int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+        int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
 
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
