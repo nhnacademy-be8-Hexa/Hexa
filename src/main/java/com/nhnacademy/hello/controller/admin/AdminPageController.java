@@ -67,6 +67,12 @@ public class AdminPageController {
         if (orders == null || orders.isEmpty()) {
             model.addAttribute("orders", List.of()); // 빈 리스트를 추가
         } else {
+            // member 필드가 null인 경우를 처리
+            orders.forEach(order -> {
+                if (order.member() == null) {
+                    throw new IllegalStateException("OrderDTO contains null member field for orderId: " + order.orderId());
+                }
+            });
             model.addAttribute("orders", orders);
         }
 
