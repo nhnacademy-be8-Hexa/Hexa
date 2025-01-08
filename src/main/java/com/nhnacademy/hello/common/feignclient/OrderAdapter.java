@@ -1,9 +1,6 @@
 package com.nhnacademy.hello.common.feignclient;
 
-import com.nhnacademy.hello.dto.order.GuestOrderDTO;
-import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
-import com.nhnacademy.hello.dto.order.OrderDTO;
-import com.nhnacademy.hello.dto.order.OrderRequestDTO;
+import com.nhnacademy.hello.dto.order.*;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -77,4 +74,8 @@ public interface OrderAdapter {
 
     @GetMapping("/api/orders/count")
     public ResponseEntity<Long> getTotalOrderCount();
+
+    @GetMapping("/api/guestOrders/validate")
+    public ResponseEntity<String> getGuestOrderPassword(
+            @Valid @RequestBody GuestOrderValidateRequestDTO guestOrderValidateRequestDTO);
 }
