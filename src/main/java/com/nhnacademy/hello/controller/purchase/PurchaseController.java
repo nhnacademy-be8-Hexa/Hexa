@@ -8,6 +8,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
+import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,8 @@ public class PurchaseController {
     private final PointDetailsAdapter pointDetailsAdapter;
     private final DeliveryAdapter deliveryAdapter;
     private final BookStatusAdapter bookStatusAdapter;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${toss.client.key}")
     private String tossClientKey;
@@ -296,6 +300,17 @@ public class PurchaseController {
                 purchaseDTO.deliveryDate().minusDays(1)
         );
         deliveryAdapter.createDelivery(deliveryRequestDTO);
+
+        // 비회원 정보 저장
+        if(!AuthInfoUtils.isLogin()){
+            GuestOrderRequestDTO guestOrderRequestDTO = new GuestOrderRequestDTO(
+                    savedOrderId,
+                    passwordEncoder.encode(purchaseDTO.guestPassword()),
+                    purchaseDTO.guestOrderNumber(),
+                    purchaseDTO.guestEmail()
+            );
+            orderAdapter.createGuestOrder(guestOrderRequestDTO);
+        }
 
         // ------------------------------------------------------------------------
 

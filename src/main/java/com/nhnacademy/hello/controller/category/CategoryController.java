@@ -24,7 +24,7 @@ public class CategoryController {
     private final CategoryAdapter categoryAdapter;
     private final BookAdapter bookAdapter;
     private final ImageStore imageStore;
-
+    private static final int PAGE_SIZE = 18;
 
     @GetMapping
     public String bookList(
@@ -47,9 +47,6 @@ public class CategoryController {
             @RequestParam(value = "latest", required = false, defaultValue = "false") Boolean latest,
             Model model
     ) {
-
-
-        final int size = 18;
 
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
@@ -76,7 +73,7 @@ public class CategoryController {
                 authorName
         ).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / size);
+        int totalPages = (int) Math.ceil((double) totalBooks / PAGE_SIZE);
 
         if (page > totalPages && totalPages != 0) {
             adjustedPage = totalPages - 1;
@@ -85,7 +82,7 @@ public class CategoryController {
 
         List<BookDTO> books = bookAdapter.getBooks(
                 adjustedPage,
-                size,
+                PAGE_SIZE,
                 sort,
                 search,
                 categoryIds,
@@ -103,10 +100,10 @@ public class CategoryController {
 
         List<BookDTO> searchBooksWithImages = setImagePaths(books);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
-        model.addAttribute("search", search);
+        model.addAttribute("categoryId", categoryId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", size);
+        model.addAttribute("size", PAGE_SIZE);
 
         return "book/categoryBooks";
     }

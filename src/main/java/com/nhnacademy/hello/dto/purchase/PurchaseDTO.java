@@ -13,7 +13,10 @@ public record PurchaseDTO(
         String addressDetail,
         Long wrappingPaperId,
         Integer usingPoint,
-        LocalDateTime deliveryDate
+        LocalDateTime deliveryDate,
+        String guestOrderNumber,
+        String guestEmail,
+        String guestPassword
 ) {
 }
 
