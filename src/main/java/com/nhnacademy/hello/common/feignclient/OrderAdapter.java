@@ -63,5 +63,6 @@ public interface OrderAdapter {
     public ResponseEntity<GuestOrderDTO> updateGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTOs);
 
-
+    @GetMapping("/api/orders/count")
+    public ResponseEntity<Long> getTotalOrderCount();
 }
