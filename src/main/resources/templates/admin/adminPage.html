@@ -94,18 +94,15 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="order : ${orders}">
-                                            <td th:text="${order.orderId}">-</td>
-                                            <td th:text="${order.member?.memberId ?: 'Unknown Member'}">-</td>
-                                            <td th:text="${order.orderPrice}">-</td>
-                                            <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
-                                            <td th:text="${order.zoneCode}">-</td>
-                                            <td th:text="${order.address}">-</td>
-                                            <td th:text="${order.addressDetail}">-</td>
-                                            <td th:text="${order.wrappingPaper?.wrappingPaperName ?: '미포함'}">-</td>
-                                            <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}">-</td>
-                                        </tr>
-                                        <tr th:if="${orders == null or #lists.isEmpty(orders)}">
-                                            <td colspan="9" class="text-center">No orders available</td>
+                                            <td th:text="${order.orderId}"></td>
+                                            <td th:text="${order.member.memberId}"></td>
+                                            <td th:text="${order.orderPrice}"></td>
+                                            <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                                            <td th:text="${order.zoneCode}"></td>
+                                            <td th:text="${order.address}"></td>
+                                            <td th:text="${order.addressDetail}"></td>
+                                            <td th:text="${order.wrappingPaper?.wrappingPaperName ?: '미포함'}"></td>
+                                            <td th:text="${order.orderStatus.orderStatus}"></td>
                                         </tr>
                                         </tbody>
                                     </table>
