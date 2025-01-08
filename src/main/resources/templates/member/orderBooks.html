@@ -57,9 +57,8 @@
                             <p><strong>주문 금액:</strong> <span th:text="${amountPrice}">0</span> 원</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>할인된 가격:</strong> <span th:text="${discountPrice}">0</span> 원</p>
+                            <p><strong>할인된 가격:</strong> <span th:text="${discountPrice}">0</span></p>
                             <p><strong>포장지 가격:</strong> <span th:text="${wrappingPaperPrice}">0</span> 원</p>
-                            <p><strong>배달비:</strong> <span th:text="${deliveryCost}">0</span> 원</p> <!-- 배달비 추가 -->
                             <p><strong>결제 금액:</strong> <span th:text="${order.orderPrice()}">결제 금액</span> 원</p>
                         </div>
                     </div>
