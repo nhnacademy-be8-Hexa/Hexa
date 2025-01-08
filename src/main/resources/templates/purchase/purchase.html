@@ -50,7 +50,7 @@
             <td>
                 <!-- 포장 가능 여부 표시 -->
                 <span th:text="${book.bookWrappable() ? '포장 가능' : '포장 불가능'}"
-                      th:classappend="${book.bookWrappable() ? 'text-primary' : 'text-danger'}"></span>
+                      th:classappend="${book.bookWrappable() ? 'text-success' : 'text-danger'}"></span>
             </td>
             <td th:data-price="${book.bookPrice}" id="book-price-${book.bookId}">
                 <span th:text="${book.bookPrice}"></span>
@@ -469,6 +469,17 @@
         }
     }
 
+    // 중복된 쿠폰 사용이 있는지 체크
+    const hasDuplicateCoupons = (couponIds) => {
+        // -1을 제외한 쿠폰 ID만 필터링
+        const filteredIds = couponIds.filter(id => id !== -1);
+
+        // 중복 여부 확인 (Set을 사용하여 중복 제거 후 길이 비교)
+        const uniqueIds = new Set(filteredIds);
+
+        return filteredIds.length !== uniqueIds.size;
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("loading-overlay");
 
@@ -508,9 +519,15 @@
         const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
             ? parseInt(buynowQuantityElement.value, 10) : null;
 
+        // 사용된 쿠폰 아이디 리스트
+        const selectedCouponIds = [];
+
         // 동적 총액 계산 함수
         const calculateTotalPrice = () => {
             overlay.style.display = "block";
+
+            // selectedCouponIds 배열 초기화
+            selectedCouponIds.length = 0;
 
             totalPrice = 0;
 
@@ -540,24 +557,19 @@
                 quantityElement.textContent = quantity;
                 let total = price * quantity;
 
-                console.log(total);
-
                 // 쿠폰 관련 로직 추가
                 const couponSelect = row.querySelector(`#coupon-select-${bookId}`);
-                console.log(couponSelect);
 
                 if (couponSelect) {
                     const selectedCouponId = parseInt(couponSelect.value, 10); // 선택된 쿠폰 ID
-                    console.log("Selected Coupon ID:", selectedCouponId);
+                    selectedCouponIds.push(selectedCouponId);
 
                     if (!isNaN(selectedCouponId) && selectedCouponId !== -1) {
                         // bookValidCouponList에서 해당 행(index)에 해당하는 쿠폰 리스트 찾기
                         const couponList = bookValidCouponList[index]; // index를 사용하여 해당 행의 쿠폰 리스트 찾기
-                        console.log("Coupon List:", couponList);
 
                         // 쿠폰 리스트에서 선택된 쿠폰 객체 찾기
                         const selectedCoupon = couponList ? couponList.find(coupon => coupon.couponId === selectedCouponId) : null;
-                        console.log("Selected Coupon:", selectedCoupon);
 
                         if (selectedCoupon) {
 
@@ -569,12 +581,15 @@
                                 total -= selectedCoupon.couponPolicy.discountValue;
                                 if (total < 0) total = 0; // 총 가격이 0보다 작아지지 않도록 처리
                             } else if (selectedCoupon.couponPolicy.discountType === 'PERCENTAGE') {
-                                const discount = (total * selectedCoupon.couponPolicy.discountValue) / 100;
+                                const discount = Math.round((total * selectedCoupon.couponPolicy.discountValue) / 100); // 할인 금액 반올림
                                 total -= discount;
                                 if (total < 0) total = 0; // 총 가격이 0보다 작아지지 않도록 처리
                             }
                         }
                     }
+                } else{
+                    // 쿠폰 선택 없으면 -1 넣기
+                    selectedCouponIds.push(-1);
                 }
 
                 // 총 가격 업데이트
@@ -651,7 +666,6 @@
             document.querySelectorAll("select.coupon-select").forEach(selectElement => {
                 selectElement.addEventListener("change", event => {
                     calculateTotalPrice();
-                    console.log("쿠폰 변경됨")
                 });
             });
         });
@@ -696,7 +710,7 @@
 
             try{
                 // 비회원 정보 검증
-                const guestData = {};
+                const purchaseData = {};
                 if(!isLoggedIn) {
                     const guestOrderNumber = document.querySelector("#guest_order_number").value;
                     const guestEmail = document.querySelector("#guest_order_email").value;
@@ -729,12 +743,13 @@
                     }
 
 
-                    guestData.guestOrderNumber = guestOrderNumber;
-                    guestData.guestEmail = guestEmail;
-                    guestData.guestPassword = guestPassword;
+                    purchaseData.guestOrderNumber = guestOrderNumber;
+                    purchaseData.guestEmail = guestEmail;
+                    purchaseData.guestPassword = guestPassword;
 
+                } else {
+                    purchaseData.selectedCouponIds = selectedCouponIds;
                 }
-
 
 
                 // 배송 정보 읽기
@@ -747,6 +762,13 @@
                     alert("주소를 설정해주세요.");
                     return; // 결제 요청 중단
                 }
+
+                // 쿠폰 중복 사용 검사
+                if(hasDuplicateCoupons(selectedCouponIds)){
+                    alert("중복 사용된 쿠폰이 있습니다!");
+                    return;
+                }
+
 
                 // 결제 정보 설정
                 // 주문 정보 구성
@@ -770,8 +792,8 @@
                     paymentData.customerName = "[[${member?.memberName ?: ""}]]";
                     paymentData.customerMobilePhone = "[[${member?.memberNumber ?: ""}]]";
                 } else {
-                    paymentData.customerEmail = guestData.guestEmail;
-                    paymentData.customerMobilePhone = guestData.guestOrderNumber;
+                    paymentData.customerEmail = purchaseData.guestEmail;
+                    paymentData.customerMobilePhone = purchaseData.guestOrderNumber;
                 }
 
                 // 화면에 표시된 책 정보 가져오기
@@ -838,7 +860,7 @@
                         wrappingPaperId: wrappingPaperSelect.value,
                         usingPoint: isNaN(pointValue) ? 0 : pointValue,
                         deliveryDate: formattedDeliveryDate,
-                        ...guestData,
+                        ...purchaseData,
                     }),
                 });
 
@@ -847,8 +869,10 @@
                     throw new Error(`서버 오류: ${errorMessage}`);
                 }
 
+                const savedOrderData = await response.json();
+
                 // GET /purchase/success
-                const successUrl = `/purchase/success?orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
+                const successUrl = `/purchase/success?orderId=${savedOrderData}&orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
                 window.location.href = successUrl;
 
             } catch(error){
