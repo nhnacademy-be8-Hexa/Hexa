@@ -20,6 +20,7 @@ public interface OrderAdapter {
 
     @GetMapping("/api/orders")
     public ResponseEntity<List<OrderDTO>> getAllOrders(
+            @RequestParam("startIndex") int startIndex,
             @RequestParam(defaultValue = "0") int page);
 
     @GetMapping("/api/members/{memberId}/orders")

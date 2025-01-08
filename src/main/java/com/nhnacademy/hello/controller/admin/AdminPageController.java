@@ -30,7 +30,7 @@ public class AdminPageController {
     private final OrderStatusAdapter orderStatusAdapter;
 
     @GetMapping("/admin")
-    public String adminPage(@RequestParam(defaultValue = "0") int page,
+    public String adminPage(@RequestParam(defaultValue = "1") int page, // 페이지 번호는 1부터 시작
                             @RequestParam(defaultValue = "10") int pageSize,
                             Model model) {
         // 사용자 로그인 및 권한 확인
@@ -62,7 +62,8 @@ public class AdminPageController {
         model.addAttribute("bookLikesMap", bookLikesMap);
 
         // 주문 목록 및 상태 가져오기
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page);
+        int startIndex = (page - 1) * pageSize; // 시작 인덱스 계산
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(startIndex, pageSize); // 수정된 메서드 호출
         List<OrderDTO> orders = response.getBody();
         if (orders != null && !orders.isEmpty()) {
             orders = orders.stream()
@@ -86,7 +87,6 @@ public class AdminPageController {
         } else {
             model.addAttribute("orders", List.of());
         }
-
 
         List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
         model.addAttribute("statuses", statuses);

@@ -116,22 +116,22 @@
                                     <!-- 이전 버튼 -->
                                     <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                                         <a class="page-link"
-                                           th:href="@{'/admin'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1}, search=${search})}">
+                                           th:href="'https://www.hexabook.shop/admin?page=' + (${currentPage > 1 ? currentPage - 1 : 1})">
                                             &laquo;
                                         </a>
                                     </li>
 
                                     <!-- 페이지 번호 -->
-                                    <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
+                                    <li class="page-item" th:each="i : ${totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
                                         th:classappend="${i == currentPage} ? 'active'">
                                         <a class="page-link" th:text="${i}"
-                                           th:href="@{'/admin'(page=${i}, search=${search})}"></a>
+                                           th:href="'https://www.hexabook.shop/admin?page=' + ${i}"></a>
                                     </li>
 
                                     <!-- 다음 버튼 -->
                                     <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                                         <a class="page-link"
-                                           th:href="@{'/admin'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}">
+                                           th:href="'https://www.hexabook.shop/admin?page=' + (${currentPage < totalPages ? currentPage + 1 : totalPages})">
                                             &raquo;
                                         </a>
                                     </li>
