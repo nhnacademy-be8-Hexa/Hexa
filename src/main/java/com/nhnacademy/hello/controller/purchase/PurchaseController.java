@@ -366,16 +366,18 @@ public class PurchaseController {
 
         // ------------------------------------------------------------------------
 
-        return ResponseEntity.ok("결제 성공.");
+        return ResponseEntity.ok(savedOrderId);
     }
 
     // 결제 성공 페이지
     @GetMapping("/purchase/success")
     public String purchaseSuccess(
+            @RequestParam("orderId") String orderId,
             @RequestParam("orderName") String orderName,
             @RequestParam("amount") Double amount,
             Model model
     ) {
+        model.addAttribute("orderId", orderId);
         model.addAttribute("orderName", orderName);
         model.addAttribute("totalPrice", new DecimalFormat("#,###").format(amount));
         return "purchase/success";

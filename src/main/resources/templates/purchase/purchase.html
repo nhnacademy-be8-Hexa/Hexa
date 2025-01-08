@@ -840,8 +840,11 @@
                     throw new Error(`서버 오류: ${errorMessage}`);
                 }
 
+                const savedOrderData = await response.json();
+                console.log(savedOrderData);
+
                 // GET /purchase/success
-                const successUrl = `/purchase/success?orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
+                const successUrl = `/purchase/success?orderId=${savedOrderData}&orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
                 window.location.href = successUrl;
 
             } catch(error){
