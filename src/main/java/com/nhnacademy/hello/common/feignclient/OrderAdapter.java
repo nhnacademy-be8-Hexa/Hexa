@@ -47,19 +47,19 @@ public interface OrderAdapter {
 
 
     // 게스트 ------------------------------------------------
-    @PostMapping
+    @PostMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> createGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTO);
 
-    @GetMapping
+    @GetMapping("/api/guestOrders")
     public List<GuestOrderDTO> getAllGuestOrders(
             @RequestParam(defaultValue = "0") int page);
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/api/guestOrders/{orderId}")
     public GuestOrderDTO getGuestOrder(
             @PathVariable Long orderId);
 
-    @PutMapping
+    @PutMapping("/api/guestOrders")
     public ResponseEntity<GuestOrderDTO> updateGuestOrder(
             @Valid @RequestBody GuestOrderRequestDTO guestOrderRequestDTOs);
 

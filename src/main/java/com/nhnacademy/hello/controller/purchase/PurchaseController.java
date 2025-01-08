@@ -8,6 +8,7 @@ import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
+import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.order.WrappingPaperDTO;
@@ -296,6 +297,17 @@ public class PurchaseController {
                 purchaseDTO.deliveryDate().minusDays(1)
         );
         deliveryAdapter.createDelivery(deliveryRequestDTO);
+
+        // 비회원 정보 저장
+        if(!AuthInfoUtils.isLogin()){
+            GuestOrderRequestDTO guestOrderRequestDTO = new GuestOrderRequestDTO(
+                    savedOrderId,
+                    purchaseDTO.guestPassword(),
+                    purchaseDTO.guestOrderNumber(),
+                    purchaseDTO.guestEmail()
+            );
+            orderAdapter.createGuestOrder(guestOrderRequestDTO);
+        }
 
         // ------------------------------------------------------------------------
 
