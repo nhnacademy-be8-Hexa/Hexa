@@ -124,7 +124,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="editMaxDiscountAmount" class="form-label">최대 할인 금액</label>
-                            <input type="text" class="form-control" id="editMaxDiscountAmount">
+                            <input type="number" class="form-control" id="editMaxDiscountAmount">
                         </div>
                         <div class="mb-3">
                             <label for="editEventType" class="form-label">이벤트 타입</label>
@@ -219,9 +219,6 @@
         const discountType = document.getElementById('discountType').value;
         const discountValue = document.getElementById('discountValue').value;
         const maxDiscountAmount = document.getElementById('maxDiscountAmount').value;
-        const data = {
-            maxDiscountAmount: maxDiscountAmount === "" ? null : maxDiscountAmount
-        };
         const eventType = document.getElementById('eventType').value;
 
         const newCouponPolicy = {
@@ -229,7 +226,7 @@
             minPurchaseAmount,
             discountType,
             discountValue,
-            data,
+            maxDiscountAmount,
             eventType
         };
 
@@ -289,10 +286,7 @@
         const minPurchaseAmount = document.getElementById('editMinPurchaseAmount').value;
         const discountType = document.getElementById('editDiscountType').value;
         const discountValue = document.getElementById('editDiscountValue').value;
-        const maxDiscountAmount = document.getElementById('maxDiscountAmount').value;
-        const data = {
-            maxDiscountAmount: maxDiscountAmount === "" ? null : maxDiscountAmount
-        };
+        const maxDiscountAmount = document.getElementById('editMaxDiscountAmount').value;
         const eventType = document.getElementById('editEventType').value;
 
         const updatedCouponPolicy = {
@@ -300,7 +294,7 @@
             minPurchaseAmount,
             discountType,
             discountValue,
-            data,
+            maxDiscountAmount,
             eventType
         };
 
@@ -354,7 +348,7 @@
                 const detailContent = document.getElementById('detailContent');
                 detailContent.innerHTML = `
                     <p><strong>쿠폰 정책 이름:</strong> ${couponPolicy.couponPolicyName}</p>
-                    <p><strong>최소 할인 금액:</strong> ${couponPolicy.minPurchaseAmounte}</p>
+                    <p><strong>최소 구매 금액:</strong> ${couponPolicy.minPurchaseAmount}</p>
                     <p><strong>할인 타입:</strong> ${couponPolicy.discountType}</p>
                     <p><strong>할인 량:</strong> ${couponPolicy.discountValue}</p>
                     <p><strong>최대 할인 금액:</strong> ${couponPolicy.maxDiscountAmount}</p>
