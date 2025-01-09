@@ -84,6 +84,8 @@
                                             <th>주문 ID</th>
                                             <th>회원 ID</th>
                                             <th>회원 이름</th>
+                                            <th>도서 ID</th>
+                                            <th>도서 이름</th>
                                             <th>총 가격</th>
                                             <th>상태</th>
                                             <th>주문 일자</th>
@@ -94,9 +96,21 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="order : ${orders}">
-                                            <td><a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}">-</a></td>
+                                            <td>
+                                                <a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}"></a>-
+                                            </td>
                                             <td th:text="${order.member != null ? order.member.memberId : 'Unknown'}">-</td>
                                             <td th:text="${order.member != null and order.member.memberName != null ? order.member.memberName : 'Unknown'}">-</td>
+                                            <td>
+                                                <ul>
+                                                    <li th:each="book : ${order.books}" th:text="${book.bookId}"></li>
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <ul>
+                                                    <li th:each="book : ${order.books}" th:text="${book.bookName}"></li>
+                                                </ul>
+                                            </td>
                                             <td th:text="${order.orderPrice}">-</td>
                                             <td th:text="${order.orderStatus.orderStatus}">-</td>
                                             <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
