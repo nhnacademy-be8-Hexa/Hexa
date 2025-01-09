@@ -43,7 +43,25 @@ public class AdminPageController {
         }
         model.addAttribute("member", memberDTO);
 
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page - 1);
+        // 가장 많이 방문한 도서 Top 5 조회
+        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null);
+        Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
+        Map<Long, Long> bookLikesMap = new HashMap<>();
+
+        for (BookDTO book : mostVisitedBooks) {
+            List<AuthorDTO> authors = bookAdapter.getAuthors(book.bookId());
+            bookAuthorsMap.put(book.bookId(), authors);
+
+            Long likeCount = bookAdapter.getLikeCount(book.bookId()).getBody();
+            bookLikesMap.put(book.bookId(), likeCount);
+        }
+
+        model.addAttribute("mostVisitedBooks", mostVisitedBooks);
+        model.addAttribute("bookAuthorsMap", bookAuthorsMap);
+        model.addAttribute("bookLikesMap", bookLikesMap);
+
+        // 대기 상태 주문만 조회
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 전달
         List<OrderDTO> allOrders = response.getBody();
 
         if (allOrders != null && !allOrders.isEmpty()) {
