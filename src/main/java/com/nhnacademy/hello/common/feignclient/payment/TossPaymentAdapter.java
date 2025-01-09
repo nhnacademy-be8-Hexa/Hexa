@@ -20,9 +20,9 @@ public interface TossPaymentAdapter {
             @RequestBody TossPaymentDto tossPayment
     );
 
-    @GetMapping("/{paymentKey}")
+    @GetMapping("/{orderId}")
     ResponseEntity<TossPaymentDto> getPayment(
-            @PathVariable String paymentKey
+            @PathVariable Long orderId
     );
 
 }
