@@ -31,19 +31,27 @@
       </tr>
       <tr>
         <th>회원 ID</th>
-        <td th:text="${order.member.memberId}"></td>
+        <td th:text="${order.member != null ? order.member.memberId : 'Unknown'}"></td>
       </tr>
       <tr>
         <th>회원 이름</th>
-        <td th:text="${order.member.memberName}"></td>
+        <td th:text="${order.member != null && order.member.memberName != null ? order.member.memberName : 'Unknown'}"></td>
       </tr>
       <tr>
         <th>도서 ID</th>
-        <td th:each="book : ${order.books}" th:text="${book.bookId}"></td>
+        <td>
+          <ul>
+            <li th:each="book : ${order.books}" th:text="${book.bookId != null ? book.bookId : 'Unknown'}"></li>
+          </ul>
+        </td>
       </tr>
       <tr>
         <th>도서 이름</th>
-        <td th:each="book : ${order.books}" th:text="${book.bookName}"></td>
+        <td>
+          <ul>
+            <li th:each="book : ${order.books}" th:text="${book.bookName != null ? book.bookName : 'Unknown'}"></li>
+          </ul>
+        </td>
       </tr>
       <tr>
         <th>연락처</th>

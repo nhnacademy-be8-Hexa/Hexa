@@ -75,6 +75,22 @@ public class OrderManageController {
     @GetMapping("/{orderId}")
     public String getOrderDetail(@PathVariable Long orderId, Model model) {
         OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
+
+        // Null 검사를 추가하여 데이터 설정
+        if (order != null && order.books() == null) {
+            order = new OrderDTO(
+                    order.orderId(),
+                    order.orderPrice(),
+                    order.orderedAt(),
+                    order.wrappingPaper(),
+                    order.orderStatus(),
+                    order.zoneCode(),
+                    order.address(),
+                    order.addressDetail(),
+                    order.member(),
+                    List.of() // 빈 리스트로 초기화
+            );
+        }
         model.addAttribute("order", order);
         return "admin/orderDetail";
     }
