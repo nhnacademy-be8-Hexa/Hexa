@@ -96,7 +96,7 @@
                                         <tr th:each="order : ${orders}">
                                             <td th:text="${order.orderId}">-</td>
                                             <td th:text="${order.member != null ? order.member.memberId : 'Unknown'}">-</td>
-                                            <td th:text="${order.member != null ? order.member.memberName : 'Unknown'}">-</td>
+                                            <td th:text="${order.member != null and order.member.memberName != null ? order.member.memberName : 'Unknown'}">-</td>
                                             <td th:text="${order.orderPrice}">-</td>
                                             <td th:text="${order.orderStatus.orderStatus}">-</td>
                                             <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>

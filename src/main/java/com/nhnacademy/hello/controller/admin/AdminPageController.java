@@ -66,11 +66,9 @@ public class AdminPageController {
         List<OrderDTO> allOrders = response.getBody();
 
         if (allOrders != null && !allOrders.isEmpty()) {
-            // 대기 상태 주문만 필터링
             List<OrderDTO> pendingOrders = allOrders.stream()
                     .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
                     .map(order -> {
-                        // member가 null인 경우 기본값 설정
                         if (order.member() == null) {
                             return new OrderDTO(
                                     order.orderId(),
@@ -81,7 +79,7 @@ public class AdminPageController {
                                     order.zoneCode(),
                                     order.address(),
                                     order.addressDetail(),
-                                    new OrderDTO.MemberDTO("Unknown"));
+                                    new OrderDTO.MemberDTO("Unknown", "Unknown"));
                         }
                         return order;
                     })
