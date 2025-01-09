@@ -1,14 +1,16 @@
 package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderBookAdapter;
-import com.nhnacademy.hello.common.feignclient.OrderStatusAdapter;
 import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class OrderManageController {
     private final OrderBookAdapter orderBookAdapter;
     private final OrderAdapter orderAdapter;
     private final BookAdapter bookAdapter;
+    private final MemberAdapter memberAdapter;
 
     @GetMapping
     public String getOrders(@RequestParam(defaultValue = "1") int page,
@@ -83,62 +85,44 @@ public class OrderManageController {
         OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
 
         if (order != null) {
-            // OrderBookResponseDTO로 도서 정보를 가져옵니다.
+            // 주문서에 포함된 도서 정보 가져오기
             OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(orderId);
 
+            List<BookDTO> books = List.of();
             if (orderBooks != null && orderBooks.length > 0) {
-                // 도서 ID 목록 추출
                 List<Long> bookIds = Arrays.stream(orderBooks)
                         .map(OrderBookResponseDTO::bookId)
                         .collect(Collectors.toList());
-
-                // BookAdapter로 도서 정보 조회
-                List<BookDTO> books = bookAdapter.getBooksByIds(bookIds);
-
-                // 도서 정보를 OrderDTO에 설정
-                order = new OrderDTO(
-                        order.orderId(),
-                        order.orderPrice(),
-                        order.orderedAt(),
-                        order.wrappingPaper(),
-                        order.orderStatus(),
-                        order.zoneCode(),
-                        order.address(),
-                        order.addressDetail(),
-                        order.member(),
-                        books
-                );
-            } else {
-                // 도서 정보가 없을 경우 빈 리스트 설정
-                order = new OrderDTO(
-                        order.orderId(),
-                        order.orderPrice(),
-                        order.orderedAt(),
-                        order.wrappingPaper(),
-                        order.orderStatus(),
-                        order.zoneCode(),
-                        order.address(),
-                        order.addressDetail(),
-                        order.member(),
-                        List.of()
-                );
+                books = bookAdapter.getBooksByIds(bookIds); // 도서 정보 조회
             }
 
-            // 회원 정보가 null인 경우 기본값 설정
-            if (order.member() == null) {
-                order = new OrderDTO(
-                        order.orderId(),
-                        order.orderPrice(),
-                        order.orderedAt(),
-                        order.wrappingPaper(),
-                        order.orderStatus(),
-                        order.zoneCode(),
-                        order.address(),
-                        order.addressDetail(),
-                        new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"),
-                        order.books()
-                );
+            // 회원 정보 가져오기
+            OrderDTO.MemberDTO member = order.member();
+            if (member != null && !"Unknown".equals(member.memberId())) {
+                MemberDTO memberDTO = memberAdapter.getMember(member.memberId());
+                if (memberDTO != null) {
+                    // 회원 정보를 OrderDTO의 MemberDTO로 변환
+                    member = new OrderDTO.MemberDTO(
+                            memberDTO.memberId(),
+                            memberDTO.memberName(),
+                            memberDTO.memberNumber()
+                    );
+                }
             }
+
+            // 최종 OrderDTO 생성
+            order = new OrderDTO(
+                    order.orderId(),
+                    order.orderPrice(),
+                    order.orderedAt(),
+                    order.wrappingPaper(),
+                    order.orderStatus(),
+                    order.zoneCode(),
+                    order.address(),
+                    order.addressDetail(),
+                    member != null ? member : new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"),
+                    books
+            );
         }
 
         model.addAttribute("order", order);
