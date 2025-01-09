@@ -41,8 +41,9 @@
           </thead>
           <tbody>
           <tr th:each="order : ${orders}">
-            <td th:text="${order.orderId}">-</td>
-            <td th:text="${order.member?.memberId ?: 'Unknown'}">-</td>
+            <td>
+              <a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}"></a>
+            </td>            <td th:text="${order.member?.memberId ?: 'Unknown'}">-</td>
             <td th:text="${order.orderPrice}">-</td>
             <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}">-</td>
             <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
@@ -70,7 +71,7 @@
           <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
               th:classappend="${i == currentPage} ? 'active'">
             <a class="page-link" th:text="${i}"
-               th:href="@{'/admin/orders'(page=${i}, search=${search})}"></a>
+               th:href="@{'/admin/orders'(page=${i})}"></a>
           </li>
 
           <!-- 다음 버튼 -->

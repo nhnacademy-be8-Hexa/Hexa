@@ -26,7 +26,7 @@ public class OrderManageController {
                             @RequestParam(defaultValue = "10")int pageSize,
                             Model model){
         // 전체 주문 목록 조회
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 전달
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page - 1);
         List<OrderDTO> orders = response.getBody();
 
         if (orders != null && !orders.isEmpty()) {
@@ -35,9 +35,12 @@ public class OrderManageController {
             model.addAttribute("orders", List.of());
         }
 
-        model.addAttribute("currentPage", page);
-        model.addAttribute("pageSize", pageSize);
+        ResponseEntity<Long> totalOrderCountResponse = orderAdapter.getTotalOrderCount();
+        Long totalOrders = totalOrderCountResponse.getBody();
+        int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
 
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
         return "admin/orderManage"; // 전체 주문 목록 페이지
     }
 
@@ -56,7 +59,7 @@ public class OrderManageController {
 
         if (order != null && "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus())) {
             OrderRequestDTO updatedOrder = new OrderRequestDTO(
-                    order.member().memberId(),
+                    order.member() != null ? order.member().memberId() : "Unknown",
                     order.orderPrice(),
                     order.wrappingPaper() != null ? order.wrappingPaper().wrappingPaperId() : null,
                     2L, // 배송중 상태 ID
@@ -64,7 +67,6 @@ public class OrderManageController {
                     order.address(),
                     order.addressDetail()
             );
-
             orderAdapter.updateOrder(orderId, updatedOrder);
         }
         return ResponseEntity.ok().build();
