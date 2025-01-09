@@ -61,28 +61,13 @@ public class AdminPageController {
         model.addAttribute("bookLikesMap", bookLikesMap);
 
 
-        // 주문 목록 조회
+        // WAIT 상태 주문만 가져오기
         ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page - 1);
         List<OrderDTO> allOrders = response.getBody();
 
         if (allOrders != null && !allOrders.isEmpty()) {
             List<OrderDTO> pendingOrders = allOrders.stream()
                     .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
-                    .map(order -> {
-                        if (order.member() == null) {
-                            return new OrderDTO(
-                                    order.orderId(),
-                                    order.orderPrice(),
-                                    order.orderedAt(),
-                                    order.wrappingPaper(),
-                                    order.orderStatus(),
-                                    order.zoneCode(),
-                                    order.address(),
-                                    order.addressDetail(),
-                                    new OrderDTO.MemberDTO("Unknown", "Unknown"));
-                        }
-                        return order;
-                    })
                     .toList();
 
             model.addAttribute("orders", pendingOrders);
@@ -96,8 +81,6 @@ public class AdminPageController {
 
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-
-
 
         return "admin/adminPage";
     }

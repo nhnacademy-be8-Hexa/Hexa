@@ -94,7 +94,7 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="order : ${orders}">
-                                            <td th:text="${order.orderId}">-</td>
+                                            <td><a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}">-</a></td>
                                             <td th:text="${order.member != null ? order.member.memberId : 'Unknown'}">-</td>
                                             <td th:text="${order.member != null and order.member.memberName != null ? order.member.memberName : 'Unknown'}">-</td>
                                             <td th:text="${order.orderPrice}">-</td>
