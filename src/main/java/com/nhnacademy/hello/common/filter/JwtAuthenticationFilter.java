@@ -42,66 +42,72 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // access 토큰와 refresh 토큰을 각각 가져옴
 
-        String accessToken = cookieUtil.getCookieValue(request,"accessToken");
+        String accessToken = cookieUtil.getCookieValue(request, "accessToken");
 
-        String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
-
-        // refresh 토큰은 무조건 있어야함
+        String refreshToken = cookieUtil.getCookieValue(request, "refreshToken");
 
 
+        // 접근 토큰이 있나
+        if (accessToken != null) {
+            // 접근토큰이 만료가 안되었나
+            if (jwtUtils.validateAccessToken(accessToken)) {
+                // 리프레시 토큰이 있으나 없으나 권한주기
 
-        // 토큰이 null 이 아니고 유효기간이 아직 남아있으면
-        if(refreshToken != null && jwtUtils.validateRefreshToken(refreshToken)){
+                String username = jwtUtils.getUsernameFromAccessToken(accessToken);
+                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(jwtUtils.getRoleFromAccessToken(accessToken)));
 
-            String sendRefreshToken = jwtProperties.getTokenPrefix() + " " + refreshToken;
+                // 인증 객체 생성
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
 
-            String serverRefreshToken = tokenAdapter.getServerToken(sendRefreshToken);
+                // 컨텍스트에 인증 설정 (security 인증)
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            // 접근토큰이 만료된 경우
+            else {
+                // 리프레시 토큰이 있는 경우
+                if (refreshToken != null) {
 
-            // 서버에 저장된 유저의 토큰이 null이 아니고 유저가 보낸 토큰과 값이 같으면
-            if(serverRefreshToken != null && Objects.equals(serverRefreshToken, refreshToken)){
+                    String sendRefreshToken = jwtProperties.getTokenPrefix() + " " + refreshToken;
 
-                // refresh token 이 만료되지 않았으면 (이 안쪽 부분까지 들어오면 인증처리되게 만들어야 함)
-                if(jwtUtils.validateRefreshToken(refreshToken)){
+                    // 접근 토큰의 이름과 권한이 리프레시 토큰의 이름과 권한과 같은가 그리고 토큰이 블랙리스트에 없는가
 
-                    // access token 만료 된 경우
-                    if((accessToken == null)  || (!jwtUtils.validateAccessToken(accessToken)) ){
+                    String accessTokenUserName = jwtUtils.getUsernameFromAccessToken(accessToken);
+                    String refreshTokenUserName = jwtUtils.getUsernameFromRefreshToken(refreshToken);
+                    String accessTokenUserRole = jwtUtils.getRoleFromAccessToken(accessToken);
+                    String refreshTokenUserRole = jwtUtils.getRoleFromAccessToken(accessToken);
+                    Boolean blacklist = tokenAdapter.isTokenBlackListed(sendRefreshToken);
 
+                    if (jwtUtils.getUsernameFromAccessToken(accessToken).equals(jwtUtils.getUsernameFromRefreshToken(refreshToken)) &&
+                            jwtUtils.getRoleFromAccessToken(accessToken).equals(jwtUtils.getRoleFromRefreshToken(refreshToken)) &&
+                            (!tokenAdapter.isTokenBlackListed(sendRefreshToken)))
+                    {
+                        // 기존 리프레시 토큰으로 새로 발급
                         AccessRefreshTokenDTO accessRefreshTokenDTO = tokenAdapter.reissueAccessRefreshToken(sendRefreshToken);
 
                         accessToken = accessRefreshTokenDTO.accessToken();
                         refreshToken = accessRefreshTokenDTO.refreshToken();
+
+                        cookieUtil.addResponseAccessTokenCookie(response, accessToken, jwtProperties.getRefreshTokenExpirationTime());
+                        cookieUtil.addResponseRefreshTokenCookie(response, refreshToken, jwtProperties.getRefreshTokenExpirationTime());
+
+
+                        // 권한 넣어줌
+                        String username = jwtUtils.getUsernameFromAccessToken(accessToken);
+                        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(jwtUtils.getRoleFromAccessToken(accessToken)));
+
+                        // 인증 객체 생성
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+                        // 컨텍스트에 인증 설정 (security 인증)
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
-
-                    // access token 만료된경우나 안된경우나 인증절차 거치고 쿠키 추가
-
-                    String username = jwtUtils.getUsernameFromAccessToken(accessToken);
-                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(jwtUtils.getRoleFromAccessToken(accessToken)));
-
-                    // 인증 객체 생성
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-                    // 컨텍스트에 인증 설정 (security 인증)
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                    cookieUtil.addResponseAccessTokenCookie(response,accessToken,jwtProperties.getAccessTokenExpirationTime());
-                    cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,jwtProperties.getRefreshTokenExpirationTime());
-
+                    // 없으면 접근 권한 없게 설정
                 }
-                else {
-                    // 리프레시 토큰 지워서 보내기
-                    cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
-                }
-
             }
-            else{
-                // 서버에 저장된 유저의 토큰이 null 이면 이것도 만료된거니까  지워서 보내기
-                // 서버 토큰이랑 리프레시 토큰이랑 다르면 서버쪽 토큰 지우고 그냥 보내서 그 계정으로 접속한 사람들 비로그인 상태로 만들기
-                cookieUtil.addResponseRefreshTokenCookie(response,refreshToken,0);
-                cookieUtil.addResponseAccessTokenCookie(response,accessToken,0);
-            }
-
         }
+        // 접근토큰이 없음
 
         filterChain.doFilter(request, response);
     }
