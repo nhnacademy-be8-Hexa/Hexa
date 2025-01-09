@@ -53,49 +53,50 @@
                 </div>
             </div>
         </div>
+
         <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+
             <div th:replace="~{fragments/admin :: admin}"></div>
 
-            <div class="main-content">
-                <div class="container-xl py-4">
+            <div class="col">
                     <h2>쿠폰 관리</h2>
                     <button class="btn btn-primary mb-3" id="createCouponButton" onclick="toggleCreateCouponModal()">쿠폰 생성</button>
 
                     <div id="createCouponModal" class="modal">
-                    <h5 class="modal-title">쿠폰 생성</h5>
-                    <form id="createCouponForm">
-                        <div class="mb-3">
-                            <label for="couponPolicyId" class="form-label">쿠폰 정책</label>
-                            <select class="form-control" id="couponPolicyId" required>
-                                <option value="" disabled selected>쿠폰 정책을 선택하세요</option>
-                                <!-- 쿠폰 정책 이름 -->
-                            </select>
-                        </div>
+                        <h5 class="modal-title">쿠폰 생성</h5>
+                        <form id="createCouponForm">
+                            <div class="mb-3">
+                                <label for="couponPolicyId" class="form-label">쿠폰 정책</label>
+                                <select class="form-control" id="couponPolicyId" required>
+                                    <option value="" disabled selected>쿠폰 정책을 선택하세요</option>
+                                    <!-- 쿠폰 정책 이름 -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="couponName" class="form-label">쿠폰 이름</label>
-                            <input type="text" class="form-control" id="couponName" maxlength="50" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="couponTarget" class="form-label">쿠폰 대상</label>
-                            <input type="text" class="form-control" id="couponTarget" maxlength="20" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="couponTargetId" class="form-label">쿠폰 대상 ID</label>
-                            <input type="number" class="form-control" id="couponTargetId">
-                        </div>
-                        <div class="mb-3">
-                            <label for="couponDeadline" class="form-label">쿠폰 유효 기간</label>
-                            <input type="datetime-local" class="form-control" id="couponDeadline" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="couponCount" class="form-label">생성 갯수</label>
-                            <input type="number" class="form-control" id="couponCount" required>
-                        </div>
-                        <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
-                        <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
-                    </form>
-                </div>
+                            <div class="mb-3">
+                                <label for="couponName" class="form-label">쿠폰 이름</label>
+                                <input type="text" class="form-control" id="couponName" maxlength="50" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="couponTarget" class="form-label">쿠폰 대상</label>
+                                <input type="text" class="form-control" id="couponTarget" maxlength="20" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="couponTargetId" class="form-label">쿠폰 대상 ID</label>
+                                <input type="number" class="form-control" id="couponTargetId">
+                            </div>
+                            <div class="mb-3">
+                                <label for="couponDeadline" class="form-label">쿠폰 유효 기간</label>
+                                <input type="datetime-local" class="form-control" id="couponDeadline" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="couponCount" class="form-label">생성 갯수</label>
+                                <input type="number" class="form-control" id="couponCount" required>
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="toggleCreateCouponModal()">취소</button>
+                            <button type="button" class="btn btn-primary" onclick="submitCreateCoupon()">저장</button>
+                        </form>
+                    </div>
 
 
                     <table class="table">
@@ -110,8 +111,10 @@
                         </thead>
                         <tbody id="couponTableBody"></tbody>
                     </table>
-                </div>
+
+
             </div>
+
         </div>
 
         <!-- 풋터 -->
