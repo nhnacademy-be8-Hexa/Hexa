@@ -1,35 +1,37 @@
 package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.LikeAdapter;
 import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.PointPolicyAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
-import com.nhnacademy.hello.common.util.AuthInfoUtils;
-import com.nhnacademy.hello.common.util.SetImagePathsUtils;
 import com.nhnacademy.hello.common.feignclient.tag.BooKTagAdapter;
 import com.nhnacademy.hello.common.feignclient.tag.TagAdapter;
+import com.nhnacademy.hello.common.util.AuthInfoUtils;
+import com.nhnacademy.hello.common.util.SetImagePathsUtils;
 import com.nhnacademy.hello.dto.book.AuthorDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
-import com.nhnacademy.hello.dto.point.PointDetailsDTO;
 import com.nhnacademy.hello.dto.point.PointPolicyDTO;
 import com.nhnacademy.hello.dto.review.ReviewDTO;
 import com.nhnacademy.hello.dto.review.ReviewRequestDTO;
 import com.nhnacademy.hello.dto.tag.TagDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class BookController {
     private final BooKTagAdapter bookTagAdapter;
     private final PointDetailsAdapter pointDetailsAdapter;
     private final PointPolicyAdapter pointPolicyAdapter;
+    private final LikeAdapter likeAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -113,8 +116,25 @@ public class BookController {
         model.addAttribute("assignedTags", assignedTags);
         model.addAttribute("bookId", bookId);
 
+        //좋아요 개수
+        Long likeCount = likeAdapter.getLikeCount(bookId).getBody();
+        model.addAttribute("likeCount", likeCount);
+
         return "book/bookDetail";
 
+    }
+
+
+    @PostMapping("/book/{bookId}/likes")
+    public String submitLike(@PathVariable Long bookId) {
+        String memberId = AuthInfoUtils.getUsername();
+
+        if (Objects.isNull(memberId) || memberId.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        likeAdapter.toggleLike(bookId, memberId);
+        return "redirect:/book/" + bookId;
     }
 
     @PostMapping("/book/{bookId}/reviews/{reviewId}")
@@ -283,8 +303,8 @@ public class BookController {
                 System.out.println("check");
                 // 여기에 포인트 추가 등의 로직을 구현할 수 있습니다.
                 // 예: userService.addPoints(memberId, 10);
-                List<PointPolicyDTO> policies =  pointPolicyAdapter.getAllPointPolicies().getBody();
-                PointPolicyDTO pointPolicyDTO =  policies.stream()
+                List<PointPolicyDTO> policies = pointPolicyAdapter.getAllPointPolicies().getBody();
+                PointPolicyDTO pointPolicyDTO = policies.stream()
                         .filter(f -> f.pointPolicyName().contains("사진 o"))
                         .collect(Collectors.toList()).getFirst();
                 CreatePointDetailDTO pointDetailDTO = new CreatePointDetailDTO(
