@@ -60,16 +60,16 @@ public class AdminPageController {
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
         model.addAttribute("bookLikesMap", bookLikesMap);
 
-        // 대기 상태 주문만 조회
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 전달
-        List<OrderDTO> allOrders = response.getBody();
+        // 주문 목록 조회
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page - 1);
+        System.out.println("Status Code: " + response.getStatusCode());
+        System.out.println("Response Body: " + response.getBody());
 
+        List<OrderDTO> allOrders = response.getBody();
         if (allOrders != null && !allOrders.isEmpty()) {
-            // 대기 상태 주문만 필터링
             List<OrderDTO> pendingOrders = allOrders.stream()
                     .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
                     .toList();
-
             model.addAttribute("orders", pendingOrders);
         } else {
             model.addAttribute("orders", List.of());
@@ -81,6 +81,7 @@ public class AdminPageController {
 
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+
 
         return "admin/adminPage";
     }
