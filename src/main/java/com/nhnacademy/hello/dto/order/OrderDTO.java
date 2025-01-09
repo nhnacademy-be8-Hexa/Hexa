@@ -13,5 +13,5 @@ public record OrderDTO(
         String addressDetail,
         MemberDTO member
 ) {
-    public record MemberDTO(String memberId) {}
+    public record MemberDTO(String memberId,String memberName) {}
 }
