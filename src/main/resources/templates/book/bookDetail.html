@@ -4,20 +4,62 @@
     <meta charset="UTF-8">
     <title>BOOK Detail</title>
 
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="/css/styles.css">
 
     <!-- Toast UI Editor CSS (필요 시) -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
+    <!-- Marked.js 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.10/purify.min.js"></script>
+
     <style>
+        /* 기존 스타일들... */
+
         /* 태그 리스트 스타일 */
         .tag-list .list-group-item::before {
             content: "# ";
             font-weight: bold;
             margin-right: 5px;
             color: red;
+        }
+
+        /* isReview가 true일 때 폼을 숨김 */
+        .hidden-form {
+            display: none;
+        }
+
+        /* 리뷰 내용 내 이미지 스타일 */
+        .review-content img {
+            max-width: 40%;
+            max-height: 50%;
+            height: auto;          /* 이미지 비율 유지 */
+            display: block;        /* 블록 요소로 설정하여 여백 적용 */
+            margin: 10px auto;     /* 이미지 중앙 정렬 및 위/아래 여백 추가 */
+            border: 1px solid #ddd; /* 선택 사항: 이미지에 테두리 추가 */
+            border-radius: 5px;     /* 선택 사항: 이미지 모서리 둥글게 */
+            padding: 5px;           /* 선택 사항: 이미지 내부 여백 */
+            background-color: #f9f9f9; /* 선택 사항: 이미지 배경 색상 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
+        }
+
+        /* 작은 화면에서 이미지 크기 조정 */
+        @media (max-width: 768px) {
+            .review-content img {
+                max-width: 100%;    /* 작은 화면에서는 100%로 설정 */
+            }
+        }
+
+        /* 리뷰 내용 내 긴 단어나 URL로 인한 오버플로우 방지 */
+        .review-content {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
     </style>
 </head>
@@ -122,7 +164,8 @@
     <div class="row mt-4 justify-content-center">
         <div class="col-md-8">
             <div style="max-height: 400px; overflow-y: auto; padding: 15px; border: 1px solid #ddd; border-radius: 5px; text-align: center; margin: 0 auto;">
-                <p th:utext="${book.bookDescription}" style="text-align: center;">
+                <!-- 'data-markdown' 속성을 추가하고, 클래스명을 부여 -->
+                <p class="book-description" th:attr="data-markdown=${book.bookDescription}" style="text-align: center;">
                     책 설명이 여기에 표시됩니다.
                 </p>
             </div>
@@ -156,7 +199,10 @@
                                 </button>
                             </div>
                         </div>
-                        <p th:utext="${review.reviewContent}">리뷰 내용</p>
+                        <!-- Markdown 리뷰 내용을 data-markdown 속성에 저장 -->
+                        <div class="review-content" th:attr="data-markdown=${review.reviewContent}">
+                            <!-- 초기에는 빈 내용으로 설정 -->
+                        </div>
                         <div th:if="${review.reviewIsBlocked}">
                             <span class="badge bg-danger">차단된 리뷰</span>
                         </div>
@@ -204,8 +250,8 @@
     <!-- 구매 여부와 로그인 여부를 모두 확인 -->
     <div class="row mt-4" th:if="${memberId != null}">
         <div class="col-md-12" th:if="${isOrder}">
-            <!-- 리뷰 작성 폼을 이미 작성하지 않은 경우에만 표시 -->
-            <div th:if="${!isReview}">
+            <!-- 리뷰 작성 폼 (항상 존재하지만, isReview 상태에 따라 숨김 처리) -->
+            <div id="reviewFormContainer" th:classappend="${isReview} ? ' hidden-form' : ''">
                 <h3>리뷰 작성</h3>
                 <form id="reviewCreateForm"
                       th:object="${reviewRequestDTO}"
@@ -246,9 +292,6 @@
                 <p>이미 리뷰를 작성하셨습니다. 리뷰를 수정하려면 리뷰 목록에서 "수정" 버튼을 클릭하세요.</p>
             </div>
         </div>
-
-        <!-- 구매하지 않은 사용자에게는 리뷰 작성 불가 메시지 표시 -->
-        <!-- 이 부분은 기존에 "isOrder"가 false일 때 메시지를 표시하도록 이미 구현되어 있으므로 추가할 필요가 없습니다 -->
     </div>
 
     <!-- 로그인하지 않은 사용자에게는 리뷰 작성 폼을 표시하지 않도록, 대신 로그인하라는 메시지 표시 -->
@@ -268,28 +311,25 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- JavaScript 수정 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
     const bookId = [[${book.bookId}]];
     document.addEventListener("DOMContentLoaded", function () {
         // '장바구니 담기' 버튼 클릭 이벤트
         document.getElementById("addToCartButton").addEventListener("click", function () {
-            // 현재 책 정보 가져오기
             const bookTitle = document.getElementById("bookTitle").innerText.trim();
             const bookPrice = document.getElementById("bookPrice").innerText.trim();
             const quantity = document.getElementById("quantity").value;
 
-            // 로컬스토리지에서 기존 장바구니 가져오기
             let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-            // 이미 담긴 책인지 확인
             const alreadyInCart = cart.some(item => item.bookId === bookId.toString());
             if (alreadyInCart) {
                 alert("이미 장바구니에 담긴 책입니다!");
                 return;
             }
 
-            // 새 책 데이터를 추가
             cart.push({
                 bookId: bookId,
                 bookTitle: bookTitle,
@@ -297,7 +337,6 @@
                 quantity: quantity,
             });
 
-            // 로컬스토리지에 저장
             localStorage.setItem("cart", JSON.stringify(cart));
 
             alert("장바구니에 추가되었습니다!");
@@ -305,14 +344,12 @@
 
         // '바로 구매' 버튼 클릭 이벤트
         document.getElementById("buyNowButton").addEventListener("click", function(e) {
-            e.preventDefault();  // 기본 링크 동작을 막음
+            e.preventDefault();
 
             const quantity = document.getElementById("quantity").value;
 
-            // 구매 URL을 생성
             const purchaseUrl = `/purchase?bookIds=${bookId}&quantity=${quantity}`;
 
-            // 바로 구매 페이지로 이동
             window.location.href = purchaseUrl;
         });
 
@@ -321,6 +358,8 @@
         const hiddenReviewContent = document.querySelector('#reviewContent');
         const reviewIdField = document.querySelector('#reviewId');
         const submitReviewButton = document.querySelector('#submitReviewButton');
+        const reviewFormContainer = document.getElementById('reviewFormContainer');
+        const imagesIncludedField = document.querySelector('#imagesIncluded'); // 숨겨진 필드
 
         let reviewEditor = null;
         if (reviewEditorContainer) {
@@ -329,38 +368,88 @@
                 height: '300px',
                 initialEditType: 'markdown',
                 previewStyle: 'vertical',
-                hooks: {
-                    addImageBlobHook: (blob, callback) => {
-                        const formData = new FormData();
-                        formData.append('image', blob);
-
-                        fetch('/upload-review-image', { // 리뷰 이미지 업로드 엔드포인트로 변경
-                            method: 'POST',
-                            body: formData,
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.url) {
-                                    callback(data.url, 'Image');
-                                } else {
-                                    alert('이미지 업로드 실패');
-                                    callback('', 'Image upload failed');
-                                }
-                            })
-                            .catch(err => {
-                                console.error('Error uploading image:', err);
-                                callback('', 'Image upload failed');
-                            });
-                    }
-                }
+                // addImageBlobHook 제거하여 이미지가 Base64로 인라인 저장되도록 함
             });
         }
 
-        // 리뷰 작성 폼 제출 시 에디터 내용 동기화
+        // 리뷰 작성 폼 제출 시 이미지 업로드 및 내용 동기화
         const reviewForm = document.getElementById('reviewCreateForm');
         if (reviewForm && reviewEditor) {
-            reviewForm.addEventListener('submit', function () {
-                hiddenReviewContent.value = reviewEditor.getMarkdown();
+            reviewForm.addEventListener('submit', async function (e) {
+                e.preventDefault(); // 기본 폼 제출 방지
+
+                let markdownContent = reviewEditor.getMarkdown();
+                let updatedMarkdown = markdownContent;
+                let imagesIncluded = false; // 이미지 포함 여부 플래그
+
+                // Markdown에서 Base64 이미지 찾기 (정규식 사용)
+                const imageRegex = /!\[([^\]]*)\]\((data:image\/[a-zA-Z]+;base64,([^)\s]+))\)/g;
+
+                let match;
+                let uploadPromises = [];
+
+                // 모든 Base64 이미지 업로드 준비
+                while ((match = imageRegex.exec(markdownContent)) !== null) {
+                    let altText = match[1];
+                    let dataUrl = match[2];
+                    let base64Data = match[3];
+
+                    let mimeMatch = dataUrl.match(/^data:(image\/[a-zA-Z]+);base64,/);
+                    if (!mimeMatch) continue; // 이미지 형식이 아닌 경우 건너뜀
+
+                    let mime = mimeMatch[1];
+                    let byteCharacters = atob(base64Data);
+                    let byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    let byteArray = new Uint8Array(byteNumbers);
+                    let blob = new Blob([byteArray], { type: mime });
+
+                    // 이미지 업로드를 위한 FormData 생성
+                    let formData = new FormData();
+                    formData.append('image', blob, 'review-image.' + mime.split('/')[1]); // 확장자 설정
+
+                    // 업로드 요청 생성 및 배열에 저장
+                    let uploadPromise = fetch('/upload-review-image', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error('이미지 업로드 실패: ' + response.statusText);
+                            }
+                        })
+                        .then(data => {
+                            if (data.url) {
+                                // Markdown에서 Base64 데이터를 URL로 대체
+                                updatedMarkdown = updatedMarkdown.replace(dataUrl, data.url);
+                                imagesIncluded = true; // 이미지 업로드 성공 시 플래그 설정
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error uploading image:', err);
+                            alert('이미지 업로드 중 오류가 발생했습니다.');
+                            // 이미지 삭제 또는 대체
+                            updatedMarkdown = updatedMarkdown.replace(match[0], '![이미지 업로드 실패]');
+                        });
+
+                    uploadPromises.push(uploadPromise);
+                }
+
+                // 모든 이미지 업로드 완료 대기
+                await Promise.all(uploadPromises);
+
+                // 이미지 포함 여부를 숨겨진 필드에 설정
+                imagesIncludedField.value = imagesIncluded;
+
+                // 수정된 Markdown 내용을 hidden textarea에 설정
+                hiddenReviewContent.value = updatedMarkdown;
+
+                // 폼 제출
+                reviewForm.submit();
             });
         }
 
@@ -372,29 +461,66 @@
                 const reviewContent = this.getAttribute('data-review-content');
                 const reviewRating = this.getAttribute('data-review-rating');
 
-                // 리뷰 내용과 평점을 에디터에 로드
-                if (reviewEditor) {
-                    reviewEditor.setMarkdown(reviewContent);
+                if (reviewFormContainer) {
+                    reviewFormContainer.classList.remove('hidden-form');
+
+                    if (reviewEditor) {
+                        reviewEditor.setMarkdown(reviewContent);
+                    } else {
+                        hiddenReviewContent.value = reviewContent;
+                    }
+
+                    reviewIdField.value = reviewId;
+
+                    document.getElementById('reviewRating').value = reviewRating;
+
+                    submitReviewButton.textContent = '리뷰 수정';
+
+                    reviewForm.action = '/book/' + bookId + '/reviews/' + reviewId;
+
+                    reviewForm.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    hiddenReviewContent.value = reviewContent;
+                    alert('리뷰 작성 폼을 찾을 수 없습니다.');
                 }
-
-                // hidden 필드에 리뷰 ID 설정
-                reviewIdField.value = reviewId;
-
-                // 제출 버튼의 텍스트 변경
-                submitReviewButton.textContent = '리뷰 수정';
-
-                // 폼의 액션을 리뷰 수정 엔드포인트로 변경
-                reviewForm.action = '/book/' + bookId + '/reviews/' + reviewId;
-
-                // 스크롤을 리뷰 작성 폼으로 이동
-                reviewForm.scrollIntoView({ behavior: 'smooth' });
             });
+        });
+
+        // 클라이언트 사이드 Markdown 변환 및 렌더링
+        // 1. 리뷰 내용 처리
+        const reviewElements = document.querySelectorAll('.review-content');
+        reviewElements.forEach(function(el) {
+            const markdownText = el.getAttribute('data-markdown');
+            if (markdownText) {
+                // marked.js를 사용하여 Markdown을 HTML로 변환
+                let rawHtml = marked.parse(markdownText);
+                // 이미지 태그에 loading="lazy" 속성 추가
+                rawHtml = rawHtml.replace(/<img /g, '<img loading="lazy" ');
+                // DOMPurify를 사용하여 변환된 HTML을 정화
+                const cleanHtml = DOMPurify.sanitize(rawHtml);
+                // 변환된 HTML을 요소에 삽입
+                el.innerHTML = cleanHtml;
+            }
+        });
+
+        // 2. 책 설명 처리 추가
+        const bookDescriptionElements = document.querySelectorAll('.book-description');
+        bookDescriptionElements.forEach(function(el) {
+            const markdownText = el.getAttribute('data-markdown');
+            if (markdownText) {
+                // marked.js를 사용하여 Markdown을 HTML로 변환
+                let rawHtml = marked.parse(markdownText);
+                // 이미지 태그에 loading="lazy" 속성 추가
+                rawHtml = rawHtml.replace(/<img /g, '<img loading="lazy" ');
+                // DOMPurify를 사용하여 변환된 HTML을 정화
+                const cleanHtml = DOMPurify.sanitize(rawHtml);
+                // 변환된 HTML을 요소에 삽입
+                el.innerHTML = cleanHtml;
+            }
         });
     });
     /*]]>*/
 </script>
+
 
 </body>
 </html>
