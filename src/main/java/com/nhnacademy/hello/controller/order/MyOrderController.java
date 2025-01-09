@@ -7,6 +7,7 @@ import com.nhnacademy.hello.dto.delivery.DeliveryDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
+import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,7 @@ public class MyOrderController {
     private final CouponAdapter couponAdapter;
     private final WrappingPaperAdapter wrappingPaperAdapter;
     private final DeliveryAdapter deliveryAdapter;
+    private final ReturnsReasonAdapter returnsReasonAdapter;
     private final Long SIZE = 10L;
 
     @GetMapping("/mypage/orders")
@@ -112,6 +114,9 @@ public class MyOrderController {
         model.addAttribute("wrappingPaperPrice", wrappingPaperPrice);
         model.addAttribute("deliveryCost", deliveryCost);
 
+        // 반품 정보를 위한 반품 사유 리스트
+        List<ReturnsReasonDTO> returnsReasonList = returnsReasonAdapter.getAllReturnsReasons();
+        model.addAttribute("returnsReasonList", returnsReasonList);
 
         return "member/orderBooks";
     }
