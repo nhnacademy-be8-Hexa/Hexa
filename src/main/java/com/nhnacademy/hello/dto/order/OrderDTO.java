@@ -17,5 +17,5 @@ public record OrderDTO(
         MemberDTO member,
         List<BookDTO> books // 주문에 포함된 도서 목록
 ) {
-    public record MemberDTO(String memberId,String memberName) {}
+    public record MemberDTO(String memberId,String memberName, String memberNumber) {}
 }
