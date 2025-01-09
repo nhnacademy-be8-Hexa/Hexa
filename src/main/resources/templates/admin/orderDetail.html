@@ -23,7 +23,7 @@
 
   <div class="container-xl py-4">
     <h2 th:text="'주문 ID: ' + ${order.orderId}"></h2>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
       <tbody>
       <tr>
         <th>주문 ID</th>
@@ -34,24 +34,61 @@
         <td th:text="${order.member.memberId}"></td>
       </tr>
       <tr>
-        <th>총액</th>
-        <td th:text="${order.orderPrice}"></td>
+        <th>회원 이름</th>
+        <td th:text="${order.member.memberName}"></td>
+      </tr>
+      <tr>
+        <th>도서 ID</th>
+        <td th:each="book : ${order.books}" th:text="${book.bookId}"></td>
+      </tr>
+      <tr>
+        <th>도서 이름</th>
+        <td th:each="book : ${order.books}" th:text="${book.bookName}"></td>
+      </tr>
+      <tr>
+        <th>연락처</th>
+        <td th:text="${order.member.memberNumber}"></td>
+      </tr>
+      <tr>
+        <th>우편번호</th>
+        <td th:text="${order.zoneCode}"></td>
+      </tr>
+      <tr>
+        <th>주소</th>
+        <td th:text="${order.address} + ' ' + ${order.addressDetail}"></td>
+      </tr>
+      <tr>
+        <th>주문일자</th>
+        <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
       </tr>
       <tr>
         <th>주문 상태</th>
         <td th:text="${order.orderStatus.orderStatus}"></td>
       </tr>
+      <tr>
+        <th>총 금액</th>
+        <td th:text="${order.orderPrice}"></td>
+      </tr>
+      <tr>
+        <th>포장 여부</th>
+        <td th:text="${order.wrappingPaper != null ? '포함' : '없음'}"></td>
+      </tr>
       </tbody>
     </table>
 
-    <div>
+    <div class="mt-3">
       <button th:if="${order.orderStatus.orderStatus == 'WAIT'}"
               th:onclick="'processOrder(' + ${order.orderId} + ')'"
               class="btn btn-primary">주문 처리</button>
       <a href="/admin/orders" class="btn btn-secondary">목록으로 돌아가기</a>
     </div>
   </div>
+
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}" class="footer mt-auto"></div>
 </div>
+</body>
+</html>
 
 <script>
   function processOrder(orderId) {
@@ -66,5 +103,3 @@
             });
   }
 </script>
-</body>
-</html>
