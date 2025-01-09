@@ -30,10 +30,9 @@ public class AdminPageController {
     private final OrderStatusAdapter orderStatusAdapter;
 
     @GetMapping("/admin")
-    public String adminPage(@RequestParam(defaultValue = "1") int page, // 페이지 번호는 1부터 시작
+    public String adminPage(@RequestParam(defaultValue = "1") int page,
                             @RequestParam(defaultValue = "10") int pageSize,
                             Model model) {
-        // 사용자 로그인 및 권한 확인
         if (!AuthInfoUtils.isLogin()) {
             return "redirect:/login";
         }
@@ -44,29 +43,11 @@ public class AdminPageController {
         }
         model.addAttribute("member", memberDTO);
 
-        // 가장 많이 방문한 도서 Top 5 조회
-        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null);
-        Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
-        Map<Long, Long> bookLikesMap = new HashMap<>();
-
-        for (BookDTO book : mostVisitedBooks) {
-            List<AuthorDTO> authors = bookAdapter.getAuthors(book.bookId());
-            bookAuthorsMap.put(book.bookId(), authors);
-
-            Long likeCount = bookAdapter.getLikeCount(book.bookId()).getBody();
-            bookLikesMap.put(book.bookId(), likeCount);
-        }
-
-        model.addAttribute("mostVisitedBooks", mostVisitedBooks);
-        model.addAttribute("bookAuthorsMap", bookAuthorsMap);
-        model.addAttribute("bookLikesMap", bookLikesMap);
-
-        // 대기 상태 주문만 조회
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 전달
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page - 1);
         List<OrderDTO> allOrders = response.getBody();
 
         if (allOrders != null && !allOrders.isEmpty()) {
-            // 대기 상태 주문 필터링
+            // 대기 상태 주문만 필터링
             List<OrderDTO> pendingOrders = allOrders.stream()
                     .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
                     .toList();
@@ -76,10 +57,6 @@ public class AdminPageController {
             model.addAttribute("orders", List.of());
         }
 
-        List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
-        model.addAttribute("statuses", statuses);
-
-        // 총 주문 수 가져오기
         ResponseEntity<Long> totalOrderCountResponse = orderAdapter.getTotalOrderCount();
         Long totalOrders = totalOrderCountResponse.getBody();
         int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
@@ -89,4 +66,5 @@ public class AdminPageController {
 
         return "admin/adminPage";
     }
+
 }
