@@ -38,6 +38,10 @@
         <td th:text="${order.member != null && order.member.memberName != null ? order.member.memberName : 'Unknown'}"></td>
       </tr>
       <tr>
+        <th>연락처</th>
+        <td th:text="${order.member != null && order.member.memberNumber != null ? order.member.memberNumber : 'Unknown'}"></td>
+      </tr>
+      <tr>
         <th>도서 ID</th>
         <td>
           <ul>

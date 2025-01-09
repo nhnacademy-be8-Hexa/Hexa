@@ -71,28 +71,41 @@ public class OrderManageController {
         }
         return ResponseEntity.ok().build();
     }
-
     @GetMapping("/{orderId}")
     public String getOrderDetail(@PathVariable Long orderId, Model model) {
         OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
 
-        // Null 검사를 추가하여 데이터 설정
-        if (order != null && order.books() == null) {
-            order = new OrderDTO(
-                    order.orderId(),
-                    order.orderPrice(),
-                    order.orderedAt(),
-                    order.wrappingPaper(),
-                    order.orderStatus(),
-                    order.zoneCode(),
-                    order.address(),
-                    order.addressDetail(),
-                    order.member(),
-                    List.of() // 빈 리스트로 초기화
-            );
+        // Null 검사를 추가하여 기본값 설정
+        if (order != null) {
+            if (order.member() == null) {
+                order = new OrderDTO(
+                        order.orderId(),
+                        order.orderPrice(),
+                        order.orderedAt(),
+                        order.wrappingPaper(),
+                        order.orderStatus(),
+                        order.zoneCode(),
+                        order.address(),
+                        order.addressDetail(),
+                        new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"), // 기본값 설정
+                        order.books() != null ? order.books() : List.of() // Null 처리
+                );
+            } else if (order.books() == null) {
+                order = new OrderDTO(
+                        order.orderId(),
+                        order.orderPrice(),
+                        order.orderedAt(),
+                        order.wrappingPaper(),
+                        order.orderStatus(),
+                        order.zoneCode(),
+                        order.address(),
+                        order.addressDetail(),
+                        order.member(),
+                        List.of() // Null 처리
+                );
+            }
         }
         model.addAttribute("order", order);
         return "admin/orderDetail";
     }
-
 }
