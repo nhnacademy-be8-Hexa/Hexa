@@ -28,13 +28,26 @@ public class BookTagController {
 
 
     @GetMapping("/book/{bookId}/admin/tagSelect")
-    public String selectTagForm(@PathVariable("bookId") Long bookId, Model model) {
-        List<TagDTO> tags = tagAdapter.getAllTags().getBody();
+    public String selectTagForm(@PathVariable("bookId") Long bookId,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "10") int pageSize,
+                                Model model) {
+        List<TagDTO> tags = tagAdapter.getAllTags(page,pageSize, "").getBody();
 
         List<TagDTO> assignedTags = bookTagAdapter.getTagsByBook(bookId).getBody();
         if (assignedTags == null) {
             assignedTags = List.of();
         }
+
+        // 태그 총계 가져오기 (필터링 조건을 반영)
+        Long totalTags = tagAdapter.getTotalTags().getBody();
+
+        // 전체 페이지 수 계산 (size가 9인 것을 전제로 함)
+        int totalPages = (int) Math.ceil((double) totalTags / pageSize);
+
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
 
 
         model.addAttribute("assignedTags", assignedTags);
