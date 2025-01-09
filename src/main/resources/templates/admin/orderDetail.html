@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문 상세정보</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+  <!-- 헤더 -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h1 class="page-title">주문 상세정보</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-xl py-4">
+    <h2 th:text="'주문 ID: ' + ${order.orderId}"></h2>
+    <table class="table table-bordered">
+      <tbody>
+      <tr>
+        <th>주문 ID</th>
+        <td th:text="${order.orderId}"></td>
+      </tr>
+      <tr>
+        <th>회원 ID</th>
+        <td th:text="${order.member.memberId}"></td>
+      </tr>
+      <tr>
+        <th>총액</th>
+        <td th:text="${order.orderPrice}"></td>
+      </tr>
+      <tr>
+        <th>주문 상태</th>
+        <td th:text="${order.orderStatus.orderStatus}"></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div>
+      <button th:if="${order.orderStatus.orderStatus == 'WAIT'}"
+              th:onclick="'processOrder(' + ${order.orderId} + ')'"
+              class="btn btn-primary">주문 처리</button>
+      <a href="/admin/orders" class="btn btn-secondary">목록으로 돌아가기</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function processOrder(orderId) {
+    fetch(`/admin/orders/${orderId}/process`, {method: 'POST'})
+            .then(response => {
+              if (response.ok) {
+                alert('주문 상태가 배송중으로 변경되었습니다.');
+                window.location.reload();
+              } else {
+                alert('처리에 실패했습니다.');
+              }
+            });
+  }
+</script>
+</body>
+</html>

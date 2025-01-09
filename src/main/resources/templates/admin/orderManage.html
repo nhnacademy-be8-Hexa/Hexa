@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>주문 상세정보</title>
+  <title>주문 관리</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -11,65 +11,81 @@
 <div class="container">
   <!-- 헤더 -->
   <div th:replace="~{fragments/header :: header}"></div>
-
   <div class="page-header d-print-none">
     <div class="container-xl">
       <div class="row g-2 align-items-center">
         <div class="col">
-          <h1 class="page-title">주문 상세정보</h1>
+          <h1 class="page-title">주문 목록</h1>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 메인 컨텐츠 -->
-  <div class="container-xl py-4">
-    <h2 th:text="'주문 ID: ' + ${order.orderId}"></h2>
+  <!-- 전체 레이아웃 -->
+  <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <!-- 사이드 메뉴 -->
+    <div th:replace="~{fragments/admin :: admin}"></div>
 
-    <!-- 주문 상세 정보 표 -->
-    <table class="table table-bordered table-striped">
-      <tbody>
-      <tr>
-        <th>주문 ID</th>
-        <td th:text="${order.orderId}"></td>
-      </tr>
-      <tr>
-        <th>회원 ID</th>
-        <td th:text="${order.member.memberId}"></td>
-      </tr>
-      <tr>
-        <th>총액</th>
-        <td th:text="${order.orderPrice}"></td>
-      </tr>
-      <tr>
-        <th>주문 일자</th>
-        <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-      </tr>
-      <tr>
-        <th>우편번호</th>
-        <td th:text="${order.zoneCode}"></td>
-      </tr>
-      <tr>
-        <th>주소</th>
-        <td th:text="${order.address}"></td>
-      </tr>
-      <tr>
-        <th>상세주소</th>
-        <td th:text="${order.addressDetail}"></td>
-      </tr>
-      <tr>
-        <th>주문 상태</th>
-        <td th:text="${order.orderStatus.orderStatus}"></td>
-      </tr>
-      <tr>
-        <th>포장 여부</th>
-        <td th:text="${order.wrappingPaper != null ? '포함' : '없음'}"></td>
-      </tr>
-      </tbody>
-    </table>
+    <!-- 메인 컨텐츠 -->
+    <div class="col">
+      <div class="table-responsive">
+        <table class="table admin-page-table">
+          <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Member ID</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Order Date</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="order : ${orders}">
+            <td th:text="${order.orderId}">-</td>
+            <td th:text="${order.member?.memberId ?: 'Unknown'}">-</td>
+            <td th:text="${order.orderPrice}">-</td>
+            <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}">-</td>
+            <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
+          </tr>
+          <tr th:if="${orders == null or #lists.isEmpty(orders)}">
+            <td colspan="5" class="text-center">No orders available</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <a href="/admin/orders" class="btn btn-secondary mt-3">목록으로 돌아가기</a>
+
+      <!-- 페이징 네비게이션 -->
+      <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <!-- 이전 버튼 -->
+          <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{'/admin/orders'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1}, search=${search})}">
+              &laquo;
+            </a>
+          </li>
+
+          <!-- 페이지 번호 -->
+          <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
+              th:classappend="${i == currentPage} ? 'active'">
+            <a class="page-link" th:text="${i}"
+               th:href="@{'/admin/orders'(page=${i}, search=${search})}"></a>
+          </li>
+
+          <!-- 다음 버튼 -->
+          <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{'/admin/orders'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages}, search=${search})}">
+              &raquo;
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </div>
+  <!-- 풋터 -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 </body>
 </html>

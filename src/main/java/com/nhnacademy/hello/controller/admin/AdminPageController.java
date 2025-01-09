@@ -61,31 +61,19 @@ public class AdminPageController {
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
         model.addAttribute("bookLikesMap", bookLikesMap);
 
-        // 주문 목록 및 상태 가져오기
-        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 값 그대로 전달
-        List<OrderDTO> orders = response.getBody();
+        // 대기 상태 주문만 조회
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page); // page 전달
+        List<OrderDTO> allOrders = response.getBody();
 
-        if (orders == null || orders.isEmpty()) {
-            model.addAttribute("orders", List.of()); // 빈 리스트 처리
-        } else {
-            orders = orders.stream()
-                    .map(order -> {
-                        if (order.member() == null) {
-                            return new OrderDTO(
-                                    order.orderId(),
-                                    order.orderPrice(),
-                                    order.orderedAt(),
-                                    order.wrappingPaper(),
-                                    order.orderStatus(),
-                                    order.zoneCode(),
-                                    order.address(),
-                                    order.addressDetail(),
-                                    new OrderDTO.MemberDTO("Unknown"));
-                        }
-                        return order;
-                    })
+        if (allOrders != null && !allOrders.isEmpty()) {
+            // 대기 상태 주문 필터링
+            List<OrderDTO> pendingOrders = allOrders.stream()
+                    .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
                     .toList();
-            model.addAttribute("orders", orders);
+
+            model.addAttribute("orders", pendingOrders);
+        } else {
+            model.addAttribute("orders", List.of());
         }
 
         List<OrderStatusDTO> statuses = orderStatusAdapter.getAllOrderStatus();
