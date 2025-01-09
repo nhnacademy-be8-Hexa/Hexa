@@ -99,16 +99,16 @@ public class SecurityConfig {
                                 .logoutSuccessHandler((request, response, authentication) -> {
                                     // 로그아웃 한 이후에 서버에서 해당 refresh token 삭제하고 access token 이랑 refresh token 삭제
 
-                                    tokenAdapter.deleteToken(cookieUtil.getCookieValue(request,"refreshToken"));
+                                    String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
+                                    if(refreshToken != null){
+                                        tokenAdapter.addToBlackListToken(jwtProperties.getTokenPrefix() + " " +cookieUtil.getCookieValue(request,"refreshToken"));
+                                    }
                                     cookieUtil.addResponseRefreshTokenCookie(response,"",0);
                                     cookieUtil.addResponseAccessTokenCookie(response,"",0);
 
                                     // 로그아웃 후 리디렉션 처리
                                     response.sendRedirect("/?clearLocalCart=true");
                                 })
-//                                .logoutSuccessUrl("/?clearLocalCart=true")
-//                                .deleteCookies("accessToken")
-//                                .deleteCookies("refreshToken")
         );
 
         // 필터 설정

@@ -128,10 +128,8 @@ public class LoginController {
 
 
         // 토큰을 쿠키에 저장한다
-        cookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getAccessTokenExpirationTime());
+        cookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getRefreshTokenExpirationTime());
         cookieUtil.addResponseRefreshTokenCookie(response,refresh_token,jwtProperties.getRefreshTokenExpirationTime());
-
-        tokenAdapter.saveToken(jwtProperties.getTokenPrefix() + " " +refresh_token);
 
 
 
