@@ -46,7 +46,12 @@ public class MyOrderController {
             page=1;
         }
 
-        List<OrderDTO> ordersList = orderAdapter.getOrdersByMemberId(page-1, member.memberId()).getBody();
+        List<OrderDTO> ordersList = orderAdapter.getOrdersByMemberId(
+                member.memberId(),
+                page-1,
+                SIZE.intValue(),
+                "orderId,desc"
+        ).getBody();
         model.addAttribute("member", member);
         model.addAttribute("ordersList", ordersList);
         model.addAttribute("pageSize", SIZE);
