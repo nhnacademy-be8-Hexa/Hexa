@@ -23,12 +23,21 @@ public interface TagAdapter {
     );
 
     @GetMapping("/tags")
-    public ResponseEntity<List<TagDTO>> getAllTags();
+    public ResponseEntity<List<TagDTO>> getAllTags(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String sort
+            );
 
     @DeleteMapping("/admin/tags/{tagId}")
     public ResponseEntity<Void> deleteTag(
             @PathVariable Long tagId
     );
+
+
+    // 전체 태그 수 조회 (검색 조건 포함)
+    @GetMapping("admin/tags/count")
+    public ResponseEntity<Long> getTotalTags();
 
 
 
