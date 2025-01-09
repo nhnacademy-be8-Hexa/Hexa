@@ -65,18 +65,42 @@ public interface CategoryAdapter {
     @GetMapping("/ids")
     ResponseEntity<List<Long>> findCategoryIdsWithSubCategories();
 
+    /**
+     * 주어진 카테고리 ID와 그 하위 서브 카테고리들의 ID 목록을 반환합니다.
+     *
+     * @param categoryId 조회할 카테고리 ID
+     * @return 카테고리 및 서브 카테고리들의 ID 목록
+     */
     @GetMapping("/ids/{categoryId}")
     ResponseEntity<List<Long>> extractCategoryIds(@PathVariable Long categoryId);
 
+
+    /**
+     * 카테고리 목록을 페이징 처리하여 반환합니다.
+     *
+     * @param page 요청된 페이지 번호
+     * @param size 한 페이지에 포함될 카테고리 수
+     * @return 페이징된 카테고리 목록
+     */
     @GetMapping("/paged")
     ResponseEntity<List<PagedCategoryDTO>> getAllPagedCategories(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     );
 
-    @GetMapping("/unPaged")
-    ResponseEntity<List<PagedCategoryDTO>> getAllUnPagedCategories();
+    /**
+     * 카테고리 목록을 페이징 처리하지 않고 전체 데이터를 반환하는 엔드포인트
+     *
+     * @return 전체 카테고리 목록
+     */
+    @GetMapping("/all")
+    ResponseEntity<List<PagedCategoryDTO>> getAllCategories();
 
+    /**
+     * 전체 카테고리 수를 반환하는 엔드포인트.
+     *
+     * @return 전체 카테고리 수
+     */
     @GetMapping("/total")
     ResponseEntity<Long> getTotal();
 
@@ -88,7 +112,7 @@ public interface CategoryAdapter {
      */
     @DeleteMapping("/{categoryId}")
     ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId);
-
+    
     // bookId로 해당 책의 카테고리 리스트 조회
     @GetMapping("/books/{bookId}")
     ResponseEntity<List<CategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
