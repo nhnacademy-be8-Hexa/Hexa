@@ -123,9 +123,9 @@
             <!-- 좋아요 갯수 및 버튼 -->
             <div class="d-flex align-items-center mb-3">
                 <span class="me-3">
-                    좋아요 <span th:text="${likeCount}">0</span>
+                    좋아요 <span th:text="${likeCount}"></span>
                 </span>
-                <form th:action="@{/book/{bookId}/like(bookId=${book.bookId})}" method="post">
+                <form th:action="@{/book/{bookId}/likes(bookId=${book.bookId})}" method="post">
                     <button type="submit" class="btn btn-light">
                         <i class="bi bi-heart-fill" style="color: red; background: transparent;"></i>
                     </button>

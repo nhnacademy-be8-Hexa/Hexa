@@ -7,25 +7,30 @@ import com.nhnacademy.hello.common.feignclient.auth.TokenAdapter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.common.util.CookieUtil;
+import com.nhnacademy.hello.common.util.SetImagePathsUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
+import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import com.nhnacademy.hello.dto.member.MemberUpdateDTO;
-import com.nhnacademy.hello.dto.point.PointDetailsDTO;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,6 +42,7 @@ public class MyPageController {
     private final TokenAdapter tokenAdapter;
     private final JwtProperties jwtProperties;
     private final CookieUtil cookieUtil;
+    private final SetImagePathsUtils setImagePathsUtils;
 
     @GetMapping("/mypage")
     public String myPage(
@@ -44,7 +50,7 @@ public class MyPageController {
     ) {
 
         // 먼저 로그인했는지 검사
-        if(!AuthInfoUtils.isLogin()){
+        if (!AuthInfoUtils.isLogin()) {
             // 로그인 하지 않았을 경우, 로그인 화면으로 이동
             return "redirect:/login";
         }
@@ -59,7 +65,7 @@ public class MyPageController {
     @GetMapping("/mypage/edit")
     public String editPage(
             Model model
-    ){
+    ) {
         MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
         MemberUpdateDTO updateDTO = new MemberUpdateDTO(
                 null,
@@ -78,14 +84,14 @@ public class MyPageController {
 
     @PostMapping("/mypage/edit")
     public String edit(
-        @Valid MemberUpdateDTO updateDTO,
-        BindingResult bindingResult,
-        Model model
-    ){
+            @Valid MemberUpdateDTO updateDTO,
+            BindingResult bindingResult,
+            Model model
+    ) {
         // 입력 형식 검증에서 걸리면 에러 보여주고 다시
         if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
-            for(ObjectError error : bindingResult.getAllErrors()) {
+            for (ObjectError error : bindingResult.getAllErrors()) {
                 errors.add(error.getDefaultMessage());
             }
             model.addAttribute("errors", errors);
@@ -115,8 +121,8 @@ public class MyPageController {
     /**
      * 주소 입력 폼 제출을 처리하는 메소드
      *
-     * @param addressDTO        제출된 주소 정보
-     * @param bindingResult     바인딩 결과
+     * @param addressDTO         제출된 주소 정보
+     * @param bindingResult      바인딩 결과
      * @param redirectAttributes 리다이렉트 시 전달할 속성
      * @return 주소 목록 페이지로 리다이렉트
      */
@@ -145,9 +151,9 @@ public class MyPageController {
      * 주소 목록을 보여주는 메소드
      *
      * @param model 뷰에 전달할 모델
-     * @param page 페이지 번호
-     * @param size 페이지 크기
-     * @param sort 정렬 기준
+     * @param page  페이지 번호
+     * @param size  페이지 크기
+     * @param sort  정렬 기준
      * @return 주소 목록 뷰
      */
     @GetMapping("/mypage/address")
@@ -170,7 +176,7 @@ public class MyPageController {
     /**
      * 특정 주소를 삭제하는 메소드
      *
-     * @param addressId         삭제할 주소 ID
+     * @param addressId          삭제할 주소 ID
      * @param redirectAttributes 리다이렉트 시 전달할 속성
      * @return 주소 목록 페이지로 리다이렉트
      */
@@ -190,7 +196,7 @@ public class MyPageController {
     }
 
     @GetMapping("/mypage/couponList")
-    public String listCoupon(Model model){
+    public String listCoupon(Model model) {
 
         MemberDTO memberDTO = memberAdapter.getMember(AuthInfoUtils.getUsername());
 
@@ -200,7 +206,7 @@ public class MyPageController {
     }
 
     @GetMapping("/mypage/delete")
-    public String memberDelete(HttpServletRequest request , HttpServletResponse response) {
+    public String memberDelete(HttpServletRequest request, HttpServletResponse response) {
         MemberUpdateDTO updateDTO = new MemberUpdateDTO(
                 null,
                 null,
@@ -212,9 +218,21 @@ public class MyPageController {
         );
         // 멤버 상태를 '탈퇴'로 업데이트
         memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
-        String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
+        String refreshToken = cookieUtil.getCookieValue(request, "refreshToken");
         tokenAdapter.addToBlackListToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
         return "redirect:/";
+    }
+
+    @GetMapping("/mypage/likes")
+    public String showLikes(Model model) {
+        List<BookDTO> likedBooks = memberAdapter.getLikedBooks(AuthInfoUtils.getUsername()).getBody();
+        List<BookDTO> likedBooksWithImages = List.of();
+        if (Objects.nonNull(likedBooks)) {
+            likedBooksWithImages = setImagePathsUtils.setImagePaths(likedBooks);
+        }
+        model.addAttribute("likedBooksWithImages", likedBooksWithImages);
+
+        return "member/likeBooks";
     }
 
 }

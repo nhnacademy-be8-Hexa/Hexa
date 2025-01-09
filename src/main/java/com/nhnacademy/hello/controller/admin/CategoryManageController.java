@@ -45,17 +45,19 @@ public class CategoryManageController {
         }
 
         List<Long> categoryIdsWithSubCategories = categoryAdapter.findCategoryIdsWithSubCategories().getBody();
+        model.addAttribute("categoryIdsWithSubCategories", categoryIdsWithSubCategories);
 
         List<PagedCategoryDTO> pagedCategories =
                 categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
-        List<PagedCategoryDTO> unPagedCategories = categoryAdapter.getAllUnPagedCategories().getBody();
+        model.addAttribute("pagedCategories", pagedCategories);
+
+
+        List<PagedCategoryDTO> allCategories = categoryAdapter.getAllCategories().getBody();
+        model.addAttribute("allCategories", allCategories);
 
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-
-        model.addAttribute("unPagedCategories", unPagedCategories);
-        model.addAttribute("pagedCategories", pagedCategories);
-        model.addAttribute("categoryIdsWithSubCategories", categoryIdsWithSubCategories);
+        
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
         model.addAttribute("currentPage", page);
