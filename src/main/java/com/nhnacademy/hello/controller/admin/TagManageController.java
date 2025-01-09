@@ -27,6 +27,7 @@ public class TagManageController {
     public String tagList(
             // 페이징 파라미터 (size는 고정값 9)
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") int pageSize,
             Model model ) {
 
         // 로그인 검사
@@ -42,14 +43,23 @@ public class TagManageController {
             return "redirect:/index";
         }
 
-        // 고정된 페이지 사이즈
-        final int size = 9;
-
-        // 페이지 번호 조정 (1 기반을 0 기반으로 변환)
-        int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
-
-        List<TagDTO> tags = tagAdapter.getAllTags().getBody();
+        // 태그 목록과 페이징 정보 조회
+        // 태그 목록과 페이징 정보 조회
+        List<TagDTO> tags = tagAdapter.getAllTags(page-1, pageSize, "").getBody();
         model.addAttribute("tags", tags);
+
+
+
+        // 태그 총계 가져오기 (필터링 조건을 반영)
+        Long totalTags = tagAdapter.getTotalTags().getBody();
+
+        // 전체 페이지 수 계산 (size가 9인 것을 전제로 함)
+        int totalPages = (int) Math.ceil((double) totalTags / pageSize);
+
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
 
 
         return "admin/tagManage";
@@ -78,11 +88,14 @@ public class TagManageController {
     }
 
     @GetMapping("/admin/tagManage/edit/{tagId}")
-    public String showEditTagForm(@PathVariable("tagId") Long tagId, Model model) {
+    public String showEditTagForm(@PathVariable("tagId") Long tagId,
+                                  @RequestParam(defaultValue = "1") int page,
+                                  @RequestParam(defaultValue = "10") int pageSize,
+                                  Model model) {
 
         TagRequestDTO tagRequestDTO = null;
-
-        List<TagDTO> tags = tagAdapter.getAllTags().getBody();
+        int size = 9;
+        List<TagDTO> tags = tagAdapter.getAllTags(page,pageSize, "").getBody();
         for(TagDTO tag : tags){
             if(tag.tagId().equals(tagId)){
                 tagRequestDTO = new TagRequestDTO(

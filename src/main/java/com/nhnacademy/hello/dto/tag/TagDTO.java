@@ -8,4 +8,8 @@ public record TagDTO(
     public Long getTagId() {
         return tagId;
     }
+
+    public String getTagName() {
+        return tagName;
+    }
 }
