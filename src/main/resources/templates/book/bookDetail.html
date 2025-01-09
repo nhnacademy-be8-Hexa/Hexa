@@ -261,6 +261,9 @@
                     <!-- 리뷰 ID (수정 시 사용, 기본적으로 비어있음) -->
                     <input type="hidden" id="reviewId" name="reviewId" th:value="${null}" />
 
+                    <!-- 이미지 포함 여부를 나타내는 숨겨진 필드 추가 -->
+                    <input type="hidden" id="imagesIncluded" name="imagesIncluded" value="false" />
+
                     <!-- 리뷰 내용 (Toast UI Editor) -->
                     <div class="mb-3">
                         <label for="reviewContentEditor" class="form-label">리뷰 내용:</label>
@@ -359,7 +362,13 @@
         const reviewIdField = document.querySelector('#reviewId');
         const submitReviewButton = document.querySelector('#submitReviewButton');
         const reviewFormContainer = document.getElementById('reviewFormContainer');
-        const imagesIncludedField = document.querySelector('#imagesIncluded'); // 숨겨진 필드
+        const reviewForm = document.getElementById('reviewCreateForm');
+
+        // 폼 내부에서 숨겨진 필드 찾기
+        let imagesIncludedField = null;
+        if (reviewForm) {
+            imagesIncludedField = reviewForm.querySelector('#imagesIncluded');
+        }
 
         let reviewEditor = null;
         if (reviewEditorContainer) {
@@ -373,8 +382,7 @@
         }
 
         // 리뷰 작성 폼 제출 시 이미지 업로드 및 내용 동기화
-        const reviewForm = document.getElementById('reviewCreateForm');
-        if (reviewForm && reviewEditor) {
+        if (reviewForm && reviewEditor && imagesIncludedField) {
             reviewForm.addEventListener('submit', async function (e) {
                 e.preventDefault(); // 기본 폼 제출 방지
 
@@ -443,7 +451,11 @@
                 await Promise.all(uploadPromises);
 
                 // 이미지 포함 여부를 숨겨진 필드에 설정
-                imagesIncludedField.value = imagesIncluded;
+                if (imagesIncludedField) {
+                    imagesIncludedField.value = imagesIncluded;
+                } else {
+                    console.warn("imagesIncludedField is not found in the form.");
+                }
 
                 // 수정된 Markdown 내용을 hidden textarea에 설정
                 hiddenReviewContent.value = updatedMarkdown;
@@ -451,6 +463,16 @@
                 // 폼 제출
                 reviewForm.submit();
             });
+        } else {
+            if (!reviewForm) {
+                console.warn("Review form (id='reviewCreateForm') not found.");
+            }
+            if (!reviewEditor) {
+                console.warn("Review editor (id='reviewContentEditor') not initialized.");
+            }
+            if (!imagesIncludedField) {
+                console.warn("Hidden field (id='imagesIncluded') not found in the review form.");
+            }
         }
 
         // '수정' 버튼 클릭 시 리뷰 수정 폼으로 전환
@@ -520,7 +542,6 @@
     });
     /*]]>*/
 </script>
-
 
 </body>
 </html>
