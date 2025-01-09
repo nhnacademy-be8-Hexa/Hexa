@@ -128,13 +128,17 @@ header {
     padding-bottom: 10px;
     justify-content: center;
     display: flex;
+    flex-wrap: nowrap; /* 항목이 한 줄에 다 들어가도록 설정 */
+    gap: 15px; /* 항목 간 간격 조정 */
 }
 
 .category-item {
     text-decoration: none;
     color: #000000;
     font-size: 18px;
-    margin: 0 80px;
+    margin: 0 65px; /* 항목 간격 조정 */
+    white-space: nowrap; /* 텍스트가 줄 바꿈 되지 않도록 설정 */
+
 }
 
 .category-item:hover {
@@ -144,6 +148,8 @@ header {
 /* 드롭다운 기본 스타일 */
 .dropdown {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .dropdown-menu {
@@ -151,32 +157,38 @@ header {
     position: absolute;
     top: 100%;
     left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: auto; /* 메뉴 크기 자동 조정 */
+}
+
+/* 서브 드롭다운 메뉴 스타일 */
+.sub-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 101%; /* 서브 카테고리 메뉴는 부모 카테고리 메뉴의 오른쪽에 위치 */
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1001;
+    white-space: nowrap;
+    width: fit-content; /* 메뉴 크기 자동 조정 */
 }
+
 
 .dropdown-item {
     position: relative;
     padding: 5px 0;
 }
 
-.sub-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 100%;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    white-space: nowrap;
-}
 
 /* 드롭다운 메뉴 표시 */
 .dropdown:hover .dropdown-menu {
