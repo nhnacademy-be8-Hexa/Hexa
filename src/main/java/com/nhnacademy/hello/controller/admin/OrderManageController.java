@@ -1,7 +1,11 @@
 package com.nhnacademy.hello.controller.admin;
 
+import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderBookAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderStatusAdapter;
+import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -10,16 +14,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/admin/orders")
 public class OrderManageController {
 
-    private final OrderStatusAdapter orderStatusAdapter;
+    private final OrderBookAdapter orderBookAdapter;
     private final OrderAdapter orderAdapter;
+    private final BookAdapter bookAdapter;
 
     @GetMapping
     public String getOrders(@RequestParam(defaultValue = "1") int page,
@@ -75,22 +82,20 @@ public class OrderManageController {
     public String getOrderDetail(@PathVariable Long orderId, Model model) {
         OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
 
-        // Null 검사를 추가하여 기본값 설정
         if (order != null) {
-            if (order.member() == null) {
-                order = new OrderDTO(
-                        order.orderId(),
-                        order.orderPrice(),
-                        order.orderedAt(),
-                        order.wrappingPaper(),
-                        order.orderStatus(),
-                        order.zoneCode(),
-                        order.address(),
-                        order.addressDetail(),
-                        new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"), // 기본값 설정
-                        order.books() != null ? order.books() : List.of() // Null 처리
-                );
-            } else if (order.books() == null) {
+            // OrderBookResponseDTO로 도서 정보를 가져옵니다.
+            OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(orderId);
+
+            if (orderBooks != null && orderBooks.length > 0) {
+                // 도서 ID 목록 추출
+                List<Long> bookIds = Arrays.stream(orderBooks)
+                        .map(OrderBookResponseDTO::bookId)
+                        .collect(Collectors.toList());
+
+                // BookAdapter로 도서 정보 조회
+                List<BookDTO> books = bookAdapter.getBooksByIds(bookIds);
+
+                // 도서 정보를 OrderDTO에 설정
                 order = new OrderDTO(
                         order.orderId(),
                         order.orderPrice(),
@@ -101,10 +106,41 @@ public class OrderManageController {
                         order.address(),
                         order.addressDetail(),
                         order.member(),
-                        List.of() // Null 처리
+                        books
+                );
+            } else {
+                // 도서 정보가 없을 경우 빈 리스트 설정
+                order = new OrderDTO(
+                        order.orderId(),
+                        order.orderPrice(),
+                        order.orderedAt(),
+                        order.wrappingPaper(),
+                        order.orderStatus(),
+                        order.zoneCode(),
+                        order.address(),
+                        order.addressDetail(),
+                        order.member(),
+                        List.of()
+                );
+            }
+
+            // 회원 정보가 null인 경우 기본값 설정
+            if (order.member() == null) {
+                order = new OrderDTO(
+                        order.orderId(),
+                        order.orderPrice(),
+                        order.orderedAt(),
+                        order.wrappingPaper(),
+                        order.orderStatus(),
+                        order.zoneCode(),
+                        order.address(),
+                        order.addressDetail(),
+                        new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"),
+                        order.books()
                 );
             }
         }
+
         model.addAttribute("order", order);
         return "admin/orderDetail";
     }

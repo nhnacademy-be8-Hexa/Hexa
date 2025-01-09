@@ -63,7 +63,7 @@
             <th>도서 이름</th>
             <td>
               <ul>
-                <li th:each="book : ${order.books}" th:text="${book.bookName != null ? book.bookName : 'Unknown'}"></li>
+                <li th:each="book : ${order.books}" th:text="${book.bookTitle != null ? book.bookTitle : 'Unknown'}"></li>
               </ul>
             </td>
           </tr>
