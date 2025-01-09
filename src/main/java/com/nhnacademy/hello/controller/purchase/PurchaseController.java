@@ -4,6 +4,7 @@ import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
+import com.nhnacademy.hello.common.feignclient.payment.TossPaymentAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
@@ -21,6 +22,7 @@ import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseBookDTO;
 import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import com.nhnacademy.hello.dto.toss.TossPayment;
+import com.nhnacademy.hello.dto.toss.TossPaymentDto;
 import com.nhnacademy.hello.service.TossService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +59,7 @@ public class PurchaseController {
     private final CouponMemberAdapter couponMemberAdapter;
     private final CouponAdapter couponAdapter;
     private final CategoryAdapter categoryAdapter;
+    private final TossPaymentAdapter tossPaymentAdapter;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -375,6 +378,14 @@ public class PurchaseController {
             }
 
         }
+
+        // 토스 페이먼트 결제 정보 저장
+        TossPaymentDto tossPaymentDto = new TossPaymentDto(
+                savedOrderId,
+                purchaseDTO.paymentKey(),
+                purchaseDTO.amount()
+        );
+        tossPaymentAdapter.addPayment(tossPaymentDto);
 
         // ------------------------------------------------------------------------
 

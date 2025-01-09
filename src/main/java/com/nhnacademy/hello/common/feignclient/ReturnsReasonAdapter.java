@@ -20,12 +20,7 @@ public interface ReturnsReasonAdapter {
 
 
     @GetMapping("/api/returnsReason")
-    public List<ReturnsReasonDTO> getAllReturnsReasons(
-            // 페이징
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") String sort
-    );
+    public List<ReturnsReasonDTO> getAllReturnsReasons();
 
     @GetMapping("/api/returnsReason/{returnsReasonId}")
     public ReturnsReasonDTO getReturnsReasonById(

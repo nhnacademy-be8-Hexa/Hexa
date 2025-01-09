@@ -24,8 +24,10 @@ public interface OrderAdapter {
 
     @GetMapping("/api/members/{memberId}/orders")
     public ResponseEntity<List<OrderDTO>> getOrdersByMemberId(
-            @Valid @RequestParam(defaultValue = "0") int page,
-            @PathVariable String memberId);
+            @PathVariable String memberId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String sort);
 
     @GetMapping("/api/orders/{orderId}")
     public ResponseEntity<OrderDTO> getOrderById(
