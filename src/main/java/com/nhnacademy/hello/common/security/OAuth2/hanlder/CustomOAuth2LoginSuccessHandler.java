@@ -182,10 +182,8 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
         String accessToken = accessRefreshTokenDTO.accessToken();
         String refreshToken = accessRefreshTokenDTO.refreshToken();
 
-        cookieUtil.addResponseAccessTokenCookie(response, accessToken, jwtProperties.getAccessTokenExpirationTime());
+        cookieUtil.addResponseAccessTokenCookie(response, accessToken, jwtProperties.getRefreshTokenExpirationTime());
         cookieUtil.addResponseRefreshTokenCookie(response, refreshToken, jwtProperties.getRefreshTokenExpirationTime());
-
-        tokenAdapter.saveToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
 
         memberAdapter.loginMember(jwtUtils.getUsernameFromAccessToken(accessToken));
     }

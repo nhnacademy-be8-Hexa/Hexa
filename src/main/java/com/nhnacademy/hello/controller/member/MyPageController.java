@@ -213,7 +213,7 @@ public class MyPageController {
         // 멤버 상태를 '탈퇴'로 업데이트
         memberAdapter.updateMember(AuthInfoUtils.getUsername(), updateDTO);
         String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
-        tokenAdapter.deleteToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
+        tokenAdapter.addToBlackListToken(jwtProperties.getTokenPrefix() + " " + refreshToken);
         return "redirect:/";
     }
 

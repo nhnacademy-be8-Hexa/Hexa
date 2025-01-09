@@ -18,17 +18,17 @@ public interface TokenAdapter {
 
     // 보낼떄 Bearer <토큰> 형식으로 보내야함
 
-    // 리프레시 토큰 생성
-    @PostMapping("/api/auth/refreshTokenRedis")
-    ResponseEntity<Void> saveToken(@RequestHeader("Authorization") String refreshToken);
+    // 리프레시 토큰 블랙리스트 등록
+    @PostMapping("/api/auth/refreshTokenBlacklists")
+    ResponseEntity<Void> addToBlackListToken(@RequestHeader("Authorization") String refreshToken);
 
-    // 리프레시 토큰 가져오기
-    @GetMapping("/api/auth/refreshTokenRedis")
-    String getServerToken(@RequestHeader("Authorization") String refreshToken);
+    // 리프레시 토큰 블랙리스트에 있는지 여부
+    @GetMapping("/api/auth/refreshTokenBlacklists")
+    Boolean isTokenBlackListed(@RequestHeader("Authorization") String refreshToken);
 
-    // 리프레시 토큰 삭제
-    @DeleteMapping("/api/auth/refreshTokenRedis")
-    ResponseEntity<Void> deleteToken(@RequestHeader("Authorization") String refreshToken);
+    // 리프레시 토큰 블랙리스트에서 삭제
+    @DeleteMapping("/api/auth/refreshTokenBlacklists")
+    ResponseEntity<Void> deleteToBlackListToken(@RequestHeader("Authorization") String refreshToken);
 
     // 토큰 재발행(접근, 리프레시)
     @PostMapping("/api/auth/reissue")
