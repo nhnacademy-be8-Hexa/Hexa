@@ -68,31 +68,45 @@ public class AdminPageController {
             List<OrderDTO> pendingOrders = allOrders.stream()
                     .filter(order -> "WAIT".equalsIgnoreCase(order.orderStatus().orderStatus()))
                     .map(order -> {
-                        // OrderBookAdapter로 해당 주문의 도서 정보 가져오기
+                        // 주문에 포함된 도서 정보 가져오기
                         OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(order.orderId());
+                        List<BookDTO> books = List.of();
+
                         if (orderBooks != null && orderBooks.length > 0) {
                             List<Long> bookIds = Arrays.stream(orderBooks)
                                     .map(OrderBookResponseDTO::bookId)
                                     .collect(Collectors.toList());
 
-                            // BookAdapter로 도서 정보 조회
-                            List<BookDTO> books = bookAdapter.getBooksByIds(bookIds);
-                            books = books != null ? books : List.of(); // Null 체크
-
-                            return new OrderDTO(
-                                    order.orderId(),
-                                    order.orderPrice(),
-                                    order.orderedAt(),
-                                    order.wrappingPaper(),
-                                    order.orderStatus(),
-                                    order.zoneCode(),
-                                    order.address(),
-                                    order.addressDetail(),
-                                    order.member(),
-                                    books // 도서 정보 추가
-                            );
+                            // 도서 정보 조회
+                            books = bookAdapter.getBooksByIds(bookIds);
+                            books = books != null ? books : List.of();
                         }
-                        return order;
+
+                        // 회원 정보 가져오기
+                        OrderDTO.MemberDTO member = order.member();
+                        if (member != null && !"Unknown".equals(member.memberId())) {
+                            MemberDTO memberDTOFromAdapter = memberAdapter.getMember(member.memberId());
+                            if (memberDTOFromAdapter != null) {
+                                member = new OrderDTO.MemberDTO(
+                                        memberDTOFromAdapter.memberId(),
+                                        memberDTOFromAdapter.memberName(),
+                                        memberDTOFromAdapter.memberNumber()
+                                );
+                            }
+                        }
+
+                        return new OrderDTO(
+                                order.orderId(),
+                                order.orderPrice(),
+                                order.orderedAt(),
+                                order.wrappingPaper(),
+                                order.orderStatus(),
+                                order.zoneCode(),
+                                order.address(),
+                                order.addressDetail(),
+                                member != null ? member : new OrderDTO.MemberDTO("Unknown", "Unknown", "Unknown"),
+                                books
+                        );
                     })
                     .collect(Collectors.toList());
 
@@ -101,6 +115,7 @@ public class AdminPageController {
             model.addAttribute("orders", List.of());
         }
 
+        // 페이지네이션 정보 추가
         ResponseEntity<Long> totalOrderCountResponse = orderAdapter.getTotalOrderCount();
         Long totalOrders = totalOrderCountResponse.getBody();
         int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
