@@ -108,7 +108,7 @@
                                             </td>
                                             <td>
                                                 <ul>
-                                                    <li th:each="book : ${order.books}" th:text="${book.bookName}"></li>
+                                                    <li th:each="book : ${order.books}" th:text="${book != null && book.bookName != null ? book.bookName : 'Unknown'}"></li>
                                                 </ul>
                                             </td>
                                             <td th:text="${order.orderPrice}">-</td>
