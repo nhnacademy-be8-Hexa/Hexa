@@ -119,9 +119,14 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                                    <button type="button" class="btn btn-primary" onclick="submitReturnForm()">반품하기</button>
+
+                                <div class="modal-footer d-flex justify-content-between align-items-center">
+                                    <span id="refund-text"></span>
+
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitReturnForm()">반품하기</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -151,9 +156,25 @@
     /*]]>*/
 </script>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var orderPrice = /*[[${order.orderPrice}]]*/ 0;
+    /*]]>*/
+</script>
+
+<script>
+    const refundAmount = orderPrice > 3000 ? orderPrice - 3000 : 0;
+    document.getElementById('refund-text').innerText = `환불 액: ${refundAmount}원`;
+</script>
+
 <script>
     function cancelOrder() {
-        if (confirm(`주문을 취소 하시겠습니까?`)) {
+        if (confirm(`주문을 취소 하시겠습니까?\n환불 액: ${orderPrice}`)) {
+
+            // 로딩 오버레이 활성
+            const overlay = document.getElementById("loading-overlay");
+            overlay.style.display = "block";
+
             fetch(`/orders/${orderId}/cancel`, {
                 method: 'POST',
                 headers: {
@@ -173,7 +194,12 @@
                 })
                 .catch(error => {
                     alert('오류가 발생했습니다. 다시 시도해주세요.\n' + error.message);
+                })
+                .finally(() => {
+                    // 로딩 오버레이 비 활성
+                    overlay.style.display = "none";
                 });
+
         }
     }
 </script>
@@ -186,10 +212,18 @@
 
     // 반품 폼 제출 처리
     function submitReturnForm() {
+
+        // 로딩 오버레이 활성
+        const overlay = document.getElementById("loading-overlay");
+        overlay.style.display = "block";
+
         var reasonId = $('#reason').val();  // 선택한 반품 사유 ID
         var returnsDetail = $('#returnsDetail').val();  // 반품 상세 입력
 
         if (!reasonId) {
+            // 로딩 오버레이 비 활성
+            overlay.style.display = "none";
+
             alert('반품 사유를 선택해주세요.');
             return;
         }
@@ -217,7 +251,12 @@
             .catch(error => {
                 // 오류 처리
                 alert(error.message);  // 오류 메시지 출력
+            })
+            .finally(() => {
+                // 로딩 오버레이 비 활성
+                overlay.style.display = "none";
             });
+
 
         $('#returnModal').modal('hide');  // 모달 닫기
     }
@@ -225,4 +264,30 @@
 
 
 </body>
+
+<!--로딩 스피너-->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+        <div class="spinner"></div>
+        <p style="color: white; margin-top: 10px;">잠시만 기다려주세요...</p>
+    </div>
+</div>
+
+<!-- 로딩 스피너 스타일 -->
+<style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto; /* 가운데 정렬 */
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
 </html>
