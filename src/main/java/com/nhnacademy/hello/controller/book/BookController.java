@@ -2,6 +2,7 @@ package com.nhnacademy.hello.controller.book;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.LikeAdapter;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
 import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.PointPolicyAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
@@ -46,6 +47,7 @@ public class BookController {
     private final PointDetailsAdapter pointDetailsAdapter;
     private final PointPolicyAdapter pointPolicyAdapter;
     private final LikeAdapter likeAdapter;
+    private final MemberAdapter memberAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -116,7 +118,12 @@ public class BookController {
         model.addAttribute("assignedTags", assignedTags);
         model.addAttribute("bookId", bookId);
 
-        //좋아요 개수
+        boolean hasLiked = false;
+        if (Objects.nonNull(memberId)) {
+            hasLiked = Boolean.TRUE.equals(likeAdapter.hasLiked(bookId, memberId).getBody());
+        }
+
+        model.addAttribute("hasLiked", hasLiked);
         Long likeCount = likeAdapter.getLikeCount(bookId).getBody();
         model.addAttribute("likeCount", likeCount);
 

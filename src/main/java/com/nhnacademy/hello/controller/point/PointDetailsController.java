@@ -30,7 +30,7 @@ public class PointDetailsController {
     public String pointsPage(Model model,
                              @RequestParam(value = "page", defaultValue = "0") int page,
                              @RequestParam(value = "size", defaultValue = "10") int size,
-                             @RequestParam(value = "sort", defaultValue = "date,desc") String sort) {
+                             @RequestParam(value = "sort", defaultValue = "pointDetailsDatetime,desc") String sort) {
 
         String username = AuthInfoUtils.getUsername();
         MemberDTO member = memberAdapter.getMember(username);
