@@ -117,16 +117,21 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                                    <button type="button" class="btn btn-primary" onclick="submitReturnForm()">반품하기</button>
+
+                                <div class="modal-footer d-flex justify-content-between align-items-center">
+                                    <span id="refund-text"></span>
+
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitReturnForm()">반품하기</button>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
                 </div>
-
 
             </div>
         </main>
@@ -148,9 +153,20 @@
     /*]]>*/
 </script>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var orderPrice = /*[[${order.orderPrice}]]*/ 0;
+    /*]]>*/
+</script>
+
+<script>
+    const refundAmount = orderPrice > 3000 ? orderPrice - 3000 : 0;
+    document.getElementById('refund-text').innerText = `환불 액: ${refundAmount}원`;
+</script>
+
 <script>
     function cancelOrder() {
-        if (confirm(`주문을 취소 하시겠습니까?`)) {
+        if (confirm(`주문을 취소 하시겠습니까?\n환불 액: ${orderPrice}`)) {
 
             // 로딩 오버레이 활성
             const overlay = document.getElementById("loading-overlay");
@@ -203,6 +219,9 @@
         var returnsDetail = $('#returnsDetail').val();  // 반품 상세 입력
 
         if (!reasonId) {
+            // 로딩 오버레이 비 활성
+            overlay.style.display = "none";
+
             alert('반품 사유를 선택해주세요.');
             return;
         }
