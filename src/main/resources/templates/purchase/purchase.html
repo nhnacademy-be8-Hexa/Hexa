@@ -480,6 +480,21 @@
         return filteredIds.length !== uniqueIds.size;
     };
 
+    // 구매한 뒤 카트 목록 업데이트
+    function removeBooksFromCart(books) {
+        // 로컬 스토리지에서 cart 가져오기
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // books의 bookId 목록 가져오기
+        const bookIdsToRemove = books.map(book => book.bookId);
+
+        // cart에서 bookId가 일치하지 않는 요소만 필터링
+        const updatedCart = cart.filter(item => !bookIdsToRemove.includes(item.bookId));
+
+        // 로컬 스토리지에 업데이트된 cart 저장
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("loading-overlay");
 
@@ -868,6 +883,12 @@
                     const errorMessage = await response.text(); // 서버에서 보낸 에러 메시지 받기
                     throw new Error(`서버 오류: ${errorMessage}`);
                 }
+
+                // 로컬 스토리지 카트 업데이트 - 장바구니 구매일 경우에만
+                if (buynowQuantity == null) {
+                    removeBooksFromCart(books);
+                }
+
 
                 const savedOrderData = await response.json();
 
