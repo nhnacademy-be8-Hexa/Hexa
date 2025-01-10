@@ -71,7 +71,7 @@ public interface CategoryAdapter {
      * @param categoryId 조회할 카테고리 ID
      * @return 카테고리 및 서브 카테고리들의 ID 목록
      */
-    @GetMapping("/ids/{categoryId}")
+    @GetMapping("/{categoryId}/ids")
     ResponseEntity<List<Long>> extractCategoryIds(@PathVariable Long categoryId);
 
 
@@ -112,7 +112,7 @@ public interface CategoryAdapter {
      */
     @DeleteMapping("/{categoryId}")
     ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId);
-    
+
     // bookId로 해당 책의 카테고리 리스트 조회
     @GetMapping("/books/{bookId}")
     ResponseEntity<List<CategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
