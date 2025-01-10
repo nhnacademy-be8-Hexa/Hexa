@@ -3,10 +3,12 @@ package com.nhnacademy.hello.controller.order;
 import com.nhnacademy.hello.common.feignclient.DeliveryAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderBookAdapter;
+import com.nhnacademy.hello.common.feignclient.ReturnsReasonAdapter;
 import com.nhnacademy.hello.dto.delivery.DeliveryDTO;
 import com.nhnacademy.hello.dto.order.GuestOrderValidateRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
+import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -27,6 +30,8 @@ public class GuestOrderController {
     private final OrderBookAdapter orderBookAdapter;
     private final PasswordEncoder passwordEncoder;
     private final DeliveryAdapter deliveryAdapter;
+
+    private final ReturnsReasonAdapter returnsReasonAdapter;
 
     @GetMapping("/guestOrder")
     public String guestOrderPage() {
@@ -75,6 +80,11 @@ public class GuestOrderController {
             model.addAttribute("wrappingPaperName", wrappingPaperName);
             model.addAttribute("wrappingPaperPrice", wrappingPaperPrice);
             model.addAttribute("deliveryCost", deliveryCost);
+
+            // 반품 정보를 위한 반품 사유 리스트
+            List<ReturnsReasonDTO> returnsReasonList = returnsReasonAdapter.getAllReturnsReasons();
+            model.addAttribute("returnsReasonList", returnsReasonList);
+
             return "guest/guestOrderInfo";
         }
         else {

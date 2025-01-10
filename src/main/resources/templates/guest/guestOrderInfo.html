@@ -62,6 +62,72 @@
                         </div>
                     </div>
                 </div>
+
+                <!--                주문 상태에 따른 처리-->
+                <div class="mt-4">
+                    <p>
+                        <strong>주문 상태:</strong>
+                        <span th:text="${order.orderStatus.orderStatus()}"
+                              th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                 order.orderStatus.orderStatusId == 3 ? 'text-success' :
+                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 'text-dark'}">
+                        </span>
+                    </p>
+
+                    <!--                    상태에 따른 버튼-->
+                    <!-- 주문 상태가 1일 경우 -->
+                    <div th:if="${order.orderStatus.orderStatusId == 1}">
+                        <button class="btn btn-danger" onclick="cancelOrder()">주문 취소</button>
+                    </div>
+
+                    <!-- 주문 상태가 3일 경우 (반품 버튼) -->
+                    <div th:if="${order.orderStatus.orderStatusId == 3}">
+                        <button class="btn btn-warning" onclick="openReturnModal()">반품하기</button>
+                    </div>
+
+                    <!-- 플로팅 모달 (반품 사유 선택 및 상세 입력) -->
+                    <div class="modal" tabindex="-1" role="dialog" id="returnModal">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">반품 사유 선택</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="returnForm">
+                                        <!-- 반품 사유 선택 -->
+                                        <div class="form-group">
+                                            <label for="reason">반품 사유</label>
+                                            <select class="form-control" id="reason" required>
+                                                <option value="" disabled selected>반품 사유를 선택하세요</option>
+                                                <!-- returnsReasonList 반복문 -->
+                                                <option th:each="reason : ${returnsReasonList}"
+                                                        th:value="${reason.returnsReasonId}"
+                                                        th:text="${reason.returnsReason}"></option>
+                                            </select>
+                                        </div>
+
+                                        <!-- 반품 상세 입력 -->
+                                        <div class="form-group">
+                                            <label for="returnsDetail">반품 상세 (선택)</label>
+                                            <textarea class="form-control" id="returnsDetail"></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                                    <button type="button" class="btn btn-primary" onclick="submitReturnForm()">반품하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
             </div>
         </main>
     </div>
@@ -70,7 +136,90 @@
     <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 부트스트랩 JS, jQuery, Popper.js (모달 기능을 위해 필요) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var orderId = /*[[${order.orderId}]]*/ 0;
+    /*]]>*/
+</script>
+
+<script>
+    function cancelOrder() {
+        if (confirm(`주문을 취소 하시겠습니까?`)) {
+            fetch(`/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('주문 취소 요청이 완료되었습니다.')
+                        location.reload();
+                    } else {
+                        throw new Error('주문 취소 요청에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    alert('오류가 발생했습니다. 다시 시도해주세요.\n' + error.message);
+                });
+        }
+    }
+</script>
+
+<script>
+    // 반품 버튼 클릭 시 모달 열기
+    function openReturnModal() {
+        $('#returnModal').modal('show');
+    }
+
+    // 반품 폼 제출 처리
+    function submitReturnForm() {
+        var reasonId = $('#reason').val();  // 선택한 반품 사유 ID
+        var returnsDetail = $('#returnsDetail').val();  // 반품 상세 입력
+
+        if (!reasonId) {
+            alert('반품 사유를 선택해주세요.');
+            return;
+        }
+
+        // POST 요청 보내기
+        fetch(`/orders/${orderId}/return`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                reasonId: reasonId,
+                returnsDetail: returnsDetail
+            })
+        })
+            .then(response => {
+                // 응답이 성공적이면 JSON 형태로 변환
+                if (response.ok) {
+                    alert('반품 요청이 완료되었습니다.')
+                    location.reload();
+                } else {
+                    throw new Error('반품 요청에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                // 오류 처리
+                alert(error.message);  // 오류 메시지 출력
+            });
+
+        $('#returnModal').modal('hide');  // 모달 닫기
+    }
+</script>
+
+
 </body>
 </html>
