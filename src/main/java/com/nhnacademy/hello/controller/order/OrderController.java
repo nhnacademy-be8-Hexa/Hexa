@@ -1,9 +1,12 @@
 package com.nhnacademy.hello.controller.order;
 
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
+import com.nhnacademy.hello.common.feignclient.ReturnsAdapter;
+import com.nhnacademy.hello.common.feignclient.ReturnsReasonAdapter;
 import com.nhnacademy.hello.common.feignclient.payment.TossPaymentAdapter;
-import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
+import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
+import com.nhnacademy.hello.dto.returns.ReturnsRequestDTO;
 import com.nhnacademy.hello.dto.toss.TossPaymentDto;
 import com.nhnacademy.hello.service.TossService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,9 @@ public class OrderController {
     private final OrderAdapter orderAdapter;
     private final TossPaymentAdapter tossPaymentAdapter;
 
+    private final ReturnsReasonAdapter returnsReasonAdapter;
+    private final ReturnsAdapter returnsAdapter;
+
     private final TossService tossService;
 
 
@@ -28,7 +34,6 @@ public class OrderController {
     public ResponseEntity<?> cancelOrder(
             @PathVariable("orderId") Long orderId
     ) {
-        OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
 
         // 결제 정보 조회
         TossPaymentDto payment = tossPaymentAdapter.getPayment(orderId).getBody();
@@ -45,7 +50,7 @@ public class OrderController {
             return response;
         }
 
-        // 주문 상태 변경 -> CANCELED
+        // 주문 상태 변경 -> CANCELED 5
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 null,
                 null,
@@ -67,6 +72,50 @@ public class OrderController {
             @RequestBody ReturnsRequest returnsRequest
             ){
 
+
+        // 반품 사유 조회
+        ReturnsReasonDTO returnsReasonDTO = returnsReasonAdapter.getReturnsReasonById(returnsRequest.reasonId());
+
+
+        // 결제 정보 조회
+        TossPaymentDto payment = tossPaymentAdapter.getPayment(orderId).getBody();
+
+        // 환불 비용이 3000원 이상일 경우에만 환불 해줌
+        if(payment.amount() > 3000) {
+
+            // 토스 주문 취소 처리
+            ResponseEntity<?> response = tossService.cancelPayment(
+                    payment.paymentKey(),
+                    "구매자 반품 처리: " + returnsReasonDTO.returnsReason(),
+                    payment.amount() - 3000 // 배송비 제외한 금액 환불
+            );
+
+            if(response.getStatusCode() != HttpStatus.OK) {
+                // 토스 처리 오류
+                return response;
+            }
+
+        }
+
+        // 주문 상태 변경 -> RETURNED 4
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
+                null,
+                null,
+                null,
+                4L,
+                null,
+                null,
+                null
+        );
+        orderAdapter.updateOrder(orderId, orderRequestDTO);
+
+        // 반품 정보 저장
+        ReturnsRequestDTO returnsRequestDTO = new ReturnsRequestDTO(
+                orderId,
+                returnsRequest.reasonId(),
+                returnsRequest.returnsDetail()
+        );
+        returnsAdapter.createReturns(returnsRequestDTO);
 
         return ResponseEntity.ok().build();
     }
