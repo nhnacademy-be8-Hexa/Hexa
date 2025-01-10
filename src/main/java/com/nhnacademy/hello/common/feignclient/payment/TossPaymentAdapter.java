@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-        name="hexa-gateway",
+        name = "hexa-gateway",
         contextId = "tossPaymentAdapter",
         path = "/api/toss-payment"
 )
@@ -24,5 +24,5 @@ public interface TossPaymentAdapter {
     ResponseEntity<TossPaymentDto> getPayment(
             @PathVariable Long orderId
     );
-
+    
 }
