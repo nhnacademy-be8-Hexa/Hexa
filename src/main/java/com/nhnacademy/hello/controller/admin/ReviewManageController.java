@@ -1,8 +1,10 @@
 package com.nhnacademy.hello.controller.admin;
 
+import com.nhnacademy.hello.common.feignclient.MemberReportAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
 import com.nhnacademy.hello.dto.review.ReviewDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +17,10 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/review")
+@Slf4j
 public class ReviewManageController {
     private final ReviewAdapter reviewAdapter;
+    private final MemberReportAdapter memberReportAdapter;
 
     // 신고 5회 이상 받은 리뷰 전체 조회
     @GetMapping
@@ -43,7 +47,7 @@ public class ReviewManageController {
                     totalReportedReviews = totalResponse.getBody();
                 }
             } catch (Exception e) {
-                System.err.println("Error fetching total reported reviews: " + e.getMessage());
+                log.error("Error fetching total reported reviews: {}", e.getMessage());
             }
 
             int totalPages = (int) Math.ceil((double) totalReportedReviews / size);
@@ -57,8 +61,6 @@ public class ReviewManageController {
 
             return "admin/reviewManage";
         } catch (Exception e) {
-            // 예외 처리: 오류 로그 기록 및 사용자에게 메시지 표시
-            System.err.println("Error fetching reviews: " + e.getMessage());
             model.addAttribute("errorMessage", "리뷰 데이터를 가져오는 중 문제가 발생했습니다.");
             return "error/500"; // 에러 페이지로 이동
         }
@@ -77,13 +79,14 @@ public class ReviewManageController {
                 }
             }
         }
-        throw new RuntimeException("리뷰를 찾을 수 없습니다.");
+        return "redirect:/admin/review";
     }
 
     // 특정 리뷰 수정
     @PutMapping("/{reviewId}/block")
     @ResponseBody
     public ResponseEntity<Void> blockReview(@PathVariable Long reviewId, @RequestParam boolean block) {
+        memberReportAdapter.allDelete(reviewId);
         return reviewAdapter.updateReviewBlock(reviewId, block);
     }
 }
