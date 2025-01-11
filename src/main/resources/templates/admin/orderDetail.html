@@ -9,117 +9,125 @@
 </head>
 <body>
 <div class="container">
-  <!-- 헤더 -->
   <div th:replace="~{fragments/header :: header}"></div>
-
   <div class="page-header d-print-none">
     <div class="container-xl">
-      <div class="row g-2 align-items-center">
-        <div class="col">
-          <h1 class="page-title">주문 상세정보</h1>
-        </div>
-      </div>
+      <h1 class="page-title">주문 상세정보</h1>
     </div>
   </div>
-
-  <!-- 전체 레이아웃 -->
   <div class="container-fluid d-flex gap-4 p-4 align-items-start">
-    <!-- 사이드 메뉴 -->
     <div th:replace="~{fragments/admin :: admin}"></div>
-
-    <!-- 메인 컨텐츠 -->
     <div class="col">
-      <div class="container-xl py-4">
-        <h2 th:text="'주문 ID: ' + ${order.orderId}"></h2>
-
-        <!-- 주문 상세 정보 표 -->
-        <table class="table table-bordered table-striped">
-          <tbody>
-          <tr>
-            <th>주문 ID</th>
-            <td th:text="${order.orderId}"></td>
-          </tr>
-          <tr>
-            <th>회원 ID</th>
-            <td th:text="${order.member != null ? order.member.memberId : 'Unknown'}"></td>
-          </tr>
-          <tr>
-            <th>회원 이름</th>
-            <td th:text="${order.member != null && order.member.memberName != null ? order.member.memberName : 'Unknown'}"></td>
-          </tr>
-          <tr>
-            <th>연락처</th>
-            <td th:text="${order.member != null && order.member.memberNumber != null ? order.member.memberNumber : 'Unknown'}"></td>
-          </tr>
-          <tr>
-            <th>도서 ID</th>
-            <td>
-              <ul>
-                <li th:each="book : ${order.books}" th:text="${book.bookId != null ? book.bookId : 'Unknown'}"></li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <th>도서 이름</th>
-            <td>
-              <ul>
-                <li th:each="book : ${order.books}" th:text="${book.bookTitle != null ? book.bookTitle : 'Unknown'}"></li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <th>우편번호</th>
-            <td th:text="${order.zoneCode}"></td>
-          </tr>
-          <tr>
-            <th>주소</th>
-            <td th:text="${order.address} + ' ' + ${order.addressDetail}"></td>
-          </tr>
-          <tr>
-            <th>주문일자</th>
-            <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-          </tr>
-          <tr>
-            <th>주문 상태</th>
-            <td th:text="${order.orderStatus.orderStatus}"></td>
-          </tr>
-          <tr>
-            <th>총 금액</th>
-            <td th:text="${order.orderPrice}"></td>
-          </tr>
-          <tr>
-            <th>포장 여부</th>
-            <td th:text="${order.wrappingPaper != null ? '포함' : '없음'}"></td>
-          </tr>
-          </tbody>
-        </table>
-
-        <div class="mt-3">
-          <button th:if="${order.orderStatus.orderStatus == 'WAIT'}"
-                  th:onclick="'processOrder(' + ${order.orderId} + ')'"
-                  class="btn btn-primary">주문 처리</button>
-          <a href="/admin/orders" class="btn btn-secondary">목록으로 돌아가기</a>
-        </div>
+      <h2 th:text="'주문 ID: ' + ${order.orderId}"></h2>
+      <table class="table table-bordered table-striped">
+        <tbody>
+        <tr>
+          <th>회원 ID</th>
+          <td th:text="${order.member != null ? order.member.memberId : '비회원'}"></td>
+        </tr>
+        <tr>
+          <th>회원 이름</th>
+          <td th:text="${order.member != null && order.member.memberName != null ? order.member.memberName : (guestOrder != null ? '비회원' : 'Unknown')}"></td>
+        </tr>
+        <tr>
+          <th>연락처</th>
+          <td th:text="${order.member != null && order.member.memberNumber != null ? order.member.memberNumber : (guestOrder != null ? guestOrder.guestOrderNumber : 'Unknown')}"></td>
+        </tr>
+        <tr>
+          <th>이메일</th>
+          <td th:text="${order.member != null && order.member.memberEmail != null ? order.member.memberEmail : (guestOrder != null ? guestOrder.guestOrderEmail : 'Unknown')}"></td>
+        </tr>
+        <!-- 도서 정보 반복 출력 -->
+        <tr th:each="book : ${books}">
+          <th>도서 ID</th>
+          <td th:text="${book != null && book.bookId != null ? book.bookId : 'Unknown'}"></td>
+        </tr>
+        <tr th:each="book : ${books}">
+          <th>도서 이름</th>
+          <td th:text="${book != null && book.bookTitle != null ? book.bookTitle : 'Unknown'}"></td>
+        </tr>
+        <tr th:each="book : ${books}">
+          <th>도서 가격</th>
+          <td th:text="${book != null && book.bookPrice != null ? book.bookPrice : 'Unknown'}"></td>
+        </tr>
+        <tr th:each="book : ${books}">
+          <th>주문 수량</th>
+          <td th:text="${book != null && book.orderBookAmount != null ? book.orderBookAmount : 'Unknown'}"></td>
+        </tr>
+        <tr th:each="book : ${books}">
+          <th>쿠폰 ID</th>
+          <td th:text="${book != null && book.couponId != null ? book.couponId : 'None'}"></td>
+        </tr>
+        <tr>
+          <th>우편번호</th>
+          <td th:text="${order.zoneCode}"></td>
+        </tr>
+        <tr>
+          <th>주소</th>
+          <td th:text="${order.address} + ' ' + ${order.addressDetail}"></td>
+        </tr>
+        <tr>
+          <th>주문일자</th>
+          <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        </tr>
+        <tr>
+          <th>주문 상태</th>
+          <td th:text="${order.orderStatus.orderStatus}"></td>
+        </tr>
+        <tr>
+          <th>총 금액</th>
+          <td th:text="${order.orderPrice}"></td>
+        </tr>
+        <tr>
+          <th>포장 여부</th>
+          <td th:text="${order.wrappingPaper != null ? '포함' : '없음'}"></td>
+        </tr>
+        </tbody>
+      </table>
+      <!-- 버튼 영역 -->
+      <div class="button-group mt-3">
+        <!-- WAIT 상태 -->
+        <button th:if="${order.orderStatus.orderStatus == 'WAIT'}"
+                class="btn btn-primary"
+                th:attr="onclick=|updateOrderStatus('${order.orderId}', 'ON_DELIVERY')|">
+          배송중으로 변경
+        </button>
+        <!-- ON_DELIVERY 상태 -->
+        <button th:if="${order.orderStatus.orderStatus == 'ON_DELIVERY'}"
+                class="btn btn-success"
+                th:attr="onclick=|updateOrderStatus('${order.orderId}', 'COMPLETE')|">
+          주문완료
+        </button>
+        <!-- 목록으로 돌아가기 버튼 -->
+        <button class="btn btn-secondary" onclick="window.location.href='/admin/orders';">
+          목록으로 돌아가기
+        </button>
       </div>
     </div>
   </div>
-
   <!-- 풋터 -->
   <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 </body>
 </html>
-
 <script>
-  function processOrder(orderId) {
-    fetch(`/admin/orders/${orderId}/process`, {method: 'POST'})
+  function updateOrderStatus(orderId, status) {
+    fetch(`/admin/orders/${orderId}/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
             .then(response => {
               if (response.ok) {
-                alert('주문 상태가 배송중으로 변경되었습니다.');
+                alert(`주문 상태가 ${status}로 변경되었습니다.`);
                 window.location.reload();
               } else {
-                alert('처리에 실패했습니다.');
+                alert('주문 상태 변경에 실패했습니다.');
               }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('서버와의 통신 중 오류가 발생했습니다.');
             });
   }
 </script>
