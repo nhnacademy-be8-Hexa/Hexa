@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.controller.book;
 
+import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.LikeAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class BookController {
     private final BookAdapter bookAdapter;
     private final ReviewAdapter reviewAdapter;
     private final ImageStore imageStore;
+    private final MemberReportAdapter memberReportAdapter;
     private final SetImagePathsUtils setImagePathsUtils;
     private final TagAdapter tagAdapter;
     private final BooKTagAdapter bookTagAdapter;
@@ -365,5 +369,31 @@ public class BookController {
 
             return "book/bookDetail";
         }
+    }
+
+    @PostMapping("/book/{bookId}/reviews/{reviewId}/report")
+    public String reviewReport(
+            @PathVariable Long bookId,
+            @PathVariable Long reviewId,
+            RedirectAttributes redirectAttributes
+    ) {
+        // 1. 현재 사용자의 memberId 가져오기
+        String memberId = AuthInfoUtils.getUsername();
+
+        try {
+            ResponseEntity<Void> response = memberReportAdapter.saveMemberReport(memberId, reviewId);
+            if (response.getStatusCode() == HttpStatus.CREATED) {
+                redirectAttributes.addFlashAttribute("reportSuccess", "리뷰가 성공적으로 신고되었습니다.");
+            } else if(response.getStatusCode().is4xxClientError()) {
+                redirectAttributes.addFlashAttribute("submissionError", "이미 신고된 리뷰입니다.");
+            } else {
+                redirectAttributes.addFlashAttribute("submissionError", "리뷰 신고에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("submissionError", "리뷰 신고에 실패했습니다.");
+        }
+
+        // 4. 책 상세 페이지로 리다이렉트
+        return "redirect:/book/" + bookId;
     }
 }

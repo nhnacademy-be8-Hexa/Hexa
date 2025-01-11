@@ -77,7 +77,7 @@
         </div>
     </div>
 
-    <!-- 오류 메시지 표시 (리뷰 작성 실패 시) -->
+    <!-- 오류 메시지 표시 (리뷰 작성 또는 신고 실패 시) -->
     <div th:if="${submissionError}">
         <div class="alert alert-danger mt-3" role="alert">
             <span th:text="${submissionError}"></span>
@@ -200,6 +200,14 @@
                                         th:data-review-rating="${review.reviewRating}">
                                     수정
                                 </button>
+                            </div>
+                            <!-- 작성자가 아닌 경우에만 '신고' 버튼 표시 -->
+                            <div th:if="${review.member.memberId != memberId}" class="d-inline-block">
+                                <form th:action="@{/book/{bookId}/reviews/{reviewId}/report(bookId=${book.bookId}, reviewId=${review.reviewId})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('이 리뷰를 신고하시겠습니까?');">
+                                        신고
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <!-- Markdown 리뷰 내용을 data-markdown 속성에 저장 -->
