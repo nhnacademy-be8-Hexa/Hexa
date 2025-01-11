@@ -62,18 +62,24 @@
   }
 
   // 장바구니 렌더링 함수
-  function renderCart() {
+  async function renderCart() {
     const cartList = document.getElementById('cartList');
     const cart = getCart();
     cartList.innerHTML = ''; // 기존 항목 비우기
 
     let totalQuantity = 0;
     let totalPrice = 0;
-    const deliveryFee = cart.length > 0 ? 3000 : 0; // 장바구니가 비어있지 않으면 배송비 3,000원
+
+    // 이미지 패스 리스트 가져오기
+    const bookIds = cart.map(item => item.bookId);
+    const imagePaths = await fetchImagePaths(bookIds);
 
     cart.forEach(item => {
       totalQuantity += item.quantity;
       totalPrice += item.bookPrice * item.quantity;
+
+      // 이미지 패스
+      const imagePath = imagePaths[item.bookId];
 
       // 장바구니 항목 요소 생성
       const cartItem = document.createElement('div');
@@ -85,7 +91,11 @@
                 <input type="checkbox" class="form-check-input select-item" value="${item.bookId}" style="border-color: #9E8DBF;">
                 </div>
                     <div class="col-md-2">
-                        <img src="/images/books/${item.bookId}.jpg" class="img-fluid rounded-start" alt="${item.bookTitle}" style="cursor: pointer;" onclick="goToBookPage('${item.bookId}')">
+                        <img src="${imagePath}"
+                         class="img-fluid mx-auto d-block rounded-start"
+                          alt="${item.bookTitle}"
+                           style="cursor: pointer; max-height: 150px; object-fit: contain;"
+                            onclick="goToBookPage('${item.bookId}')">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -142,6 +152,25 @@
 
     window.location.href = `/purchase?${queryString}`;
   }
+
+  // 책 이미지 패스 불러오기
+  async function fetchImagePaths(bookIds) {
+    const response = await fetch('/cart/getBookImages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookIds)
+    });
+
+    if (response.ok) {
+      return await response.json();
+    } else {
+      console.error("Failed to fetch image paths");
+      return {};
+    }
+  }
+
 
 
 </script>
