@@ -9,8 +9,7 @@
 .table {
     width: 100%;
     border-collapse: collapse; /* 테두리가 겹치지 않도록 */
-    table-layout: fixed; /* 열 크기를 균등하게 */
-}
+    table-layout: auto; /* 자동 열 크기 조정으로 변경 */}
 
 .table th, .table td {
     text-align: center;
@@ -260,5 +259,42 @@
 /* 추가적으로 필요한 경우 Preview 영역 배경 조정 */
 .toastui-editor-ww-mode .toastui-editor {
     background-color: #FFFFFF; /* 흰색 */
+}
+
+
+/* 열 간격을 늘리고 칸이 겹치는 문제를 해결 */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+    width: 120px; /* 주문 ID */
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+    width: 180px; /* 회원 ID / 게스트 번호 */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+    width: 200px; /* 회원 이름 / 게스트 이메일 */
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+    width: 180px; /* 연락처 */
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+    width: 220px; /* 이메일 */
+}
+
+.table th:nth-child(6),
+.table td:nth-child(6) {
+    width: 100px; /* 도서 ID */
+}
+
+.table th:nth-child(7),
+.table td:nth-child(7) {
+    width: 200px; /* 도서 이름 */
 }
 

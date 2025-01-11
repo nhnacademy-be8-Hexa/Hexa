@@ -47,7 +47,8 @@
           <tr th:each="order : ${orders}">
             <td>
               <a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}"></a>
-            </td>            <td th:text="${order.member?.memberId ?: 'Unknown'}">-</td>
+            </td>
+            <td th:text="${order.member != null ? order.member.memberId : '비회원'}"></td>
             <td th:text="${order.orderPrice}">-</td>
             <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}"
                 th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
@@ -58,7 +59,7 @@
             <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
           </tr>
           <tr th:if="${orders == null or #lists.isEmpty(orders)}">
-            <td colspan="5" class="text-center">No orders available</td>
+            <td colspan="8" class="text-center">No orders available</td>
           </tr>
           </tbody>
         </table>
