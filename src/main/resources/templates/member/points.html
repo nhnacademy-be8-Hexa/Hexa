@@ -45,7 +45,8 @@
                         <tbody>
                         <tr th:each="detail, indexStat : ${pointDetails}">
                             <td th:text="${indexStat.count}">1</td>
-                            <td th:text="${detail.pointDetailsIncrement}">0</td>
+                            <td th:text="${detail.pointDetailsIncrement}"
+                                th:class="${detail.pointDetailsIncrement() < 0 ? 'text-danger' : 'text-success'}" >0</td>
                             <td th:text="${detail.pointDetailsComment}">내용</td>
                             <td th:text="${#temporals.format(detail.pointDetailsDatetime, 'yyyy-MM-dd HH:mm:ss')}">날짜</td>
                         </tr>
