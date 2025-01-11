@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>주문 관리</title>
+
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -45,7 +49,12 @@
               <a th:href="@{/admin/orders/{orderId}(orderId=${order.orderId})}" th:text="${order.orderId}"></a>
             </td>            <td th:text="${order.member?.memberId ?: 'Unknown'}">-</td>
             <td th:text="${order.orderPrice}">-</td>
-            <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}">-</td>
+            <td th:text="${order.orderStatus?.orderStatus ?: 'Unknown'}"
+                th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                 order.orderStatus.orderStatusId == 3 ? 'text-success' :
+                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 'text-dark'}"
+            >-</td>
             <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">-</td>
           </tr>
           <tr th:if="${orders == null or #lists.isEmpty(orders)}">
