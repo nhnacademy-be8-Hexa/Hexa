@@ -120,14 +120,17 @@
                 별점: ★★★☆☆ (리뷰 수: <span th:text="${totalCount}">0</span>개)
             </p>
 
-            <!-- 좋아요 갯수 및 버튼 -->
             <div class="d-flex align-items-center mb-3">
                 <span class="me-3">
                     좋아요 <span th:text="${likeCount}"></span>
                 </span>
+
                 <form th:action="@{/book/{bookId}/likes(bookId=${book.bookId})}" method="post">
-                    <button type="submit" class="btn btn-light">
-                        <i class="bi bi-heart-fill" style="color: red; background: transparent;"></i>
+                    <!-- 좋아요 버튼 아이콘 -->
+                    <button type="submit" class="btn btn-light" title="좋아요">
+                        <i th:class="${hasLiked ? 'bi bi-heart-fill' : 'bi bi-heart'}"
+                           th:style="${hasLiked ? 'color: red;' : 'color: gray;'}"
+                           style="background: transparent;"></i>
                     </button>
                 </form>
             </div>

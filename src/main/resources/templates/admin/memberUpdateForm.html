@@ -14,89 +14,96 @@
 
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <h2 class="text-center mb-4" style="color: #9E8DBF;">Member Update</h2>
+    <div class="container-fluid d-flex gap-4 p-4 align-items-start">
 
-    <form th:action="@{'/admin/members/update/' + ${memberId}}" method="post" id="memberUpdateForm">
-        <!-- Member ID (Read-Only) -->
-        <div class="mb-3">
-            <label for="memberId" class="form-label">Member ID</label>
-            <input type="text" class="form-control" id="memberId" name="memberId" th:value="${memberId}" readonly>
+        <div th:replace="~{fragments/admin :: admin}"></div>
+
+        <div class="flex-grow-1">
+            <h2 class="text-center mb-4" style="color: #9E8DBF;">Member Update</h2>
+
+            <form th:action="@{'/admin/members/update/' + ${memberId}}" method="post" id="memberUpdateForm">
+                <!-- Member ID (Read-Only) -->
+                <div class="mb-3">
+                    <label for="memberId" class="form-label">Member ID</label>
+                    <input type="text" class="form-control" id="memberId" name="memberId" th:value="${memberId}" readonly>
+                </div>
+
+                <!-- Member Name -->
+                <div class="mb-3">
+                    <label for="memberName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="memberName" name="memberName" th:value="${updateDTO.memberName}" required minlength="2" maxlength="20">
+                    <div class="form-text">Name must be between 2 and 20 characters.</div>
+                </div>
+
+                <!-- Member Number -->
+                <div class="mb-3">
+                    <label for="memberNumber" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="memberNumber" name="memberNumber" th:value="${updateDTO.memberNumber}" required minlength="10" maxlength="11" pattern="\d*">
+                    <div class="form-text">Phone number must be 10 to 11 digits.</div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="memberEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="memberEmail" name="memberEmail" th:value="${updateDTO.memberEmail}" maxlength="320">
+                    <div class="form-text">Email address (optional, max 320 characters).</div>
+                </div>
+
+                <!-- Birth Date -->
+                <div class="mb-3">
+                    <label for="memberBirthAt" class="form-label">Birth Date</label>
+                    <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt" th:value="${updateDTO.memberBirthAt}">
+                </div>
+
+                <!-- Member Created At (Read-Only) -->
+                <div class="mb-3">
+                    <label for="memberCreatedAt" class="form-label">Member Created At</label>
+                    <input type="text" class="form-control" id="memberCreatedAt" th:value="${memberCreatedAt}" readonly>
+                </div>
+
+                <!-- Last Login At (Read-Only) -->
+                <div class="mb-3">
+                    <label for="memberLastLoginAt" class="form-label">Last Login At</label>
+                    <input type="text" class="form-control" id="memberLastLoginAt" th:value="${memberLastLoginAt}" readonly>
+                </div>
+
+                <!-- Member Status -->
+                <div class="mb-3">
+                    <label for="memberStatus" class="form-label">Member Status</label>
+                    <select class="form-select" id="memberStatus" name="statusId">
+                        <option th:each="status : ${memberStatuses}"
+                                th:value="${status.statusId}"
+                                th:selected="${status.statusId == updateDTO.statusId}"
+                                th:text="${status.statusName}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Member Rating -->
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Rating</label>
+                    <select class="form-select" id="rating" name="ratingId">
+                        <option th:each="rating : ${ratings}"
+                                th:value="${rating.ratingId}"
+                                th:selected="${rating.ratingId == updateDTO.ratingId}"
+                                th:text="${rating.ratingName}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="/admin/members" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+
+            <div th:if="${errors}" class="alert alert-danger mt-3">
+            <ul>
+                <li th:each="error : ${errors}" th:text="${error}"></li>
+            </ul>
         </div>
-
-        <!-- Member Name -->
-        <div class="mb-3">
-            <label for="memberName" class="form-label">Name</label>
-            <input type="text" class="form-control" id="memberName" name="memberName" th:value="${updateDTO.memberName}" required minlength="2" maxlength="20">
-            <div class="form-text">Name must be between 2 and 20 characters.</div>
         </div>
-
-        <!-- Member Number -->
-        <div class="mb-3">
-            <label for="memberNumber" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" id="memberNumber" name="memberNumber" th:value="${updateDTO.memberNumber}" required minlength="10" maxlength="11" pattern="\d*">
-            <div class="form-text">Phone number must be 10 to 11 digits.</div>
-        </div>
-
-        <!-- Email -->
-        <div class="mb-3">
-            <label for="memberEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="memberEmail" name="memberEmail" th:value="${updateDTO.memberEmail}" maxlength="320">
-            <div class="form-text">Email address (optional, max 320 characters).</div>
-        </div>
-
-        <!-- Birth Date -->
-        <div class="mb-3">
-            <label for="memberBirthAt" class="form-label">Birth Date</label>
-            <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt" th:value="${updateDTO.memberBirthAt}">
-        </div>
-
-        <!-- Member Created At (Read-Only) -->
-        <div class="mb-3">
-            <label for="memberCreatedAt" class="form-label">Member Created At</label>
-            <input type="text" class="form-control" id="memberCreatedAt" th:value="${memberCreatedAt}" readonly>
-        </div>
-
-        <!-- Last Login At (Read-Only) -->
-        <div class="mb-3">
-            <label for="memberLastLoginAt" class="form-label">Last Login At</label>
-            <input type="text" class="form-control" id="memberLastLoginAt" th:value="${memberLastLoginAt}" readonly>
-        </div>
-
-        <!-- Member Status -->
-        <div class="mb-3">
-            <label for="memberStatus" class="form-label">Member Status</label>
-            <select class="form-select" id="memberStatus" name="statusId">
-                <option th:each="status : ${memberStatuses}"
-                        th:value="${status.statusId}"
-                        th:selected="${status.statusId == updateDTO.statusId}"
-                        th:text="${status.statusName}">
-                </option>
-            </select>
-        </div>
-
-        <!-- Member Rating -->
-        <div class="mb-3">
-            <label for="rating" class="form-label">Rating</label>
-            <select class="form-select" id="rating" name="ratingId">
-                <option th:each="rating : ${ratings}"
-                        th:value="${rating.ratingId}"
-                        th:selected="${rating.ratingId == updateDTO.ratingId}"
-                        th:text="${rating.ratingName}">
-                </option>
-            </select>
-        </div>
-
-        <!-- Buttons -->
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-            <a href="/admin/members" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
-
-    <div th:if="${errors}" class="alert alert-danger mt-3">
-        <ul>
-            <li th:each="error : ${errors}" th:text="${error}"></li>
-        </ul>
     </div>
 
     <!-- Footer -->

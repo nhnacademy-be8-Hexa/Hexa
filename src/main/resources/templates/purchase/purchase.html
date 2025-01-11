@@ -480,6 +480,21 @@
         return filteredIds.length !== uniqueIds.size;
     };
 
+    // 구매한 뒤 카트 목록 업데이트
+    function removeBooksFromCart(books) {
+        // 로컬 스토리지에서 cart 가져오기
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // books의 bookId 목록 가져오기
+        const bookIdsToRemove = books.map(book => book.bookId);
+
+        // cart에서 bookId가 일치하지 않는 요소만 필터링
+        const updatedCart = cart.filter(item => !bookIdsToRemove.includes(item.bookId));
+
+        // 로컬 스토리지에 업데이트된 cart 저장
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("loading-overlay");
 
@@ -869,6 +884,12 @@
                     throw new Error(`서버 오류: ${errorMessage}`);
                 }
 
+                // 로컬 스토리지 카트 업데이트 - 장바구니 구매일 경우에만
+                if (buynowQuantity == null) {
+                    removeBooksFromCart(books);
+                }
+
+
                 const savedOrderData = await response.json();
 
                 // GET /purchase/success
@@ -898,9 +919,9 @@
 
 <!-- 결제 처리 중 로딩 오버레이 -->
 <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
         <div class="spinner"></div>
-        <p style="color: white;">잠시만 기다려주세요...</p>
+        <p style="color: white; margin-top: 10px;">잠시만 기다려주세요...</p>
     </div>
 </div>
 
@@ -913,12 +934,14 @@
         border-top: 5px solid white;
         border-radius: 50%;
         animation: spin 1s linear infinite;
+        margin: 0 auto; /* 가운데 정렬 */
     }
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
 </style>
+
 
 
 </html>
