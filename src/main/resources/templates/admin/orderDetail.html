@@ -76,7 +76,12 @@
         </tr>
         <tr>
           <th>주문 상태</th>
-          <td th:text="${order.orderStatus.orderStatus}"></td>
+          <td th:text="${order.orderStatus.orderStatus}"
+              th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                 order.orderStatus.orderStatusId == 3 ? 'text-success' :
+                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 'text-dark'}"
+          ></td>
         </tr>
         <tr>
           <th>총 금액</th>
