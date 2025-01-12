@@ -70,9 +70,11 @@
                     <p>
                         <strong>주문 상태:</strong>
                         <span th:text="${order.orderStatus.orderStatus()}"
-                              th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                              th:class="${order.orderStatus.orderStatusId == 2 or
+                 order.orderStatus.orderStatusId == 6 ? 'text-warning' :
                  order.orderStatus.orderStatusId == 3 ? 'text-success' :
-                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 (order.orderStatus.orderStatusId == 4 or
+                 order.orderStatus.orderStatusId == 5) ? 'text-danger' :
                  'text-dark'}">
                         </span>
                     </p>
