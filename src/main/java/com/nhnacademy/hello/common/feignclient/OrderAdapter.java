@@ -6,7 +6,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "hexa-gateway", contextId = "orderAdapter")
 public interface OrderAdapter {
@@ -55,7 +57,14 @@ public interface OrderAdapter {
     @GetMapping("api/orders/count/{memberId}")
     public ResponseEntity<Long> countAllByMember_MemberId (@PathVariable String memberId);
 
+    @GetMapping("/api/orders/status")
+    public List<OrderDTO> getOrderStatus(
+            @RequestParam Long statusId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size);
 
+    @GetMapping("/api/orders/status/{statusId}/count")
+    public ResponseEntity<Long> countOrdersByStatus(@PathVariable("statusId") Long statusId);
 
     // 게스트 ------------------------------------------------
     @PostMapping("/api/guestOrders")

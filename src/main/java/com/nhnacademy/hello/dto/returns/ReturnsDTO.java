@@ -1,8 +1,9 @@
 package com.nhnacademy.hello.dto.returns;
 
+
 public record ReturnsDTO(
         Long orderId,
-        Long returnsReasonId,
+        ReturnsReasonDTO returnsReason, // JSON 응답의 "returnsReason" 객체를 매핑
         String returnsDetail,
         OrderDTO order
 ) {
