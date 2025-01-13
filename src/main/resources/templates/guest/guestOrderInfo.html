@@ -79,13 +79,14 @@
                     </p>
 
                     <!--                    상태에 따른 버튼-->
-                    <!-- 주문 상태가 1일 경우 -->
+                    <!-- 주문 상태가 1(WAIT)일 경우-->
                     <div th:if="${order.orderStatus.orderStatusId == 1}">
                         <button class="btn btn-danger" onclick="cancelOrder()">주문 취소</button>
                     </div>
 
-                    <!-- 주문 상태가 3일 경우 (반품 버튼) -->
-                    <div th:if="${order.orderStatus.orderStatusId == 3}">
+                    <!-- 주문 상태가 7(RECEIPT)일 경우 (주문 확정, 반품 신청 버튼) -->
+                    <div th:if="${order.orderStatus.orderStatusId == 7}">
+                        <button class="btn btn-success" onclick="confirmOrder()">주문 확정</button>
                         <button class="btn btn-warning" onclick="openReturnModal()">반품 신청</button>
                     </div>
 
@@ -203,6 +204,47 @@
 
         }
     }
+</script>
+
+<script>
+
+    // 주문 확정
+    function confirmOrder() {
+        if (confirm(`주문을 확정 하시겠습니까?\n이후 환불 할 수 없습니다.`)) {
+
+            // 로딩 오버레이 활성
+            const overlay = document.getElementById("loading-overlay");
+            overlay.style.display = "block";
+
+            fetch(`/orders/${orderId}/confirm`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('주문 확정이 완료되었습니다.')
+                        location.reload();
+                    } else {
+                        throw new Error('주문 확정 실패');
+                    }
+                })
+                .catch(error => {
+                    alert('오류가 발생했습니다. 다시 시도해주세요.\n' + error.message);
+                })
+                .finally(() => {
+                    // 로딩 오버레이 비 활성
+                    overlay.style.display = "none";
+                });
+
+        }
+
+    }
+
 </script>
 
 <script>
