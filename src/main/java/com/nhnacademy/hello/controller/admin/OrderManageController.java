@@ -6,16 +6,16 @@ import com.nhnacademy.hello.dto.order.*;
 import com.nhnacademy.hello.dto.returns.ReturnsDTO;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/admin/orders")
@@ -25,7 +25,7 @@ public class OrderManageController {
     private final OrderAdapter orderAdapter;
     private final ReturnsAdapter returnsAdapter;
     private final MemberAdapter memberAdapter;
-    private final ReturnsReasonAdapter returnsReasonAdapter;
+    private final OrderStatusAdapter orderStatusAdapter;
 
     @GetMapping
     public String getOrders(@RequestParam(defaultValue = "1") int page,
@@ -33,34 +33,37 @@ public class OrderManageController {
                             @RequestParam(required = false) Long statusId,
                             Model model) {
         List<OrderDTO> orders = List.of();
+        List<OrderStatusDTO> statuses = List.of();
         Long totalOrders = 0L;
 
         try {
+            // 상태 목록 가져오기
+            statuses = orderStatusAdapter.getAllOrderStatus();
+
             if (statusId != null) {
-                // 특정 상태의 주문 목록과 개수 가져오기
+                // 상태 ID에 따른 주문 목록 가져오기
                 orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
                 totalOrders = orderAdapter.countOrdersByStatus(statusId).getBody();
             } else {
-                // 모든 주문 목록과 개수 가져오기
+                // 모든 주문 목록 가져오기
                 orders = orderAdapter.getAllOrders(page - 1).getBody();
                 totalOrders = orderAdapter.getTotalOrderCount().getBody();
             }
 
-            // 주문 목록 처리
-            assert orders != null;
-            orders = orders.stream()
-                    .map(this::processOrderMemberInfo)
-                    .collect(Collectors.toList());
-
         } catch (Exception e) {
-            log.error("Error fetching orders", e);
+            model.addAttribute("statuses", statuses);
+            model.addAttribute("orders", List.of());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", 0);
+            return "admin/orderManage";
         }
 
-        model.addAttribute("orders", orders);
-
         int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
+        model.addAttribute("statuses", statuses);
+        model.addAttribute("orders", orders);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+        model.addAttribute("statusId", statusId);
 
         return "admin/orderManage";
     }
@@ -71,50 +74,45 @@ public class OrderManageController {
         List<OrderBookResponseDTO> books = List.of();
         GuestOrderDTO guestOrder = null;
         String returnsReason = "Unknown";
-        Long returnsReasonId = null;
+        String returnsDetail = "Unknown";
 
         try {
-            // 도서 정보 가져오기
             if (order != null) {
                 OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(orderId);
                 if (orderBooks != null) {
                     books = Arrays.asList(orderBooks);
                 }
 
-                // 반품 사유 및 사유 ID 가져오기
                 String orderStatus = order.orderStatus().orderStatus();
                 if ("RETURN_REQUEST".equalsIgnoreCase(orderStatus) || "RETURNED".equalsIgnoreCase(orderStatus)) {
-                    try {
-                        ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
-                        log.info("Fetched ReturnsDTO: {}", returns);
-
-                        if (returns != null && returns.returnsReason() != null) {
-                            returnsReasonId = returns.returnsReason().returnsReasonId();
+                    ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
+                    if (returns != null) {
+                        if (returns.returnsReason() != null) {
                             returnsReason = returns.returnsReason().returnsReason();
-                        } else {
-                            log.warn("ReturnsDTO does not contain returnsReason for orderId: {}", orderId);
                         }
-                    } catch (FeignException.NotFound e) {
-                        log.warn("Returns not found for orderId: {}", orderId);
+                        if (returns.returnsDetail() != null) {
+                            returnsDetail = returns.returnsDetail();
+                        }
                     }
                 }
 
-                // 회원 정보 처리
                 order = processOrderMemberInfo(order);
             }
         } catch (Exception e) {
-            log.error("Error fetching order details for orderId: {}", orderId, e);
+            // 예외 발생 시 기본 정보를 설정
+            model.addAttribute("order", null);
+            model.addAttribute("books", List.of());
+            model.addAttribute("guestOrder", null);
+            model.addAttribute("returnsReason", "Unknown");
+            model.addAttribute("returnsDetail", "Unknown");
+            return "admin/orderDetail";
         }
 
         model.addAttribute("order", order);
         model.addAttribute("books", books);
         model.addAttribute("guestOrder", guestOrder);
         model.addAttribute("returnsReason", returnsReason);
-        model.addAttribute("returnsReasonId", returnsReasonId);
-
-        log.info("Order Details: {}", order);
-        log.info("Returns Reason: {}", returnsReason);
-        log.info("Returns Reason ID: {}", returnsReasonId);
+        model.addAttribute("returnsDetail", returnsDetail);
 
         return "admin/orderDetail";
     }
@@ -159,5 +157,40 @@ public class OrderManageController {
                 order.addressDetail(),
                 member
         );
+    }
+
+    @PostMapping("/{orderId}/status")
+    @ResponseBody
+    public ResponseEntity<Void> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, Long> request) {
+        try {
+            Long statusId = request.get("statusId");
+            if (statusId == null) {
+                return ResponseEntity.badRequest().build(); // 필수 데이터 누락
+            }
+
+            OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
+            if (order == null) {
+                return ResponseEntity.notFound().build(); // 주문 정보가 없는 경우
+            }
+
+            // OrderRequestDTO 생성
+            OrderRequestDTO updatedOrder = new OrderRequestDTO(
+                    null,
+                    null,
+                    null,
+                    statusId, // 상태 ID
+                    null,
+                    null,
+                    null
+            );
+
+            // 상태 업데이트
+            orderAdapter.updateOrder(orderId, updatedOrder);
+
+            return ResponseEntity.ok().build(); // 성공
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 로그 기록
+            return ResponseEntity.status(500).body(null); // 서버 오류
+        }
     }
 }
