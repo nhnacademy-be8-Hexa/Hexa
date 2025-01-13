@@ -120,12 +120,11 @@ public class OrderController {
 
             // 반품 사유 조회
             ReturnsDTO returnsDTO = returnsAdapter.getReturnsByOrderId(orderId);
-            ReturnsReasonDTO returnsReasonDTO = returnsReasonAdapter.getReturnsReasonById(returnsDTO.returnsReasonId());
 
             // 토스 주문 취소 처리
             ResponseEntity<?> response = tossService.cancelPayment(
                     payment.paymentKey(),
-                    "구매자 반품 신청: " + returnsReasonDTO.returnsReason(),
+                    "구매자 반품 신청: " + returnsDTO.returnsReason().returnsReason(),
                     payment.amount() - 3000 // 배송비 제외한 금액 환불
             );
 
