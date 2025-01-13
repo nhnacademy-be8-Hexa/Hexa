@@ -6,7 +6,6 @@ import com.nhnacademy.hello.dto.order.*;
 import com.nhnacademy.hello.dto.returns.ReturnsDTO;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/admin/orders")
@@ -37,27 +35,26 @@ public class OrderManageController {
 
         try {
             if (statusId != null) {
-                // 특정 상태의 주문 목록과 개수 가져오기
                 orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
                 totalOrders = orderAdapter.countOrdersByStatus(statusId).getBody();
             } else {
-                // 모든 주문 목록과 개수 가져오기
                 orders = orderAdapter.getAllOrders(page - 1).getBody();
                 totalOrders = orderAdapter.getTotalOrderCount().getBody();
             }
 
-            // 주문 목록 처리
-            assert orders != null;
             orders = orders.stream()
                     .map(this::processOrderMemberInfo)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
-            log.error("Error fetching orders", e);
+            // 예외 발생 시에도 UI에 빈 리스트와 기본 정보를 제공
+            model.addAttribute("orders", List.of());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", 0);
+            return "admin/orderManage";
         }
 
         model.addAttribute("orders", orders);
-
         int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
@@ -71,50 +68,45 @@ public class OrderManageController {
         List<OrderBookResponseDTO> books = List.of();
         GuestOrderDTO guestOrder = null;
         String returnsReason = "Unknown";
-        Long returnsReasonId = null;
+        String returnsDetail = "Unknown";
 
         try {
-            // 도서 정보 가져오기
             if (order != null) {
                 OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(orderId);
                 if (orderBooks != null) {
                     books = Arrays.asList(orderBooks);
                 }
 
-                // 반품 사유 및 사유 ID 가져오기
                 String orderStatus = order.orderStatus().orderStatus();
                 if ("RETURN_REQUEST".equalsIgnoreCase(orderStatus) || "RETURNED".equalsIgnoreCase(orderStatus)) {
-                    try {
-                        ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
-                        log.info("Fetched ReturnsDTO: {}", returns);
-
-                        if (returns != null && returns.returnsReason() != null) {
-                            returnsReasonId = returns.returnsReason().returnsReasonId();
+                    ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
+                    if (returns != null) {
+                        if (returns.returnsReason() != null) {
                             returnsReason = returns.returnsReason().returnsReason();
-                        } else {
-                            log.warn("ReturnsDTO does not contain returnsReason for orderId: {}", orderId);
                         }
-                    } catch (FeignException.NotFound e) {
-                        log.warn("Returns not found for orderId: {}", orderId);
+                        if (returns.returnsDetail() != null) {
+                            returnsDetail = returns.returnsDetail();
+                        }
                     }
                 }
 
-                // 회원 정보 처리
                 order = processOrderMemberInfo(order);
             }
         } catch (Exception e) {
-            log.error("Error fetching order details for orderId: {}", orderId, e);
+            // 예외 발생 시 기본 정보를 설정
+            model.addAttribute("order", null);
+            model.addAttribute("books", List.of());
+            model.addAttribute("guestOrder", null);
+            model.addAttribute("returnsReason", "Unknown");
+            model.addAttribute("returnsDetail", "Unknown");
+            return "admin/orderDetail";
         }
 
         model.addAttribute("order", order);
         model.addAttribute("books", books);
         model.addAttribute("guestOrder", guestOrder);
         model.addAttribute("returnsReason", returnsReason);
-        model.addAttribute("returnsReasonId", returnsReasonId);
-
-        log.info("Order Details: {}", order);
-        log.info("Returns Reason: {}", returnsReason);
-        log.info("Returns Reason ID: {}", returnsReasonId);
+        model.addAttribute("returnsDetail", returnsDetail);
 
         return "admin/orderDetail";
     }

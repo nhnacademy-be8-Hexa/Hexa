@@ -10,8 +10,6 @@ import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class AdminPageController {
-    private static final Logger logger = LoggerFactory.getLogger(AdminPageController.class);
 
     private final MemberAdapter memberAdapter;
     private final BookAdapter bookAdapter;
@@ -34,7 +31,6 @@ public class AdminPageController {
     public String adminPage(@RequestParam(defaultValue = "1") int page,
                             @RequestParam(defaultValue = "10") int pageSize,
                             Model model) {
-        // 관리자 인증
         if (!AuthInfoUtils.isLogin()) {
             return "redirect:/login";
         }
@@ -45,7 +41,6 @@ public class AdminPageController {
         }
         model.addAttribute("member", adminMember);
 
-        // 가장 많이 방문한 도서 Top 5 조회
         List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null);
         Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
         Map<Long, Long> bookLikesMap = new HashMap<>();
@@ -62,10 +57,7 @@ public class AdminPageController {
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
         model.addAttribute("bookLikesMap", bookLikesMap);
 
-        // 주문 대기 목록 추가
         addOrderDataToModel(page, pageSize, "waitOrders", 1L, model);
-
-        // 환불 대기 목록 추가
         addOrderDataToModel(page, pageSize, "returnOrders", 6L, model);
 
         return "admin/adminPage";
@@ -74,24 +66,18 @@ public class AdminPageController {
     private void addOrderDataToModel(
             int page, int pageSize, String attributeName, Long statusId, Model model) {
         try {
-            // 상태별 주문 목록 가져오기
             List<OrderDTO> orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
-
-            // 상태별 총 개수 가져오기
             Long totalCount = orderAdapter.countOrdersByStatus(statusId).getBody();
 
-            // 페이징 계산
             int totalPages = (int) Math.ceil((double) totalCount / pageSize);
             int currentPage = Math.min(Math.max(page, 1), totalPages);
 
-            // 상세 정보 구성
             List<Map<String, Object>> enrichedOrders = enrichOrderDetails(orders);
 
             model.addAttribute(attributeName, enrichedOrders);
             model.addAttribute(attributeName + "CurrentPage", currentPage);
             model.addAttribute(attributeName + "TotalPages", totalPages);
         } catch (Exception e) {
-            logger.error(attributeName + " 데이터를 가져오는 중 오류 발생", e);
             model.addAttribute(attributeName, List.of());
             model.addAttribute(attributeName + "CurrentPage", 1);
             model.addAttribute(attributeName + "TotalPages", 0);
@@ -103,7 +89,6 @@ public class AdminPageController {
             Map<String, Object> orderDetails = new HashMap<>();
             orderDetails.put("order", order);
 
-            // 회원 정보 처리
             OrderDTO.MemberDTO member = order.member();
             if (member == null || "Unknown".equals(member.memberId())) {
                 try {
@@ -131,7 +116,6 @@ public class AdminPageController {
             }
             orderDetails.put("member", member);
 
-            // 도서 정보 처리
             try {
                 OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(order.orderId());
                 orderDetails.put("books", Arrays.asList(orderBooks));
