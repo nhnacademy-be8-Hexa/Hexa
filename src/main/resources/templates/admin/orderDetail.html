@@ -85,17 +85,13 @@
                  'text-dark'}">
           </td>
         </tr>
-        <tr th:if="${returnsReason != null}">
+        <tr th:if="${order.orderStatus.orderStatus == 'RETURN_REQUEST' || order.orderStatus.orderStatus == 'RETURNED'}">
           <th>반품 사유</th>
-          <td th:text="${returnsReason}"></td>
+          <td th:text="${returnsReason ?: 'Unknown'}"></td>
         </tr>
-        <tr th:if="${returnsReasonId != null}">
-          <th>반품 사유 ID</th>
-          <td th:text="${returnsReasonId}"></td>
-        </tr>
-        <tr>
-          <th>총 금액</th>
-          <td th:text="${order.orderPrice}"></td>
+        <tr th:if="${order.orderStatus.orderStatus == 'RETURN_REQUEST' || order.orderStatus.orderStatus == 'RETURNED'}">
+          <th>반품 상세</th>
+          <td th:text="${returnsDetail ?: 'Unknown'}"></td>
         </tr>
         <tr>
           <th>포장 여부</th>
