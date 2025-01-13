@@ -7,6 +7,7 @@ import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
 import lombok.AllArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,8 @@ public class EventController {
     private final CouponMemberAdapter couponMemberAdapter;
     private final MemberAdapter memberAdapter;
     private final CouponAdapter couponAdapter;
+    private final RabbitTemplate rabbitTemplate;
+    private final CouponConsumer couponGet;
 
     @GetMapping("/event")
     public String Event(Model model){
@@ -38,15 +41,13 @@ public class EventController {
 
         MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
 
-        List<CouponDTO> coupon = couponAdapter.getCouponByCouponName("test");
+        // 쿠폰 발급 요청 메시지 생성
+        String couponRequestMessage = member.memberId();
 
-        for (CouponDTO couponDTO : coupon) {
-            if (!couponMemberAdapter.isCouponAlreadyAssigned(couponDTO.couponId(), member.memberId())
-                    && !couponMemberAdapter.checkCouponDuplicate(couponDTO.couponId())) {
-                couponMemberAdapter.createMemberCoupon(member.memberId(), couponDTO.couponId());
-                break; // 한 개만 발급되도록 루프 종료
-            }
-        }
+        // 쿠폰 발급 요청을 메시지 큐에 전송
+        rabbitTemplate.convertAndSend("hexa.coupon.exchanges","hexa.coupon.binding", couponRequestMessage);
+
+        couponGet.couponGet();
 
         return "/event/event";
     }
