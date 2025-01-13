@@ -3,87 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hexa Books</title>
+    <title th:text="#{categoryBooks.page.title}">Hexa Books</title>
 
-    <!-- 외부 CSS 파일 링크 -->
     <link rel="stylesheet" href="/css/styles.css">
 
     <script>
         // 책을 클릭 시 상세 페이지로 이동
         function goToBookPage(bookId) {
-            window.location.href = '/book/' + bookId; // bookId를 URL에 붙여서 상세 페이지로 이동
+            window.location.href = '/book/' + bookId;
         }
     </script>
 </head>
 <body>
 
 <div class="container">
-    <!-- 헤더 포함 -->
-    <!--    <div th:replace="~{fragments/header :: header}"></div>-->
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <!-- 검색 결과 -->
     <section>
-        <h2 class="section-title">검색 결과</h2>
+        <h2 class="section-title" th:text="#{categoryBooks.search.result}">검색 결과</h2>
 
-        <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
         <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
-            <p>카테고리에 포함된 도서가 없습니다.</p>
+            <p th:text="#{categoryBooks.search.empty}">카테고리에 포함된 도서가 없습니다.</p>
         </div>
 
         <div class="book-list">
             <div class="book-item clickable-book"
                  th:each="book : ${searchBooksWithImages}"
                  th:data-book-id="${book.bookId()}">
-                <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
+                <img th:src="${book.imagePath()}"
+                     th:alt="|${book.bookTitle()} #{categoryBooks.book.imageAlt}|">
                 <div class="book-title"
                      th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
-                    책 제목
+                    <span th:text="#{categoryBooks.book.title}">책 제목</span>
                 </div>
             </div>
         </div>
-
     </section>
 
-    <!-- 페이징 네비게이션 -->
     <nav aria-label="Page navigation example" th:if="${totalPages > 0}">
         <div class="pagination justify-content-center">
-            <!-- 이전 페이지 버튼 -->
-            <span class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/categories/books'(page=${currentPage - 1 > 0 ? currentPage - 1 : 1}, categoryId=${categoryId})}"
-                   aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </span>
+      <span class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{'/categories/books'(page=${currentPage - 1 > 0 ? currentPage - 1 : 1}, categoryId=${categoryId})}"
+           th:attr="aria-label=#{categoryBooks.pagination.previous}">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </span>
 
-            <!-- 페이지 번호 -->
             <span class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
                   th:classappend="${i eq currentPage} ? 'active'">
-                <a class="page-link" th:text="${i}"
-                   th:href="@{'/categories/books'(page=${i}, categoryId=${categoryId})}">${i}</a>
-            </span>
+        <a class="page-link" th:text="${i}"
+           th:href="@{'/categories/books'(page=${i}, categoryId=${categoryId})}">${i}</a>
+      </span>
 
-            <!-- 다음 페이지 버튼 -->
             <span class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{'/categories/books'(page=${currentPage + 1 <= totalPages ? currentPage + 1 : totalPages}, categoryId=${categoryId})}"
-                   aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </span>
+        <a class="page-link"
+           th:href="@{'/categories/books'(page=${currentPage + 1 <= totalPages ? currentPage + 1 : totalPages}, categoryId=${categoryId})}"
+           th:attr="aria-label=#{categoryBooks.pagination.next}">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </span>
         </div>
     </nav>
 
-    <!-- 풋터 포함 -->
-    <!--    <div th:replace="~{fragments/footer :: footer}"></div>-->
     <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var accessDeniedMsg = /*[[#{categoryBooks.error.accessDenied}]]*/ "접근 권한이 없습니다";
 
-<script>
     window.onload = function () {
-        // 책 아이템 클릭 이벤트 핸들러
+        const urlParams = new URLSearchParams(window.location.search);
+        const clearLocalCart = urlParams.get('clearLocalCart');
+        const errorMessage = urlParams.get('error');
+
+        if (clearLocalCart === 'true') {
+            localStorage.removeItem("cart");
+        }
+
+        if (errorMessage === 'access_denied') {
+            alert(accessDeniedMsg);
+        }
+
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        history.replaceState(null, null, newUrl);
+
         document.querySelectorAll('.clickable-book').forEach(bookItem => {
             bookItem.addEventListener('click', function () {
                 const bookId = this.dataset.bookId;
@@ -91,6 +96,7 @@
             });
         });
     };
+    /*]]>*/
 </script>
 
 </body>
