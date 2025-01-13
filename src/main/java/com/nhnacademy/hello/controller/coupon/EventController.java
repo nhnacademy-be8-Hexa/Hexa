@@ -27,7 +27,7 @@ public class EventController {
 
     @GetMapping("/event")
     public String Event(Model model){
-        return"/event/event";
+        return"event/event";
     }
 
     @PostMapping("/coupon-get")
@@ -49,6 +49,6 @@ public class EventController {
 
         couponGet.couponGet();
 
-        return "/event/event";
+        return "event/event";
     }
 }
