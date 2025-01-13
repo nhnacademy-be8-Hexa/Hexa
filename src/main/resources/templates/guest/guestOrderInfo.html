@@ -68,9 +68,11 @@
                     <p>
                         <strong>주문 상태:</strong>
                         <span th:text="${order.orderStatus.orderStatus()}"
-                              th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                              th:class="${order.orderStatus.orderStatusId == 2 or
+                 order.orderStatus.orderStatusId == 6 ? 'text-warning' :
                  order.orderStatus.orderStatusId == 3 ? 'text-success' :
-                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 (order.orderStatus.orderStatusId == 4 or
+                 order.orderStatus.orderStatusId == 5) ? 'text-danger' :
                  'text-dark'}">
                         </span>
                     </p>
@@ -83,7 +85,7 @@
 
                     <!-- 주문 상태가 3일 경우 (반품 버튼) -->
                     <div th:if="${order.orderStatus.orderStatusId == 3}">
-                        <button class="btn btn-warning" onclick="openReturnModal()">반품하기</button>
+                        <button class="btn btn-warning" onclick="openReturnModal()">반품 신청</button>
                     </div>
 
                     <!-- 플로팅 모달 (반품 사유 선택 및 상세 입력) -->
@@ -227,7 +229,7 @@
         }
 
         // POST 요청 보내기
-        fetch(`/orders/${orderId}/return`, {
+        fetch(`/orders/${orderId}/return-request`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -240,10 +242,10 @@
             .then(response => {
                 // 응답이 성공적이면 JSON 형태로 변환
                 if (response.ok) {
-                    alert('반품 요청이 완료되었습니다.')
+                    alert('반품 신청이 완료되었습니다.')
                     location.reload();
                 } else {
-                    throw new Error('반품 요청에 실패했습니다.');
+                    throw new Error('반품 신청 실패');
                 }
             })
             .catch(error => {
