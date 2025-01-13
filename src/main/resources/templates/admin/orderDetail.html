@@ -74,6 +74,14 @@
           <th>주문 상태</th>
           <td th:text="${order.orderStatus.orderStatus}"></td>
         </tr>
+        <tr th:if="${returnsReason != null}">
+          <th>반품 사유</th>
+          <td th:text="${returnsReason}"></td>
+        </tr>
+        <tr th:if="${returnsReasonId != null}">
+          <th>반품 사유 ID</th>
+          <td th:text="${returnsReasonId}"></td>
+        </tr>
         <tr>
           <th>총 금액</th>
           <td th:text="${order.orderPrice}"></td>
@@ -98,10 +106,17 @@
                 th:attr="onclick=|updateOrderStatus('${order.orderId}', 'COMPLETE')|">
           주문완료
         </button>
+        <!-- 반품 승인 버튼 -->
+        <button th:if="${order.orderStatus.orderStatus == 'RETURN_REQUEST'}"
+                class="btn btn-warning"
+                th:attr="onclick=|approveReturn('${order.orderId}')|">
+          반품 승인
+        </button>
         <!-- 목록으로 돌아가기 버튼 -->
         <button class="btn btn-secondary" onclick="window.location.href='/admin/orders';">
           목록으로 돌아가기
         </button>
+
       </div>
     </div>
   </div>
@@ -130,4 +145,23 @@
               alert('서버와의 통신 중 오류가 발생했습니다.');
             });
   }
+  function approveReturn(orderId) {
+    fetch(`/admin/orders/${orderId}/approve-return`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+            .then(response => {
+              if (response.ok) {
+                alert('반품이 승인되었습니다.');
+                window.location.reload();
+              } else {
+                alert('반품 승인에 실패했습니다.');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('서버와의 통신 중 오류가 발생했습니다.');
+            });
+  }
+
 </script>
