@@ -19,16 +19,17 @@
 
     <div class="container">
         <h1>쿠폰 발급 페이지</h1>
-        <form method="post" action="/coupon">
+        <form method="post" action="/coupon-get">
             <button type="submit" id="couponButton">쿠폰 발급받기</button>
         </form>
+        <div id="couponMessage" style="margin-top: 10px; color: green;"></div>
     </div>
 
     <script>
         document.getElementById('couponButton').addEventListener('click', function() {
             // 쿠폰 발급 메시지 표시
             const messageDiv = document.getElementById('couponMessage');
-            messageDiv.textContent = "쿠폰이 발급되었습니다! 쿠폰 코드: COUPON2025";
+            messageDiv.textContent = "쿠폰이 발급되었습니다!";
         });
     </script>
 
