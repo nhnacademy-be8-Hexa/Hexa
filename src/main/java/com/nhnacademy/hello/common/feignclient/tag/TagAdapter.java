@@ -39,6 +39,7 @@ public interface TagAdapter {
     @GetMapping("admin/tags/count")
     public ResponseEntity<Long> getTotalTags();
 
-
+    @GetMapping("/tags/{tagId}")
+    public ResponseEntity<TagDTO> getTagById(@PathVariable Long tagId);
 
 }

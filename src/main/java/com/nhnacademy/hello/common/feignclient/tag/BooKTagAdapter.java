@@ -12,18 +12,21 @@ import java.util.List;
 public interface BooKTagAdapter {
 
     @PostMapping("/admin/books/{bookId}/tags/{tagId}")
-    public ResponseEntity<Void> addBookTag(@PathVariable Long bookId, @PathVariable Long tagId);
+    ResponseEntity<Void> addBookTag(@PathVariable Long bookId, @PathVariable Long tagId);
 
     @GetMapping("/books/{bookId}/tags")
-    public ResponseEntity<List<TagDTO>> getTagsByBook(@PathVariable Long bookId);
+    ResponseEntity<List<TagDTO>> getTagsByBook(@PathVariable Long bookId);
 
     @GetMapping("/tags/{tagId}/books")
-    public ResponseEntity<List<BookDTO>> getBooksByTag(@PathVariable Long tagId,
+    ResponseEntity<List<BookDTO>> getBooksByTag(@PathVariable Long tagId,
                                                        @RequestParam("page") int page,
                                                        @RequestParam("size") int size,
                                                        @RequestParam("sort") String sort);
 
     @DeleteMapping("/admin/books/{bookId}/tags/{tagId}")
-    public ResponseEntity<Void> deleteBookTag(@PathVariable Long bookId, @PathVariable Long tagId);
+    ResponseEntity<Void> deleteBookTag(@PathVariable Long bookId, @PathVariable Long tagId);
+
+    @GetMapping("/tags/{tagId}/books/count")
+    ResponseEntity<Integer> getBookCountByTag(@PathVariable Long tagId);
 
 }
