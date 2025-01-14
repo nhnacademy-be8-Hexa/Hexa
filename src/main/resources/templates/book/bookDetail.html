@@ -157,9 +157,11 @@
     </div>
 
     <!-- 태그 섹션 -->
-    <ul class="list-group mt-4 tag-list">
-        <li class="list-group-item" th:each="tag : ${assignedTags}">
-            <span th:text="${tag.tagName}">태그 이름</span>
+    <ul class="list-group mt-4 tag-list list-group-horizontal flex-wrap">
+        <li class="list-group-item px-2 py-1" th:each="tag : ${assignedTags}">
+            <a th:href="@{'/tag/' + ${tag.tagId}}" class="text-decoration-none">
+                <span th:text="${tag.tagName}">태그 이름</span>
+            </a>
         </li>
     </ul>
 
