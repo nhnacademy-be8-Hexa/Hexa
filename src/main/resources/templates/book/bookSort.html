@@ -24,9 +24,13 @@
 
   <!-- 검색 결과 -->
   <section>
-    <h2 class="section-title">검색 결과</h2>
 
-    <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
+      <h2 class="section-title"
+          th:text="${tagName != null} ? '# ' + ${tagName} : '검색 결과'">
+          검색 결과
+      </h2>
+
+      <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
     <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
       <p>검색 결과가 없습니다.</p>
     </div>
