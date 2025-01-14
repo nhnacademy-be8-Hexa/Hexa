@@ -4,21 +4,30 @@ import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
 import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
 import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
-import com.nhnacademy.hello.dto.book.*;
+import com.nhnacademy.hello.dto.book.BookDTO;
+import com.nhnacademy.hello.dto.book.BookRequestDTO;
+import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
+import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
+import com.nhnacademy.hello.dto.book.PublisherRequestDTO;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
+import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.image.ImageStore;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin/bookManage")
@@ -30,7 +39,9 @@ public class BookManageController {
     private final CategoryAdapter categoryAdapter;
 
     @Autowired
-    public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter, BookStatusAdapter bookStatusAdapter, ImageStore imageStore, CategoryAdapter categoryAdapter) {
+    public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter,
+                                BookStatusAdapter bookStatusAdapter, ImageStore imageStore,
+                                CategoryAdapter categoryAdapter) {
         this.bookAdapter = bookAdapter;
         this.publisherAdapter = publisherAdapter;
         this.bookStatusAdapter = bookStatusAdapter;
@@ -153,7 +164,8 @@ public class BookManageController {
      * @return 도서 목록 페이지로 리다이렉트
      */
     @PostMapping("/add")
-    public String addBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO, BindingResult bindingResult, Model model) {
+    public String addBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO,
+                          BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             // 출판사 목록과 카테고리 목록을 다시 모델에 추가
             List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
@@ -208,14 +220,17 @@ public class BookManageController {
             return "redirect:/admin/bookManage/bookManage";
         }
 
+
         // BookDTO를 BookUpdateRequestDTO로 매핑
         BookUpdateRequestDTO bookUpdateRequestDTO = new BookUpdateRequestDTO(
                 book.bookTitle(),
                 book.bookDescription(),
                 book.bookPrice(),
                 book.bookWrappable(),
-                book.bookStatus().bookStatusId().toString()
+                book.bookStatus().bookStatusId().toString(),
+                new ArrayList<>()
         );
+
         List<BookStatusRequestDTO> bookStatuses = bookStatusAdapter.getBookStatus(bookId.toString());
 
         model.addAttribute("bookUpdateRequestDTO", bookUpdateRequestDTO);
@@ -226,6 +241,20 @@ public class BookManageController {
         // 출판사 목록 추가 (선택 사항)
         List<PublisherRequestDTO> publishers = publisherAdapter.getPublishers();
         model.addAttribute("publishers", publishers);
+
+        // 카테고리 목록 불러오기
+        ResponseEntity<List<CategoryDTO>> categoriesResponse = categoryAdapter.getCategories();
+        if (categoriesResponse.getStatusCode().is2xxSuccessful()) {
+            model.addAttribute("categories", categoriesResponse.getBody());
+        } else {
+            model.addAttribute("categories", List.of());
+        }
+
+        List<PagedCategoryDTO> selectedCategories = categoryAdapter.getAllCategoriesByBookId(bookId).getBody();
+        List<Long> selectedCategoryIds = selectedCategories != null ? selectedCategories.stream()
+                .map(PagedCategoryDTO::getCategoryId)
+                .toList() : List.of();
+        model.addAttribute("selectedCategoryIds", selectedCategoryIds);
 
         return "admin/bookEditForm"; // 도서 수정 폼 템플릿
     }
@@ -244,9 +273,56 @@ public class BookManageController {
             List<BookStatusRequestDTO> bookStatuses = bookStatusAdapter.getBookStatus(bookId.toString());
             model.addAttribute("bookStatuses", bookStatuses);
 
+            ResponseEntity<List<CategoryDTO>> categoriesResponse = categoryAdapter.getCategories();
+            if (categoriesResponse.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("categories", categoriesResponse.getBody());
+            } else {
+                model.addAttribute("categories", List.of());
+            }
+
+            List<PagedCategoryDTO> selectedCategories = categoryAdapter.getAllCategoriesByBookId(bookId).getBody();
+            List<Long> selectedCategoryIds = selectedCategories != null ? selectedCategories.stream()
+                    .map(PagedCategoryDTO::getCategoryId)
+                    .toList() : List.of();
+            model.addAttribute("selectedCategoryIds", selectedCategoryIds);
+
             return "admin/bookEditForm";
         }
 
+        List<PagedCategoryDTO> currentCategories = categoryAdapter.getAllCategoriesByBookId(bookId).getBody();
+        List<Long> currentCategoryIds = currentCategories != null ? currentCategories.stream()
+                .map(PagedCategoryDTO::getCategoryId)
+                .toList() : List.of();
+
+        List<Long> updatedCategoryIds = Optional.ofNullable(bookUpdateRequestDTO.categoryIds())
+                .orElse(List.of());
+
+
+        // 추가해야 할 카테고리들 (현재 카테고리 목록에 없는 것들)
+        List<Long> categoriesToAdd = updatedCategoryIds.stream()
+                .filter(categoryId -> !currentCategoryIds.contains(categoryId))
+                .toList();
+
+        // 삭제해야 할 카테고리들 (현재 카테고리 목록에 있지만, DTO에 없는 것들)
+        List<Long> categoriesToRemove = currentCategoryIds.stream()
+                .filter(categoryId -> !updatedCategoryIds.contains(categoryId))
+                .toList();
+
+        // 카테고리 추가 로직 (추가해야 할 카테고리가 있을 때만)
+        if (!categoriesToAdd.isEmpty()) {
+            for (Long categoryId : categoriesToAdd) {
+                categoryAdapter.insertBook(categoryId, bookId);
+            }
+        }
+
+        // 카테고리 삭제 로직 (삭제해야 할 카테고리가 있을 때만)
+        if (!categoriesToRemove.isEmpty()) {
+            for (Long categoryId : categoriesToRemove) {
+                categoryAdapter.deleteByCategoryIdAndBookId(categoryId, bookId);
+            }
+        }
+
+        
         bookAdapter.updateBook(bookId, bookUpdateRequestDTO);
         return "redirect:/admin/bookManage";
     }

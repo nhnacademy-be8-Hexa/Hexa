@@ -49,6 +49,6 @@ public class EventController {
 
         couponGet.couponGet();
 
-        return "event/event";
+        return "redirect:/event";
     }
 }

@@ -1,9 +1,10 @@
 package com.nhnacademy.hello.controller.book;
 
-import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
 import com.nhnacademy.hello.common.feignclient.LikeAdapter;
 import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.MemberReportAdapter;
 import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
 import com.nhnacademy.hello.common.feignclient.PointPolicyAdapter;
 import com.nhnacademy.hello.common.feignclient.ReviewAdapter;
@@ -52,6 +53,7 @@ public class BookController {
     private final PointPolicyAdapter pointPolicyAdapter;
     private final LikeAdapter likeAdapter;
     private final MemberAdapter memberAdapter;
+    private final CategoryAdapter categoryAdapter;
 
     @GetMapping("/book/{bookId}")
     public String bookDetail(
@@ -384,7 +386,7 @@ public class BookController {
             ResponseEntity<Void> response = memberReportAdapter.saveMemberReport(memberId, reviewId);
             if (response.getStatusCode() == HttpStatus.CREATED) {
                 redirectAttributes.addFlashAttribute("reportSuccess", "리뷰가 성공적으로 신고되었습니다.");
-            } else if(response.getStatusCode().is4xxClientError()) {
+            } else if (response.getStatusCode().is4xxClientError()) {
                 redirectAttributes.addFlashAttribute("submissionError", "이미 신고된 리뷰입니다.");
             } else {
                 redirectAttributes.addFlashAttribute("submissionError", "리뷰 신고에 실패했습니다.");

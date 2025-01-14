@@ -70,6 +70,10 @@
                         <form action="/admin/categoryManage/add" method="post">
                             <!-- 카테고리 ID를 hidden input으로 전송 -->
                             <input type="hidden" name="subCategoryId" th:value="${category.categoryId}">
+
+                            <input type="hidden" name="parentCategoryId"
+                                   th:value="${category.parentCategory != null ? category.parentCategory.categoryId : ''}">
+
                             <!-- 드롭다운에서 선택된 부모 카테고리 ID는 자동으로 전송됨 -->
                             <div class="d-flex align-items-center">
 

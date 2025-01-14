@@ -93,7 +93,8 @@
                 <div class="mb-3">
                     <label for="bookPubDate" class="form-label">출판일자:</label>
                     <input type="date" id="bookPubDate" name="bookPubDate" class="form-control"
-                           th:field="*{bookPubDate}"/>
+                           th:field="*{bookPubDate}"
+                           th:max="${T(java.time.LocalDate).now()}"/>
                     <div class="text-danger" th:if="${#fields.hasErrors('bookPubDate')}"
                          th:errors="*{bookPubDate}">출판일자 오류</div>
                 </div>

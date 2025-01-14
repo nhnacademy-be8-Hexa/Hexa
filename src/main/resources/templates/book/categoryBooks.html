@@ -56,7 +56,7 @@
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </span>
-
+            
             <!-- 페이지 번호 -->
             <span class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
                   th:classappend="${i eq currentPage} ? 'active'">
