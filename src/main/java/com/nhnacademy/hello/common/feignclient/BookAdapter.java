@@ -26,7 +26,7 @@ public interface BookAdapter {
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort,
-            
+
             //도서 제목으로 검색
             @RequestParam(required = false) String search,
             //카테고리(아이디)로 검색

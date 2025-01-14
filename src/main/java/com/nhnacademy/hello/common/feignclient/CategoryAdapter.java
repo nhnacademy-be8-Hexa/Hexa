@@ -58,6 +58,10 @@ public interface CategoryAdapter {
             @PathVariable("bookId") Long bookId
     );
 
+
+    @PostMapping("/{categoryId}/books")
+    ResponseEntity<Void> insertBooks(@PathVariable Long categoryId, @RequestBody List<Long> books);
+    
     @DeleteMapping("/{categoryId}/books/{bookId}")
     ResponseEntity<Void> deleteByCategoryIdAndBookId(@PathVariable Long categoryId,
                                                      @PathVariable Long bookId);
@@ -100,9 +104,15 @@ public interface CategoryAdapter {
     @DeleteMapping("/{categoryId}")
     ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId);
 
+
+    @DeleteMapping("/{categoryId}/books")
+    public ResponseEntity<Void> deleteByCategoryIdAndBookIds(@PathVariable Long categoryId,
+                                                             @RequestParam List<Long> bookIds);
+
     // bookId로 해당 책의 카테고리 리스트 조회
     @GetMapping("/books/{bookId}")
     ResponseEntity<List<PagedCategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
+
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<List<BookDTO>> getAllBooksByCategoryId(@PathVariable Long categoryId);
