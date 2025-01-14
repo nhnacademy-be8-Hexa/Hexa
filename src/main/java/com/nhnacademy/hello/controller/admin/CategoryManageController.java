@@ -2,12 +2,14 @@ package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
+import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.category.SecondCategoryRequestDTO;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,7 +68,7 @@ public class CategoryManageController {
 
 
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
-        SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
+        SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null, null);
 
 
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
@@ -87,11 +89,28 @@ public class CategoryManageController {
         return "redirect:/admin/categoryManage";
     }
 
+
     @PostMapping("/add")
     public String createSecondCategory(
             @Valid @ModelAttribute("secondCategoryRequestDTO") SecondCategoryRequestDTO secondCategoryRequestDTO) {
-        categoryAdapter.insertCategory(secondCategoryRequestDTO.categoryId(), secondCategoryRequestDTO.subCategoryId());
 
+        // 사용자가 선택한 카테고리와 연결 되어있는 모든 책들의 ID를 조회
+        List<BookDTO> books =
+                categoryAdapter.getAllBooksByCategoryId(secondCategoryRequestDTO.subCategoryId()).getBody();
+        List<Long> bookIds = books.stream().map(BookDTO::bookId).toList();
+
+        // 원래 부모 카테고리가 존재한다면, 해당 카테고리와 연결된 책들의 관계를 삭제
+        if (Objects.nonNull(secondCategoryRequestDTO.parentCategoryId())) {
+            categoryAdapter.deleteByCategoryIdAndBookIds(secondCategoryRequestDTO.parentCategoryId(), bookIds);
+        }
+
+        // 새로 지정된 부모 카테고리가 선택되었다면, 책들과 새 부모 카테고리 간의 관계를 생성
+        if (!secondCategoryRequestDTO.categoryId().equals(0L)) {
+            categoryAdapter.insertBooks(secondCategoryRequestDTO.categoryId(), bookIds);
+        }
+
+        categoryAdapter.insertCategory(secondCategoryRequestDTO.categoryId(), secondCategoryRequestDTO.subCategoryId());
+        
         return "redirect:/admin/categoryManage";
     }
 
