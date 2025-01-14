@@ -53,11 +53,13 @@
                             <td th:text="${order.orderPrice()}"> </td>
                             <td th:text="${#temporals.format(order.orderedAt(), 'yyyy-MM-dd HH:mm:ss')}"> </td>
                             <td th:text="${order.orderStatus().orderStatus()}"
-                                th:class="${order.orderStatus.orderStatusId == 2 ? 'text-warning' :
+                                th:class="${order.orderStatus.orderStatusId == 2 or
+                 order.orderStatus.orderStatusId == 6 ? 'text-warning' :
                  order.orderStatus.orderStatusId == 3 ? 'text-success' :
-                 (order.orderStatus.orderStatusId == 4 or order.orderStatus.orderStatusId == 5) ? 'text-danger' :
-                 'text-dark'}"
-                            > </td>
+                 (order.orderStatus.orderStatusId == 4 or
+                 order.orderStatus.orderStatusId == 5) ? 'text-danger' :
+                 order.orderStatus.orderStatusId == 7 ? 'text-primary' :
+                 'text-dark'}"> </td>
                             <td th:text="${order.address()}"> </td>
                             <td th:text="${order.addressDetail()}"> </td>
                             <td th:text="${order.wrappingPaper() != null ? order.wrappingPaper().wrappingPaperName() : '없음'}"> </td>

@@ -6,23 +6,31 @@ import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
+import lombok.AllArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
+
 @Controller
+@AllArgsConstructor
 public class EventController {
 
-    private CouponMemberAdapter couponMemberAdapter;
-    private MemberAdapter memberAdapter;
+    private final CouponMemberAdapter couponMemberAdapter;
+    private final MemberAdapter memberAdapter;
+    private final CouponAdapter couponAdapter;
+    private final RabbitTemplate rabbitTemplate;
+    private final CouponConsumer couponGet;
 
     @GetMapping("/event")
     public String Event(Model model){
-        return"/event/event";
+        return"event/event";
     }
 
-    @PostMapping("/admin/coupon")
+    @PostMapping("/coupon-get")
     public String issueCoupon(Model model) {
 
         // 먼저 로그인했는지 검사
@@ -31,11 +39,16 @@ public class EventController {
             return "redirect:/login";
         }
 
-        // 현재 로그인된 아이디를 이용해서 api 로부터 멤버 정보 받아옴
         MemberDTO member = memberAdapter.getMember(AuthInfoUtils.getUsername());
 
-        couponMemberAdapter.createMemberCoupon(member.memberId(),  1l);
+        // 쿠폰 발급 요청 메시지 생성
+        String couponRequestMessage = member.memberId();
 
-        return "/event/event"; // 결과를 다시 보여줄 뷰
+        // 쿠폰 발급 요청을 메시지 큐에 전송
+        rabbitTemplate.convertAndSend("hexa.coupon.exchanges","hexa.coupon.binding", couponRequestMessage);
+
+        couponGet.couponGet();
+
+        return "redirect:/event";
     }
 }

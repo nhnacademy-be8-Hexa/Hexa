@@ -22,6 +22,10 @@ public interface CouponAdapter {
             @RequestParam(name = "active", required = false, defaultValue = "true") Boolean active
     );
 
+    // 쿠폰 이름으로 조회
+    @GetMapping("/api/coupons/{couponName}/name")
+    List<CouponDTO> getCouponByCouponName(@PathVariable(name = "couponName") String couponName);
+
     // 쿠폰 생성
     @PostMapping("/api/coupons")
     List<CouponDTO> createCoupons(
