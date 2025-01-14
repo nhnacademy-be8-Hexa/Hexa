@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>휴면 계정 인증</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{dormancy.page.title}">휴면 계정 인증</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <style>
         /* 공통 스타일 유지 */
         .auth-btn {
-            background-color: #007BFF; /* 파란색 버튼 */
+            background-color: #007BFF;
             color: white;
             font-weight: bold;
             border: none;
@@ -22,6 +22,7 @@
             position: relative;
         }
     </style>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
 <div class="container">
@@ -32,7 +33,7 @@
     <main class="d-flex justify-content-center align-items-center vh-50 bg-light">
         <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
             <form method="post" action="/login/verify">
-                <h1 class="h3 mb-3 fw-normal text-center">휴면 계정 인증</h1>
+                <h1 class="h3 mb-3 fw-normal text-center" th:text="#{dormancy.h1}">휴면 계정 인증</h1>
 
                 <!-- 메시지 표시 -->
                 <div th:if="${message}" class="alert alert-warning text-center" role="alert">
@@ -41,8 +42,9 @@
 
                 <!-- 인증 번호 입력 -->
                 <div class="form-floating mb-3">
-                    <input type="text" name="authCode" class="form-control" id="authCode" placeholder="인증 번호" required pattern="\d{4}" title="4자리 숫자를 입력하세요">
-                    <label for="authCode">인증 번호</label>
+                    <input type="text" name="authCode" class="form-control" id="authCode"
+                           th:placeholder="#{dormancy.placeholder.authCode}" required pattern="\d{4}" title="4자리 숫자를 입력하세요">
+                    <label for="authCode" th:text="#{dormancy.label.authCode}">인증 번호</label>
                 </div>
 
                 <!-- 에러 메시지 -->
@@ -51,7 +53,9 @@
                 </div>
 
                 <!-- 인증 버튼 -->
-                <button class="w-100 btn-lg auth-btn btn mt-3" type="submit">인증 완료</button>
+                <button class="w-100 btn-lg auth-btn btn mt-3" type="submit" th:text="#{dormancy.button.submit}">
+                    인증 완료
+                </button>
             </form>
         </div>
     </main>
