@@ -2,6 +2,7 @@ package com.nhnacademy.hello.controller.coupon;
 
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
 import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
+import com.nhnacademy.hello.dto.member.MemberDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,4 +33,5 @@ public class CouponMemberController {
     public Void deleteMemberCoupon(@PathVariable String memberId, @PathVariable Long couponId) {
         return couponMemberAdapter.deleteMemberCoupon(memberId, couponId);
     }
+
 }

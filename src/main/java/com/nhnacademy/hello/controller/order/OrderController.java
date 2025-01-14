@@ -30,7 +30,7 @@ public class OrderController {
 
     private final TossService tossService;
 
-
+    // 유저의 배송 전 주문 취소
     @PostMapping("/orders/{orderId}/cancel")
     public ResponseEntity<?> cancelOrder(
             @PathVariable("orderId") Long orderId
@@ -65,6 +65,27 @@ public class OrderController {
 
 
         return response;
+    }
+
+    // 사용자의 주문 확정
+    @PostMapping("/orders/{orderId}/confirm")
+    public ResponseEntity<?> confirmOrder(
+            @PathVariable("orderId") Long orderId
+    ){
+
+        // 주문 상태 변경 -> COMPLETE 3
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
+                null,
+                null,
+                null,
+                3L,
+                null,
+                null,
+                null
+        );
+        orderAdapter.updateOrder(orderId, orderRequestDTO);
+
+        return ResponseEntity.ok().build();
     }
 
     // 사용자의 반품 신청
@@ -120,12 +141,11 @@ public class OrderController {
 
             // 반품 사유 조회
             ReturnsDTO returnsDTO = returnsAdapter.getReturnsByOrderId(orderId);
-            ReturnsReasonDTO returnsReasonDTO = returnsReasonAdapter.getReturnsReasonById(returnsDTO.returnsReasonId());
 
             // 토스 주문 취소 처리
             ResponseEntity<?> response = tossService.cancelPayment(
                     payment.paymentKey(),
-                    "구매자 반품 신청: " + returnsReasonDTO.returnsReason(),
+                    "구매자 반품 신청: " + returnsDTO.returnsReason().returnsReason(),
                     payment.amount() - 3000 // 배송비 제외한 금액 환불
             );
 

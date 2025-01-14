@@ -121,7 +121,7 @@
   // 특정 장바구니 항목 삭제 함수
   function deleteCartItem(bookId) {
     let cart = getCart();
-    cart = cart.filter(item => item.bookId !== bookId);
+    cart = cart.filter(item => item.bookId !== parseInt(bookId));
     localStorage.setItem('cart', JSON.stringify(cart));
     renderCart();
   }

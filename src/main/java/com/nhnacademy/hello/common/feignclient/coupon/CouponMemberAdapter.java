@@ -1,9 +1,12 @@
 package com.nhnacademy.hello.common.feignclient.coupon;
 
 import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
+import com.nhnacademy.hello.dto.member.MemberDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 @FeignClient(name = "hexa-gateway", contextId = "couponMemberAdapter")
@@ -20,4 +23,13 @@ public interface CouponMemberAdapter {
     // 회원에게서 쿠폰 회수(삭제)
     @DeleteMapping("api/members/{memberId}/coupons/{couponId}")
     Void deleteMemberCoupon(@PathVariable String memberId, @PathVariable Long couponId);
+
+    // 특정 사용자가 특정 쿠폰을 이미 발급았는지 확인
+    @GetMapping("api/members/coupons/is-assigned")
+    Boolean isCouponAlreadyAssigned(@RequestParam Long couponId,
+                                                    @RequestParam String memberId);
+
+    @GetMapping("api/members/coupons/check-duplicate")
+    Boolean checkCouponDuplicate(@RequestParam Long couponId);
+
 }
