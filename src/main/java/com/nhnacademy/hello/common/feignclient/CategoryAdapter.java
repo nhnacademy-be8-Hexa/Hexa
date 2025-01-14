@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.common.feignclient;
 
+import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
@@ -62,15 +63,6 @@ public interface CategoryAdapter {
                                                      @PathVariable Long bookId);
 
     /**
-     * 모든 카테고리에서 서브카테고리가 존재하는 카테고리들의 ID를 반환
-     *
-     * @return 서브카테고리가 있는 카테고리들의 ID 목록
-     */
-    @GetMapping("/ids")
-    ResponseEntity<List<Long>> getCategoryIdsWithSubCategories();
-
-
-    /**
      * 카테고리 목록을 페이징 처리하여 반환합니다.
      *
      * @param page 요청된 페이지 번호
@@ -111,6 +103,7 @@ public interface CategoryAdapter {
     // bookId로 해당 책의 카테고리 리스트 조회
     @GetMapping("/books/{bookId}")
     ResponseEntity<List<PagedCategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
-    
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<List<BookDTO>> getAllBooksByCategoryId(@PathVariable Long categoryId);
 }
