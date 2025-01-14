@@ -21,17 +21,17 @@
 
   <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
     <div class="text-center">
-      <h1>주문이 완료되었습니다.</h1>
+      <h1 th:text="#{purchase_success.header}">주문이 완료되었습니다.</h1>
       <p class="h4 text-success">
-        주문하신 상품: <span th:text="${orderName}"></span>
+        <span th:text="#{purchase_success.orderName}"/> <span th:text="${orderName}"></span>
       </p>
       <p class="h4 text-primary">
-        총 결제 금액: <span th:text="${totalPrice}"></span> 원
+        <span th:text="#{purchase_success.total}"/> <span th:text="${totalPrice}"></span> <span th:text="#{won}"/>
       </p>
       <p class="h4 text-muted">
-        주문 번호: <span th:text="${orderId}"></span>
+        <span th:text="#{purchase_success.orderId}"/> <span th:text="${orderId}"></span>
       </p>
-      <a href="/" class="btn btn-primary mt-4">홈으로</a>
+      <a href="/" class="btn btn-primary mt-4" th:text="#{purchase_success.home}">홈으로</a>
     </div>
   </div>
 
