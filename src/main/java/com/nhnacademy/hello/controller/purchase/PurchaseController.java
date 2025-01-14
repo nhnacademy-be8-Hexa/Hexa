@@ -1,6 +1,14 @@
 package com.nhnacademy.hello.controller.purchase;
 
-import com.nhnacademy.hello.common.feignclient.*;
+import com.nhnacademy.hello.common.feignclient.BookAdapter;
+import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
+import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
+import com.nhnacademy.hello.common.feignclient.DeliveryAdapter;
+import com.nhnacademy.hello.common.feignclient.MemberAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderAdapter;
+import com.nhnacademy.hello.common.feignclient.OrderStatusAdapter;
+import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
+import com.nhnacademy.hello.common.feignclient.WrappingPaperAdapter;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
@@ -10,7 +18,7 @@ import com.nhnacademy.hello.dto.address.AddressDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
 import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
-import com.nhnacademy.hello.dto.category.CategoryDTO;
+import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
@@ -24,15 +32,6 @@ import com.nhnacademy.hello.dto.purchase.PurchaseDTO;
 import com.nhnacademy.hello.dto.toss.TossPayment;
 import com.nhnacademy.hello.dto.toss.TossPaymentDto;
 import com.nhnacademy.hello.service.TossService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.time.ZonedDateTime;
@@ -40,6 +39,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -100,7 +111,7 @@ public class PurchaseController {
         }
 
         // 바로구매로 넘어올 시 quantity가 있음
-        if(quantity != null && quantity > 0) {
+        if (quantity != null && quantity > 0) {
             model.addAttribute("buynow_quantity", quantity);
         }
 
@@ -110,8 +121,8 @@ public class PurchaseController {
 
         // 포장 가능 여부 계산해서 전달
         boolean isWrappable = true;
-        for(BookDTO bookDTO : bookList) {
-            if(!bookDTO.bookWrappable()){
+        for (BookDTO bookDTO : bookList) {
+            if (!bookDTO.bookWrappable()) {
                 isWrappable = false;
                 break;
             }
@@ -120,7 +131,7 @@ public class PurchaseController {
 
         // 포인트 전달 (비회원은 0으로)
         Long havingPoint = 0L;
-        if(isLoggedIn){
+        if (isLoggedIn) {
             String memberId = principal.getName();
             ResponseEntity<Long> pointSumResponse = pointDetailsAdapter.sumPoint(memberId);
             havingPoint = pointSumResponse.getBody();
@@ -128,7 +139,7 @@ public class PurchaseController {
         model.addAttribute("havingPoint", havingPoint);
 
         // -----쿠폰-------------------------------
-        if(AuthInfoUtils.isLogin()){
+        if (AuthInfoUtils.isLogin()) {
             // 내가 가진 쿠폰의 id 리스트 뽑기
             List<CouponMemberDTO> couponMemberList = couponMemberAdapter.getMemberCoupons(AuthInfoUtils.getUsername());
             List<Long> couponIdList = couponMemberList.stream().map(CouponMemberDTO::couponId).toList();
@@ -140,24 +151,27 @@ public class PurchaseController {
             List<List<CouponDTO>> bookValidCouponList = new ArrayList<>();
 
             // 모든 주문할 책에 대하여
-            for(BookDTO bookDTO : bookList) {
+            for (BookDTO bookDTO : bookList) {
 
                 // 현재 책의 카테고리 리스트
-                List<CategoryDTO> categoryList = categoryAdapter.getAllCategoriesByBookId(bookDTO.bookId()).getBody();
-                List<Long> categoryIdList = categoryList.stream().map(CategoryDTO::getCategoryId).toList();
+                List<PagedCategoryDTO> categoryList =
+                        categoryAdapter.getAllCategoriesByBookId(bookDTO.bookId()).getBody();
+                List<Long> categoryIdList = categoryList.stream().map(PagedCategoryDTO::getCategoryId).toList();
 
                 List<CouponDTO> validCouponList = new ArrayList<>();
                 // 내 쿠폰 중에서 사용가능한 쿠폰을 찾아서 담는다
-                for(CouponDTO couponDTO : couponList) {
+                for (CouponDTO couponDTO : couponList) {
                     // ( 사용처가 ALL이거나,
                     // BOOK 이고 타겟 아이디가 일치하거나,
                     // CATEGORY 이고 타겟 아이디가 해당 책의 카테고리를 포함하거나) &&
                     // 사용기한이 유효하다
-                    if( couponDTO.couponDeadline().isAfter(ZonedDateTime.now())
-                            && (    couponDTO.couponTarget().equals("ALL") ||
-                                    ( couponDTO.couponTarget().equals("BOOK") && couponDTO.couponTargetId().equals(bookDTO.bookId()) ) ||
-                                    ( couponDTO.couponTarget().equals("CATEGORY") && categoryIdList.contains(couponDTO.couponTargetId()) )
-                            )
+                    if (couponDTO.couponDeadline().isAfter(ZonedDateTime.now())
+                            && (couponDTO.couponTarget().equals("ALL") ||
+                            (couponDTO.couponTarget().equals("BOOK") &&
+                                    couponDTO.couponTargetId().equals(bookDTO.bookId())) ||
+                            (couponDTO.couponTarget().equals("CATEGORY") &&
+                                    categoryIdList.contains(couponDTO.couponTargetId()))
+                    )
                     ) {
                         validCouponList.add(couponDTO);
                     }
@@ -254,10 +268,11 @@ public class PurchaseController {
     @PostMapping("/purchase")
     public ResponseEntity<?> purchase(
             @RequestBody PurchaseDTO purchaseDTO
-    ){
+    ) {
 
         // toss에 결제 승인 요청
-        ResponseEntity<?> response = tossService.confirmPayment(purchaseDTO.paymentKey(), purchaseDTO.orderId(), purchaseDTO.amount());
+        ResponseEntity<?> response =
+                tossService.confirmPayment(purchaseDTO.paymentKey(), purchaseDTO.orderId(), purchaseDTO.amount());
 
         // 성공적인 응답
         if (response.getStatusCode() != HttpStatus.OK) {
@@ -274,27 +289,28 @@ public class PurchaseController {
         // '수량부족' 책 상태 아이디 조회
         Long bookStatusId = 2L;
         List<BookStatusRequestDTO> bookStatusList = bookStatusAdapter.getBookStatus();
-        for(BookStatusRequestDTO bookStatusRequestDTO : bookStatusList) {
-            if(bookStatusRequestDTO.bookStatus().equals("수량부족")){
+        for (BookStatusRequestDTO bookStatusRequestDTO : bookStatusList) {
+            if (bookStatusRequestDTO.bookStatus().equals("수량부족")) {
                 bookStatusId = bookStatusRequestDTO.bookStatusId();
                 break;
             }
         }
 
         // 책들 판매 처리
-        for(PurchaseBookDTO book : purchaseDTO.books()){
+        for (PurchaseBookDTO book : purchaseDTO.books()) {
             // 책 판매량 증가, 재고 감소
             bookAdapter.incrementBookSellCount(book.bookId(), book.quantity());
 
             // 해당 책의 갯수가 5개 이하가 되면 수량 부족 상태로 전환.
-            if(bookAdapter.getBook(book.bookId()).bookAmount() < 5){
+            if (bookAdapter.getBook(book.bookId()).bookAmount() < 5) {
                 bookAdapter.updateBook(book.bookId(),
                         new BookUpdateRequestDTO(
                                 null,
                                 null,
                                 null,
                                 null,
-                                bookStatusId.toString()
+                                bookStatusId.toString(),
+                                new ArrayList<>()
                         )
                 );
 
@@ -305,15 +321,15 @@ public class PurchaseController {
 
         // 'WAIT' 주문 상태의 아이디 검색
         Long statusId = 1L;
-        for(OrderStatusDTO dto : orderStatusAdapter.getAllOrderStatus()){
-            if(dto.orderStatus().equals("WAIT")){
+        for (OrderStatusDTO dto : orderStatusAdapter.getAllOrderStatus()) {
+            if (dto.orderStatus().equals("WAIT")) {
                 statusId = dto.orderStatusId();
                 break;
             }
         }
 
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
-                AuthInfoUtils.isLogin()? AuthInfoUtils.getUsername() : null,
+                AuthInfoUtils.isLogin() ? AuthInfoUtils.getUsername() : null,
                 purchaseDTO.amount(),
                 purchaseDTO.wrappingPaperId() <= 0 ? null : purchaseDTO.wrappingPaperId(),
                 statusId,
@@ -327,10 +343,10 @@ public class PurchaseController {
                 purchaseDTO.books().stream().map(PurchaseBookDTO::bookId).toList(),
                 purchaseDTO.books().stream().map(PurchaseBookDTO::quantity).toList(),
                 null
-                ).getBody();
+        ).getBody();
 
         // 포인트 사용 처리
-        if(purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0){
+        if (purchaseDTO.usingPoint() != null && purchaseDTO.usingPoint() > 0) {
             CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
                     purchaseDTO.usingPoint() * (-1),
                     "주문 : " + payment.orderName()
@@ -339,9 +355,10 @@ public class PurchaseController {
         }
 
         // 포인트 적립 처리
-        if(AuthInfoUtils.isLogin()){
+        if (AuthInfoUtils.isLogin()) {
             CreatePointDetailDTO createPointDetailDTO = new CreatePointDetailDTO(
-                    (int)(purchaseDTO.amount() * 0.01 * memberAdapter.getMember(AuthInfoUtils.getUsername()).rating().ratingPercent()) ,
+                    (int) (purchaseDTO.amount() * 0.01 *
+                            memberAdapter.getMember(AuthInfoUtils.getUsername()).rating().ratingPercent()),
                     "주문 포인트 적립 : " + payment.orderName()
             );
             pointDetailsAdapter.createPointDetails(AuthInfoUtils.getUsername(), createPointDetailDTO);
@@ -357,7 +374,7 @@ public class PurchaseController {
         deliveryAdapter.createDelivery(deliveryRequestDTO);
 
         // 비회원 정보 저장
-        if(!AuthInfoUtils.isLogin()){
+        if (!AuthInfoUtils.isLogin()) {
             GuestOrderRequestDTO guestOrderRequestDTO = new GuestOrderRequestDTO(
                     savedOrderId,
                     passwordEncoder.encode(purchaseDTO.guestPassword()),
@@ -368,10 +385,10 @@ public class PurchaseController {
         }
 
         // 쿠폰 사용 처리
-        if(AuthInfoUtils.isLogin()){
+        if (AuthInfoUtils.isLogin()) {
 
-            for(Long couponId : purchaseDTO.selectedCouponIds()) {
-                if(couponId == -1){
+            for (Long couponId : purchaseDTO.selectedCouponIds()) {
+                if (couponId == -1) {
                     continue;
                 }
                 couponAdapter.useCoupon(couponId);

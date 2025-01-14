@@ -44,7 +44,7 @@ public class CategoryManageController {
             page = totalPages;
         }
 
-        List<Long> categoryIdsWithSubCategories = categoryAdapter.findCategoryIdsWithSubCategories().getBody();
+        List<Long> categoryIdsWithSubCategories = categoryAdapter.getCategoryIdsWithSubCategories().getBody();
         model.addAttribute("categoryIdsWithSubCategories", categoryIdsWithSubCategories);
 
         List<PagedCategoryDTO> pagedCategories =
@@ -57,12 +57,13 @@ public class CategoryManageController {
 
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-        
+
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", PAGE_SIZE);
+
 
         return "admin/categoryManageForm";
     }

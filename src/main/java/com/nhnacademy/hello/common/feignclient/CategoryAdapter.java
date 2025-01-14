@@ -57,22 +57,17 @@ public interface CategoryAdapter {
             @PathVariable("bookId") Long bookId
     );
 
+    @DeleteMapping("/{categoryId}/books/{bookId}")
+    ResponseEntity<Void> deleteByCategoryIdAndBookId(@PathVariable Long categoryId,
+                                                     @PathVariable Long bookId);
+
     /**
      * 모든 카테고리에서 서브카테고리가 존재하는 카테고리들의 ID를 반환
      *
      * @return 서브카테고리가 있는 카테고리들의 ID 목록
      */
     @GetMapping("/ids")
-    ResponseEntity<List<Long>> findCategoryIdsWithSubCategories();
-
-    /**
-     * 주어진 카테고리 ID와 그 하위 서브 카테고리들의 ID 목록을 반환합니다.
-     *
-     * @param categoryId 조회할 카테고리 ID
-     * @return 카테고리 및 서브 카테고리들의 ID 목록
-     */
-    @GetMapping("/{categoryId}/ids")
-    ResponseEntity<List<Long>> extractCategoryIds(@PathVariable Long categoryId);
+    ResponseEntity<List<Long>> getCategoryIdsWithSubCategories();
 
 
     /**
@@ -115,5 +110,7 @@ public interface CategoryAdapter {
 
     // bookId로 해당 책의 카테고리 리스트 조회
     @GetMapping("/books/{bookId}")
-    ResponseEntity<List<CategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
+    ResponseEntity<List<PagedCategoryDTO>> getAllCategoriesByBookId(@PathVariable Long bookId);
+    
+
 }

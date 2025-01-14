@@ -48,7 +48,6 @@ public class CategoryController {
 
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
-
         ResponseEntity<List<CategoryDTO>> categoryResponse = categoryAdapter.getCategories();
 
         List<CategoryDTO> categories;
@@ -57,12 +56,11 @@ public class CategoryController {
             model.addAttribute("categories", categories);
         } else {
             // 에러 처리 로직 (예: 빈 리스트 또는 예외 던지기)
-            categories = List.of();
             model.addAttribute("categories", List.of());
         }
 
-        List<Long> categoryIds = categoryAdapter.extractCategoryIds(categoryId).getBody();
-        
+        List<Long> categoryIds = List.of(categoryId);
+
         Long totalBooks = bookAdapter.getTotalBooks(
                 search,
                 categoryIds,
