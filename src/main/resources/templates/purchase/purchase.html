@@ -27,18 +27,18 @@
 
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <h1>주문</h1>
+    <h1 th:text="#{purchase.logo}">주문</h1>
 
     <!-- 장바구니 항목 테이블 -->
     <table class="table table-bordered">
         <thead>
         <tr class="table-secondary">
-            <th>책 제목</th>
-            <th>포장 가능 여부</th>
-            <th>가격 (원)</th>
-            <th>수량</th>
-            <th th:if="${isLoggedIn}">쿠폰 사용</th>
-            <th>합계 (원)</th>
+            <th th:text="#{purchase.book.name}">제목</th>
+            <th th:text="#{purchase.book.wrappable}">포장 가능 여부</th>
+            <th th:text="#{purchase.book.price}">가격 (원)</th>
+            <th th:text="#{purchase.book.quantity}">수량</th>
+            <th th:if="${isLoggedIn}" th:text="#{purchase.book.coupon}">쿠폰 사용</th>
+            <th th:text="#{purchase.book.total}">합계 (원)</th>
         </tr>
         </thead>
         <tbody id="cart-items">
@@ -49,7 +49,7 @@
             </td>
             <td>
                 <!-- 포장 가능 여부 표시 -->
-                <span th:text="${book.bookWrappable() ? '포장 가능' : '포장 불가능'}"
+                <span th:text="#{${book.bookWrappable() ? 'purchase.book.wrappable.yes' : 'purchase.book.wrappable.no'}}"
                       th:classappend="${book.bookWrappable() ? 'text-success' : 'text-danger'}"></span>
             </td>
             <td th:data-price="${book.bookPrice}" id="book-price-${book.bookId}">
@@ -62,7 +62,7 @@
             <!-- 쿠폰 사용 -->
             <td th:if="${isLoggedIn}">
                 <select class="form-control coupon-select" th:id="'coupon-select-' + ${book.bookId}" th:name="'coupon-' + ${book.bookId}">
-                    <option value="-1">선택안함</option>
+                    <option value="-1" th:text="#{purchase.coupon.noselect}">선택안함</option>
                     <option th:each="coupon : ${bookValidCouponList[iterStat.index]}"
                             th:value="${coupon.couponId}"
                             th:text="${coupon.couponName}">
@@ -79,13 +79,14 @@
 
 <!--    포장지 선택-->
     <div class="form-group">
-        <label for="wrapping-paper-select" class="font-weight-bold h5">
+        <label for="wrapping-paper-select" class="font-weight-bold h5" th:text="#{purchase.paper.select}">
             포장지 선택
-            <span th:if="${not isWrappable}" style="color: red; font-size: small;">포장 불가능한 상품이 포함되어 있습니다.</span>
+            <span th:if="${not isWrappable}" style="color: red; font-size: small;"
+                  th:text="#{purchase.paper.warning}">포장 불가능한 상품이 포함되어 있습니다.</span>
         </label>
         <select id="wrapping-paper-select" class="form-control"
                 th:disabled="${not isWrappable}" >
-            <option value="-1" data-price="0">선택하지 않음 (0원)</option>
+            <option value="-1" data-price="0" th:text="#{purchase.paper.noselect}">선택하지 않음 (0원)</option>
             <!-- 포장지 옵션들 -->
             <option th:each="paper : ${wrappingPaperList}"
                     th:value="${paper.wrappingPaperId}"
@@ -98,17 +99,17 @@
 
 <!--    포인트 사용-->
     <div th:if="${isLoggedIn}" class="form-group mt-4">
-        <label for="point-input" class="font-weight-bold h5">포인트 사용</label>
+        <label for="point-input" class="font-weight-bold h5" th:text="#{purchase.point.label}">포인트 사용</label>
         <div class="input-group">
             <input type="number"
                    id="point-input"
                    class="form-control"
-                   placeholder="사용할 포인트 입력"
+                   th:placeholder="#{purchase.point.placeholder}"
                    min="0"
                    th:max="${havingPoint}"
                    value="0">
             <div class="input-group-append">
-                <span class="input-group-text" th:text="'현재 포인트: ' + ${havingPoint} + 'P'"></span>
+                <span class="input-group-text" th:text="#{purchase.point.having} + ${havingPoint} + 'P'"></span>
             </div>
         </div>
     </div>
@@ -117,25 +118,25 @@
     <div class="container mt-4" th:if="${not isLoggedIn}">
         <!-- 비회원 정보 상자 -->
         <div class="p-4 bg-light border rounded">
-            <h3 class="text-center mb-4">비회원 정보</h3>
+            <h3 class="text-center mb-4" th:text="#{purchase.guest.header}">비회원 정보</h3>
 
             <!-- 입력 필드들 -->
             <div class="form-group">
-                <label for="guest_order_number">전화 번호</label>
+                <label for="guest_order_number" th:text="#{purchase.guest.number}">전화 번호</label>
                 <input type="text" id="guest_order_number" name="guest_order_number" class="form-control"
                        placeholder="01012345678" minlength="10" maxlength="11" required>
             </div>
 
             <div class="form-group">
-                <label for="guest_order_email">이메일</label>
+                <label for="guest_order_email" th:text="#{purchase.guest.email}">이메일</label>
                 <input type="email" id="guest_order_email" name="guest_order_email" class="form-control"
                        placeholder="email@example.com" maxlength="320" required>
             </div>
 
             <div class="form-group">
-                <label for="guest_order_password">비밀번호</label>
+                <label for="guest_order_password" th:text="#{purchase.guest.password}">비밀번호</label>
                 <input type="password" id="guest_order_password" name="guest_order_password" class="form-control"
-                       placeholder="4~20자리 비밀번호 입력" minlength="4" maxlength="20" required>
+                       th:placeholder="#{purchase.guest.password.placeholder}" minlength="4" maxlength="20" required>
             </div>
         </div>
     </div>
@@ -144,50 +145,56 @@
 
     <!--   배송일 지정 필드-->
     <div class="form-group mt-4">
-        <label for="delivery-date" class="font-weight-bold h5">배송일 선택</label>
+        <label for="delivery-date" class="font-weight-bold h5" th:text="#{purchase.delivery.label}">배송일 선택</label>
         <input type="date" id="delivery-date" class="form-control" required>
-        <small class="text-muted">하루 뒤 부터 선택 가능합니다.</small>
+        <small class="text-muted" th:text="#{purchase.delivery.small}">하루 뒤 부터 선택 가능합니다.</small>
     </div>
 
-    <h1 class="mt-4">배송지</h1>
+    <h1 class="mt-4" th:text="#{purchase.address.header}">배송지</h1>
     <!-- 주소 표시 요소들: 모든 사용자에게 노출 -->
     <div class="card p-3">
         <!-- 주소 별칭 -->
         <div class="mb-2">
-            <strong>주소 별칭:</strong>
+            <strong th:text="#{purchase.address.addressName} + ':'">주소 별칭:</strong>
             <span id="recipientNameDisplay"></span>
         </div>
         <!-- 우편번호 -->
         <div class="mb-2">
-            <strong>배송지 우편번호:</strong>
+            <strong th:text="#{purchase.address.postCode} + ':'">배송지 우편번호:</strong>
             <span id="postCode"></span>
         </div>
         <!-- 주소 -->
         <div class="mb-2">
-            <strong>배송지 주소:</strong>
+            <strong th:text="#{purchase.address.address} + ':'">배송지 주소:</strong>
             <span id="addressDisplay"></span>
         </div>
         <!-- 상세주소 -->
         <div class="mb-2">
-            <strong>배송지 상세주소:</strong>
+            <strong th:text="#{purchase.address.details} + ':'">배송지 상세주소:</strong>
             <span id="addressDetailsDisplay"></span>
         </div>
         <!-- 로그인 상태에 따른 버튼 표시 -->
-        <button th:if="${isLoggedIn}" class="btn btn-primary" onclick="goToChangeAddress()">배송지 변경</button>
-        <button th:unless="${isLoggedIn}" class="btn btn-primary" onclick="goToAddAddress()">배송지 추가</button>
+        <button th:if="${isLoggedIn}" class="btn btn-primary"
+                onclick="goToChangeAddress()" th:text="#{purchase.address.changeButton}">배송지 변경</button>
+        <button th:unless="${isLoggedIn}" class="btn btn-primary"
+                onclick="goToAddAddress()" th:text="#{purchase.address.addButton}">배송지 추가</button>
     </div>
 
     <!--    배송비 표시-->
-    <h5 class="mt-4">배송비 3000원</h5>
+    <h5 class="mt-4" th:text="#{purchase.deliveryCharge}">배송비 3000원</h5>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
-        <h4>총 가격: <span id="total-price">0</span> 원</h4>
+        <h4>
+            <span th:text="#{purchase.total.head}">총 가격:</span>
+            <span id="total-price">0</span>
+            <span th:text="#{purchase.total.won}">원</span>
+        </h4>
     </div>
 
     <!-- 결제 버튼 -->
     <div class="text-center mt-4">
-        <button id="payment-button" class="btn btn-primary btn-lg">toss로 간편 결제하기</button>
+        <button id="payment-button" class="btn btn-primary btn-lg" th:text="#{purchase.paymentButton}">toss 결제</button>
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
@@ -199,8 +206,8 @@
     <div class="modal-dialog modal-lg"> <!-- 모달 크기 조정 가능 -->
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">배송지 목록</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                <h5 class="modal-title" th:text="#{purchase.addressModal.title}">배송지 목록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{close}"></button>
             </div>
             <div class="modal-body">
                 <ul class="list-group mb-3" id="addressList">
@@ -212,24 +219,31 @@
                             <span th:text="${address.address}">주소</span><br>
                             <span th:text="${address.addressDetail}">상세주소</span>
                         </div>
-                        <button class="btn btn-secondary btn-sm" th:attr="data-id=${address.addressId}" onclick="selectAddress(this)">선택</button>
+                        <button class="btn btn-secondary btn-sm" th:attr="data-id=${address.addressId}"
+                                onclick="selectAddress(this)" th:text="#{purchase.addressModal.select}">선택</button>
                     </li>
                 </ul>
                 <!-- Modal 내 '새 배송지 추가' 버튼 비활성화 조건 추가 -->
                 <div class="mt-3">
                     <button class="btn btn-primary w-100"
                             th:if="${#lists.size(addressList ?: {}) < 10}"
-                            onclick="openAddAddressModal()">
+                            onclick="openAddAddressModal()"
+                            th:text="#{purchase.addressModal.openButton}"
+                    >
                         새 배송지 추가
                     </button>
                     <button class="btn btn-primary w-100"
                             th:if="${#lists.size(addressList ?: {}) >= 10}"
-                            disabled>
+                            disabled
+                            th:text="#{purchase.addressModal.addButton}"
+                    >
                         배송지 추가 (최대 10개)
                     </button>
                 </div>
                 <!-- (선택 사항) 최대 배송지 수를 초과했을 때 안내 메시지 추가 -->
-                <div th:if="${#lists.size(addressList ?: {}) >= 10}" class="mt-2 text-danger">
+                <div th:if="${#lists.size(addressList ?: {}) >= 10}" class="mt-2 text-danger"
+                     th:text="#{purchase.addressModal.error}">
+                >
                     배송지는 최대 10개까지 등록할 수 있습니다.
                 </div>
             </div>
@@ -243,35 +257,36 @@
         <form id="addAddressForm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">새 배송지 추가</h5>
+                    <h5 class="modal-title" th:text="#{purchase.addAddressModal.title}">새 배송지 추가</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
                 <div class="modal-body">
                     <!-- 주소 별칭 입력 필드 -->
                     <div class="mb-3">
-                        <label for="newRecipientName" class="form-label">주소 별칭</label>
+                        <label for="newRecipientName" class="form-label" th:text="#{purchase.address.addressName}">주소 별칭</label>
                         <input type="text" class="form-control" id="newRecipientName" required>
                     </div>
                     <!-- 우편번호 및 주소 검색 버튼 -->
                     <div class="mb-3">
-                        <label for="newPostCode" class="form-label">우편번호</label>
+                        <label for="newPostCode" class="form-label" th:text="#{purchase.address.postCode}">우편번호</label>
                         <input type="text" class="form-control" id="newPostCode" readonly>
-                        <button type="button" class="btn btn-secondary mt-2" onclick="sample4_execDaumPostcode()">우편번호 찾기</button>
+                        <button type="button" class="btn btn-secondary mt-2" onclick="sample4_execDaumPostcode()"
+                        th:text="#{purchase.addAddressModal.postCodeButton}">우편번호 찾기</button>
                     </div>
                     <!-- 도로명 주소 -->
                     <div class="mb-3">
-                        <label for="newAddressDisplay" class="form-label">주소</label>
+                        <label for="newAddressDisplay" class="form-label" th:text="#{purchase.address.address}">주소</label>
                         <input type="text" class="form-control" id="newAddressDisplay" readonly>
                     </div>
                     <!-- 상세 주소 입력 -->
                     <div class="mb-3">
-                        <label for="newDetailAddress" class="form-label">상세 주소</label>
+                        <label for="newDetailAddress" class="form-label" th:text="#{purchase.address.details}">상세 주소</label>
                         <input type="text" class="form-control" id="newDetailAddress" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">추가</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary" th:text="#{add}">추가</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{cancel}">취소</button>
                 </div>
             </div>
         </form>
