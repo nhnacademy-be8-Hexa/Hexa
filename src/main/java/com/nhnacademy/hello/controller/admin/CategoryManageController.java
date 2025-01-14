@@ -1,6 +1,8 @@
 package com.nhnacademy.hello.controller.admin;
 
+import com.nhnacademy.hello.common.feignclient.BookAdapter;
 import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
+import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.FirstCategoryRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.category.SecondCategoryRequestDTO;
@@ -22,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CategoryManageController {
     private final CategoryAdapter categoryAdapter;
     private static final int PAGE_SIZE = 9;
+    private final BookAdapter bookAdapter;
 
-    public CategoryManageController(CategoryAdapter categoryAdapter) {
+    public CategoryManageController(CategoryAdapter categoryAdapter, BookAdapter bookAdapter) {
         this.categoryAdapter = categoryAdapter;
+        this.bookAdapter = bookAdapter;
     }
 
     @GetMapping
@@ -44,9 +48,14 @@ public class CategoryManageController {
             page = totalPages;
         }
 
-        List<Long> categoryIdsWithSubCategories = categoryAdapter.findCategoryIdsWithSubCategories().getBody();
+        List<Long> categoryIdsWithSubCategories = categoryAdapter.getCategories().getBody().stream()
+                .filter(category -> !category.getSubCategories().isEmpty())
+                .map(CategoryDTO::getCategoryId)
+                .toList();
+
         model.addAttribute("categoryIdsWithSubCategories", categoryIdsWithSubCategories);
 
+        // 2차 카테고리에 포함된 도서가 있을경우
         List<PagedCategoryDTO> pagedCategories =
                 categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
         model.addAttribute("pagedCategories", pagedCategories);
@@ -55,14 +64,17 @@ public class CategoryManageController {
         List<PagedCategoryDTO> allCategories = categoryAdapter.getAllCategories().getBody();
         model.addAttribute("allCategories", allCategories);
 
+
         FirstCategoryRequestDTO firstCategoryRequestDTO = new FirstCategoryRequestDTO("");
         SecondCategoryRequestDTO secondCategoryRequestDTO = new SecondCategoryRequestDTO(null, null);
-        
+
+
         model.addAttribute("firstCategoryRequestDTO", firstCategoryRequestDTO);
         model.addAttribute("secondCategoryRequestDTO", secondCategoryRequestDTO);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", PAGE_SIZE);
+
 
         return "admin/categoryManageForm";
     }
@@ -79,6 +91,7 @@ public class CategoryManageController {
     public String createSecondCategory(
             @Valid @ModelAttribute("secondCategoryRequestDTO") SecondCategoryRequestDTO secondCategoryRequestDTO) {
         categoryAdapter.insertCategory(secondCategoryRequestDTO.categoryId(), secondCategoryRequestDTO.subCategoryId());
+
         return "redirect:/admin/categoryManage";
     }
 
