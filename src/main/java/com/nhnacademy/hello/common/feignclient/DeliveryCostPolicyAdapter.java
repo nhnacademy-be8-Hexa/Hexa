@@ -17,13 +17,15 @@ public interface DeliveryCostPolicyAdapter {
     ResponseEntity<DeliveryCostPolicyDTO> getRecent();
 
     @GetMapping("/api/delivery-cost-policy/all")
-    public ResponseEntity<List<DeliveryCostPolicyDTO>> getAll(
+    ResponseEntity<List<DeliveryCostPolicyDTO>> getAll(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort
     );
 
+    @GetMapping("/api/delivery-cost-policy/count")
+    ResponseEntity<Long> getCount();
 
     @PostMapping("/api/delivery-cost-policy")
-    public ResponseEntity<?> create(@RequestBody DeliveryCostPolicyRequest deliveryCostPolicyRequest);
+    ResponseEntity<?> create(@RequestBody DeliveryCostPolicyRequest deliveryCostPolicyRequest);
 }

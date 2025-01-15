@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+
+</head>
+<body>
+
+<div class="container">
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <div th:replace="~{fragments/admin :: admin}"></div>
+
+    <div class="col">
+
+      <h3>배송비 정책 관리</h3>
+
+      <div class="d-flex align-items-center mb-3">
+        <!-- 배송비 입력 -->
+        <input type="number" class="form-control me-2" placeholder="배송비 입력" name="deliveryCost" id="deliveryCost" required>
+        <!-- 무료 최소 주문 금액 입력 -->
+        <input type="number" class="form-control me-2" placeholder="무료 최소 주문 금액" name="freeMinimumAmount" id="freeMinimumAmount" required>
+        <!-- 생성 버튼 -->
+        <button class="btn btn-primary" onclick="submitPolicy()">생성</button>
+      </div>
+
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>아이디</th>
+          <th>배송비</th>
+          <th>무료 최소 주문 금액</th>
+          <th>생성자</th>
+          <th>생성 시간</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- policyList 데이터 순회 -->
+        <tr th:each="policy : ${policyList}">
+          <td th:text="${policy.deliveryCostPolicyId}"></td>
+          <td th:text="${policy.deliveryCost}"></td>
+          <td th:text="${policy.freeMinimumAmount}"></td>
+          <td th:text="${policy.createdBy}"></td>
+          <td th:text="${policy.createdAt}"></td>
+        </tr>
+        </tbody>
+      </table>
+
+      <nav>
+        <ul class="pagination justify-content-center">
+          <!-- 이전 버튼 -->
+          <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{|/delivery-cost-policy?page=${currentPage - 1}&size=${pageSize}|}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <!-- 페이지 번호 -->
+          <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+              th:classappend="${i == currentPage} ? 'active'">
+            <a class="page-link" th:href="@{|/delivery-cost-policy?page=${i}&size=${pageSize}|}" th:text="${i}"></a>
+          </li>
+
+          <!-- 다음 버튼 -->
+          <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{|/delivery-cost-policy?page=${currentPage + 1}&size=${pageSize}|}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+
+    </div>
+
+  </div>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+
+</body>
+
+<script>
+  // JavaScript로 폼 데이터를 POST 요청으로 전송
+  function submitPolicy() {
+    const deliveryCost = document.getElementById('deliveryCost').value;
+    const freeMinimumAmount = document.getElementById('freeMinimumAmount').value;
+
+    if (!deliveryCost || !freeMinimumAmount) {
+      alert("모든 값을 입력해주세요.");
+      return;
+    }
+
+    // POST 요청 전송
+    fetch('/admin/delivery-cost-policy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        deliveryCost: parseInt(deliveryCost),
+        freeMinimumAmount: parseInt(freeMinimumAmount)
+      })
+    })
+            .then(response => {
+              if (response.ok) {
+                alert("정책이 성공적으로 생성되었습니다.");
+                location.reload(); // 페이지 새로고침
+              } else {
+                alert("정책 생성에 실패했습니다.");
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert("오류가 발생했습니다.");
+            });
+  }
+</script>
+
+</html>
