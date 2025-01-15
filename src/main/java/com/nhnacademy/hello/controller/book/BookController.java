@@ -80,6 +80,11 @@ public class BookController {
         totalCount = totalCount != null ? totalCount : 0L;
         model.addAttribute("totalCount", totalCount);
 
+
+        BigDecimal rating = reviewAdapter.getReviewRating(bookId).getBody();
+        // 모델에 데이터를 추가
+        model.addAttribute("rating", rating);
+
         // 총 페이지 수 계산
         int totalPages = (int) Math.ceil((double) totalCount / size);
         model.addAttribute("totalPages", totalPages);

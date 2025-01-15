@@ -89,7 +89,7 @@ public class CategoryManageController {
         return "redirect:/admin/categoryManage";
     }
 
-
+    
     @PostMapping("/add")
     public String createSecondCategory(
             @Valid @ModelAttribute("secondCategoryRequestDTO") SecondCategoryRequestDTO secondCategoryRequestDTO) {
@@ -110,7 +110,7 @@ public class CategoryManageController {
         }
 
         categoryAdapter.insertCategory(secondCategoryRequestDTO.categoryId(), secondCategoryRequestDTO.subCategoryId());
-        
+
         return "redirect:/admin/categoryManage";
     }
 
