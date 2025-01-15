@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출판사 추가</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <!-- 헤더 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h1 class="page-title">출판사 추가</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container-fluid d-flex justify-content-center p-4">
+        <div class="col-md-6">
+            <form th:action="@{/admin/publisherManage/add}" method="post" class="card shadow-sm p-4">
+                <div class="mb-3">
+                    <label for="publisherName" class="form-label">출판사 이름</label>
+                    <input type="text" class="form-control" id="publisherName" name="publisherName" placeholder="출판사 이름을 입력하세요" required>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">추가</button>
+                    <a th:href="@{/admin/bookManage}" class="btn btn-secondary">취소</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 풋터 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
