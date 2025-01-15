@@ -365,7 +365,7 @@ public class PurchaseController {
         // 배송 정보 저장
         DeliveryRequestDTO deliveryRequestDTO = new DeliveryRequestDTO(
                 savedOrderId,
-                3000,
+                purchaseDTO.deliveryAmount(),
                 purchaseDTO.deliveryDate(),
                 purchaseDTO.deliveryDate().minusDays(1)
         );
