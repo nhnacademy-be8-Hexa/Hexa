@@ -15,4 +15,5 @@ public interface ElasticSearchAdapter {
 
     @GetMapping("/api/search/total")
     ResponseEntity<Long> getTotalSearchBooks(@RequestParam("search") String search);
+
 }
