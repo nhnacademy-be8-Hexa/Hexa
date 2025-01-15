@@ -79,25 +79,17 @@
     <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var cart = /*[[${cart}]]*/ '[]';
+    /*]]>*/
+</script>
+
+
 <script>
-    window.onload = function () {
-        // URL에서 clearLocalCart 파라미터가 있는지 확인
-        const urlParams = new URLSearchParams(window.location.search);
-        const clearLocalCart = urlParams.get('clearLocalCart');
-        const errorMessage = urlParams.get('error');
 
-        // 로그인 성공 시 로컬 스토리지에서 cart 삭제
-        if (clearLocalCart === 'true') {
-            localStorage.removeItem("cart");
-        }
-
-        if (errorMessage === 'access_denied') {
-            alert("접근 권한이 없습니다");
-        }
-
-        // URL에서 clearLocalCart 파라미터 제거
-        history.replaceState(null, null, window.location.pathname);  // URL에서 파라미터 제거
-
+    document.addEventListener('DOMContentLoaded', () => {
         // 책 아이템 클릭 이벤트 핸들러
         document.querySelectorAll('.clickable-book').forEach(bookItem => {
             bookItem.addEventListener('click', function () {
@@ -105,7 +97,81 @@
                 goToBookPage(bookId);
             });
         });
+    });
+
+    function getCart() {
+        return localStorage.getItem('cart');
+    }
+
+    window.onload = function () {
+        // URL에서 clearLocalCart 파라미터가 있는지 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const clearLocalCart = urlParams.get('clearLocalCart');
+        const errorMessage = urlParams.get('error');
+        const logout = urlParams.get('logout');
+
+        // 로그인 성공 시 로컬 스토리지에서 cart 삭제
+        if (clearLocalCart === 'true') {
+            console.log(logout);
+
+            if(logout && getCart()) {
+                // cart가 존재하면 로그아웃 한 시점임
+                // cart의 리스트 직렬화된 문자열을 서버로 전달
+                const cart = getCart();
+
+                fetch(`/cart/${logout}`,{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: cart
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error('서버로 카트를 전송하는 데 실패했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('카트를 서버로 전송하는 중 오류 발생:', error);
+                    });
+
+
+
+            }
+
+            localStorage.removeItem("cart");
+
+            // model 로 넘어온 cart가 존재하면 로그인 한 시점임
+            // 문자열을 로컬 스토리지 cart에 추가
+            if(cart){
+                try {
+                    // 문자열을 JSON 객체로 변환
+                    var cartObj = JSON.parse(cart);
+                    // localStorage에 JSON 문자열로 저장
+                    localStorage.setItem("cart", JSON.stringify(cartObj));
+                    console.log("카트가 로컬 스토리지에 저장되었습니다.");
+                } catch (e) {
+                    console.error("카트 데이터를 파싱하는 중 오류 발생:", e);
+                }
+            }
+
+
+
+        }
+
+        if (errorMessage === 'access_denied') {
+            alert("접근 권한이 없습니다");
+        }
+
+
+
+        // URL에서 clearLocalCart 파라미터 제거
+        history.replaceState(null, null, window.location.pathname);  // URL에서 파라미터 제거
+
     };
+
+
+
 </script>
 
 </body>
