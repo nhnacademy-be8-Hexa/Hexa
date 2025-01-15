@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.controller.login;
 
+import com.nhnacademy.hello.common.feignclient.CartAdapter;
 import com.nhnacademy.hello.common.feignclient.auth.TokenAdapter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
 import com.nhnacademy.hello.common.util.CookieUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -30,6 +32,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Controller
 public class LoginController {
+
+    private final CartAdapter cartAdapter;
 
     private final JwtProperties jwtProperties;
     private final MemberAdapter memberAdapter;
@@ -51,7 +55,8 @@ public class LoginController {
             @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response,
             Model model,
-            HttpSession session
+            HttpSession session,
+            RedirectAttributes redirectAttributes
     ) throws IOException {
         // 인증 서버에 로그인 요청을 하고 토큰을 받는다.
         AccessRefreshTokenDTO accessRefreshTokenDTO = tokenAdapter.login(loginRequest);
@@ -131,7 +136,9 @@ public class LoginController {
         cookieUtil.addResponseAccessTokenCookie(response,access_token,jwtProperties.getRefreshTokenExpirationTime());
         cookieUtil.addResponseRefreshTokenCookie(response,refresh_token,jwtProperties.getRefreshTokenExpirationTime());
 
-
+        // 카트 불러오기
+        String cart = cartAdapter.getCart(loginRequest.id()).getBody();
+        redirectAttributes.addFlashAttribute("cart", cart);
 
         // 로그인 후 홈페이지로 이동
 
