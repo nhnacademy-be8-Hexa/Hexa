@@ -1,11 +1,30 @@
 <!-- 풋터 -->
 <div th:fragment="footer">
 <footer>
-    <p>&copy; 2024 Book Shop. 모든 권리 보유.</p>
+
+    <p>&copy; 2024 Hexa Book Shop. 모든 권리 보유.</p>
+
+    <!-- 언어 선택 -->
+    <div class="text-center mt-2 mb-2">
+        <a href="javascript:void(0);" class="btn-sm" onclick="changeLocale('kor')">한국어</a>
+        <a href="javascript:void(0);" class="btn-sm ms-2" onclick="changeLocale('eng')">English</a>
+    </div>
+
+
     <!-- Hexa GitHub 링크 추가 -->
     <p>
         <a href="https://github.com/nhnacademy-be8-Hexa" target="_blank">Hexa GitHub</a>
     </p>
     <p><a href="/privacy">개인정보처리방침</a> | <a href="/terms">이용약관</a></p>
+
+    <script>
+        function changeLocale(locale) {
+            const url = new URL(window.location.href); // 현재 URL 객체 생성
+            url.searchParams.set('locale', locale);   // locale 파라미터 추가 또는 수정
+            window.location.href = url.toString();   // 새 URL로 이동
+        }
+    </script>
+
 </footer>
 </div>
+
