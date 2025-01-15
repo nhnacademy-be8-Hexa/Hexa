@@ -1,12 +1,11 @@
 package com.nhnacademy.hello.controller.cart;
 
+import com.nhnacademy.hello.common.feignclient.CartAdapter;
 import com.nhnacademy.hello.image.ImageStore;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Map;
 public class CartController {
 
     private final ImageStore imageStore;
+    private final CartAdapter cartAdapter;
 
     @GetMapping("/cart")
     public String Cart() {
@@ -35,6 +35,15 @@ public class CartController {
             imagePaths.put(bookId, imagePath);
         }
         return imagePaths;
+    }
+
+    @PostMapping("/cart/{memberId}")
+    public ResponseEntity<?> saveCart(
+            @PathVariable String memberId,
+            @RequestBody String cart
+    ){
+        cartAdapter.setCart(memberId, cart);
+        return ResponseEntity.ok().build();
     }
 
 

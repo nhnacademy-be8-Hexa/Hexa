@@ -5,6 +5,7 @@ import com.nhnacademy.hello.common.security.OAuth2.hanlder.CustomOAuth2LoginSucc
 import com.nhnacademy.hello.common.security.OAuth2.service.CustomOAuth2UserService;
 import com.nhnacademy.hello.common.filter.JwtAuthenticationFilter;
 import com.nhnacademy.hello.common.properties.JwtProperties;
+import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.common.util.CookieUtil;
 import com.nhnacademy.hello.common.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +98,9 @@ public class SecurityConfig {
                 logout ->
                         logout.logoutUrl("/logout")
                                 .logoutSuccessHandler((request, response, authentication) -> {
+                                    String token = cookieUtil.getCookieValue(request, "accessToken");
+                                    String memberId = jwtUtils.getUsernameFromAccessToken(token);
+
                                     // 로그아웃 한 이후에 서버에서 해당 refresh token 삭제하고 access token 이랑 refresh token 삭제
 
                                     String refreshToken = cookieUtil.getCookieValue(request,"refreshToken");
@@ -107,7 +111,7 @@ public class SecurityConfig {
                                     cookieUtil.addResponseAccessTokenCookie(response,"",0);
 
                                     // 로그아웃 후 리디렉션 처리
-                                    response.sendRedirect("/?clearLocalCart=true");
+                                    response.sendRedirect("/?clearLocalCart=true&logout=" + memberId);
                                 })
         );
 
