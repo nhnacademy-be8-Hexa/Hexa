@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{bookSearch.page.title}">Hexa Books</title>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* 표 스타일 */
+        table.books-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table.books-table th, table.books-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table.books-table th {
+            background-color: #f4f4f4;
+        }
+
+        table.books-table td img {
+            width: 100px; /* 이미지 크기 조정 */
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 빈 결과 처리 */
+        .no-results {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="~{fragments/Header :: Header}"></div>
+    
+    <!-- 검색창 -->
+    <div class="search-bar-container">
+        <form class="search-form" action="/admin/aladinApi" method="GET">
+            <label>
+                <input type="text" name="query" class="search-input" placeholder="검색어를 입력하세요">
+            </label>
+            <button type="submit" class="search-button">검색</button>
+        </form>
+    </div>
+
+    <!-- 검색된 책 정보 출력 -->
+    <div th:if="${#lists.isEmpty(books)}">
+        <p>검색 결과가 없습니다.</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(books)}">
+        <h2>"<span th:text="${query}">검색어</span>"에 대한 결과</h2>
+        <table class="books-table">
+            <thead>
+            <tr>
+                <th>이미지</th> <!-- 이미지 컬럼 추가 -->
+                <th>제목</th>
+                <th>저자</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td>
+                    <!-- 이미지 URL을 src로 바인딩 -->
+                    <img th:src="${book.cover}" alt="책 이미지" style="width: 100px; height: auto;">
+                </td>
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.author}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 풋터 포함 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+
+</body>
+</html>
