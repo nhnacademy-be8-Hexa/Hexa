@@ -22,6 +22,6 @@ public class AladinApiController {
         List<AladinBookDTO> books = aladinApiAdapter.searchBooks(query);
         model.addAttribute("books", books);
         model.addAttribute("query", query);
-        return "/admin/aladinBookSearch";
+        return "admin/aladinBookSearch";
     }
 }
