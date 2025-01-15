@@ -8,28 +8,53 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        /* 표 스타일 */
-        table.books-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        /* 책 정보를 표시하는 스타일 */
+        .book-container {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            gap: 20px; /* 이미지와 텍스트 사이의 간격을 설정 */
         }
 
-        table.books-table th, table.books-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+        /* 책 이미지 컨테이너 */
+        .book-image {
+            flex-shrink: 0; /* 이미지가 크기 축소되지 않도록 */
+            max-width: 100%; /* 최대 너비를 100%로 설정하여 화면 크기에 맞게 조정 */
+            display: block;
+            margin-right: 20px;
         }
 
-        table.books-table th {
-            background-color: #f4f4f4;
-        }
-
-        table.books-table td img {
-            width: 100px; /* 이미지 크기 조정 */
-            height: auto;
+        .book-image img {
+            width: auto; /* 원본 크기를 유지하도록 설정 */
+            height: auto; /* 비율을 유지하도록 설정 */
+            max-width: 150px; /* 이미지의 최대 너비 설정 (원하는 크기) */
+            max-height: 225px; /* 이미지의 최대 높이 설정 (원하는 크기) */
             display: block;
             margin: 0 auto;
+        }
+
+        .book-details {
+            flex-grow: 1;
+            padding: 10px; /* 책 정보와 이미지의 간격을 설정 */
+        }
+
+        .book-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .book-description {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .book-authors {
+            font-size: 1.1em;
+            color: #777;
         }
 
         /* 빈 결과 처리 */
@@ -38,51 +63,58 @@
             font-size: 1.2em;
             color: #666;
         }
+
+        /* 반응형을 위한 이미지 컨테이너 */
+        @media (max-width: 767px) {
+            .book-container {
+                flex-direction: column; /* 작은 화면에서는 세로로 표시 */
+                align-items: center;
+            }
+
+            .book-image {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <!-- 헤더 포함 -->
-    <div th:replace="~{fragments/Header :: Header}"></div>
-    
-    <!-- 검색창 -->
-    <div class="search-bar-container">
-        <form class="search-form" action="/admin/aladinApi" method="GET">
-            <label>
-                <input type="text" name="query" class="search-input" placeholder="검색어를 입력하세요">
-            </label>
-            <button type="submit" class="search-button">검색</button>
-        </form>
-    </div>
+    <div th:replace="~{fragments/aladinSearchHeader:: aladinSearchHeader}"></div>
+
 
     <!-- 검색된 책 정보 출력 -->
-    <div th:if="${#lists.isEmpty(books)}">
+    <div th:if="${#lists.isEmpty(books)}" class="no-results">
         <p>검색 결과가 없습니다.</p>
     </div>
 
     <div th:if="${not #lists.isEmpty(books)}">
         <h2>"<span th:text="${query}">검색어</span>"에 대한 결과</h2>
-        <table class="books-table">
-            <thead>
-            <tr>
-                <th>이미지</th> <!-- 이미지 컬럼 추가 -->
-                <th>제목</th>
-                <th>저자</th>
+        <div th:each="book : ${books}" class="book-container">
+            <!-- 책 이미지 -->
+            <div class="book-image">
+                <img th:src="${book.cover}" alt="책 이미지">
+            </div>
 
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="book : ${books}">
-                <td>
-                    <!-- 이미지 URL을 src로 바인딩 -->
-                    <img th:src="${book.cover}" alt="책 이미지" style="width: 100px; height: auto;">
-                </td>
-                <td th:text="${book.title}"></td>
-                <td th:text="${book.author}"></td>
-            </tr>
-            </tbody>
-        </table>
+            <!-- 책 상세 정보 -->
+            <div class="book-details">
+                <!-- 책 제목 -->
+                <div class="book-title" th:text="${book.title}"></div>
+
+                <!-- 책 설명 -->
+                <div class="book-description" th:text="${book.description}"></div>
+
+                <!-- 책 저자 -->
+                <div class="book-authors">
+                    <span th:each="author, iterStat : ${book.authors}">
+                        <span th:text="${author}"></span>
+                        <span th:if="${iterStat.index != book.authors.size() - 1}">,</span>
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 풋터 포함 -->

@@ -1,8 +1,10 @@
 package com.nhnacademy.hello.dto.book;
 
+import java.util.List;
+
 public record AladinBookDTO(
         String title,
-        String author,
+        List<String> authors,
         String priceSales,
         String priceStandard,
         String publisher,
