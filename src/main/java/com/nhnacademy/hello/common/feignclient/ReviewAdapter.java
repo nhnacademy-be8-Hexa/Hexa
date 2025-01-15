@@ -3,11 +3,17 @@ package com.nhnacademy.hello.common.feignclient;
 import com.nhnacademy.hello.dto.review.ReviewDTO;
 import com.nhnacademy.hello.dto.review.ReviewRequestDTO;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "hexa-gateway", contextId = "reviewAdapter")
 public interface ReviewAdapter {
@@ -51,7 +57,7 @@ public interface ReviewAdapter {
             // 페이징
             @RequestParam("page") int page,
             @RequestParam("size") int size
-            );
+    );
 
     @DeleteMapping("/api/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(
@@ -95,4 +101,6 @@ public interface ReviewAdapter {
             @PathVariable Long bookId
     );
 
+    @GetMapping("/api/books/{bookId}/review-rating")
+    ResponseEntity<BigDecimal> getReviewRating(@PathVariable Long bookId);
 }
