@@ -30,7 +30,7 @@
         <!-- 무료 최소 주문 금액 입력 -->
         <input type="number" class="form-control me-2" placeholder="무료 최소 주문 금액" name="freeMinimumAmount" id="freeMinimumAmount" required>
         <!-- 생성 버튼 -->
-        <button class="btn btn-primary" onclick="submitPolicy()">생성</button>
+        <button class="btn btn-primary px-4" onclick="submitPolicy()">생성</button>
       </div>
 
       <table class="table table-bordered">
@@ -38,7 +38,7 @@
         <tr>
           <th>아이디</th>
           <th>배송비</th>
-          <th>무료 최소 주문 금액</th>
+          <th>무료 배송<br/>최소 주문 금액</th>
           <th>생성자</th>
           <th>생성 시간</th>
         </tr>
@@ -92,42 +92,50 @@
 <script>
   // JavaScript로 폼 데이터를 POST 요청으로 전송
   function submitPolicy() {
-    const deliveryCost = document.getElementById('deliveryCost').value;
-    const freeMinimumAmount = document.getElementById('freeMinimumAmount').value;
+    if(confirm(`새 배송비 정책을 생성 하시겠습니까?\n지금부터 주문에 새로 생성한 정책으로 반영됩니다.`)) {
 
-    if (!deliveryCost || !freeMinimumAmount) {
-      alert("모든 값을 입력해주세요.");
-      return;
-    }
+      const deliveryCost = document.getElementById('deliveryCost').value;
+      const freeMinimumAmount = document.getElementById('freeMinimumAmount').value;
 
-    LoadingSpinner.show();
+      if (!deliveryCost || !freeMinimumAmount) {
+        alert("모든 값을 입력해주세요.");
+        return;
+      }
 
-    // POST 요청 전송
-    fetch('/admin/delivery-cost-policy', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        deliveryCost: parseInt(deliveryCost),
-        freeMinimumAmount: parseInt(freeMinimumAmount)
+      if(deliveryCost < 0 || freeMinimumAmount < 0) {
+        alert("올바른 값을 입력해주세요!");
+        return;
+      }
+
+      LoadingSpinner.show();
+
+      // POST 요청 전송
+      fetch('/admin/delivery-cost-policy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          deliveryCost: parseInt(deliveryCost),
+          freeMinimumAmount: parseInt(freeMinimumAmount)
+        })
       })
-    })
-            .then(response => {
-              if (response.ok) {
-                alert("정책이 성공적으로 생성되었습니다.");
-                location.reload(); // 페이지 새로고침
-              } else {
-                alert("정책 생성에 실패했습니다.");
-              }
-            })
-            .catch(error => {
-              console.error('Error:', error);
-              alert("오류가 발생했습니다.");
-            })
-            .finally(()=>{
-              LoadingSpinner.hide();
-            });
+              .then(response => {
+                if (response.ok) {
+                  alert("정책이 성공적으로 생성되었습니다.");
+                  location.reload(); // 페이지 새로고침
+                } else {
+                  alert("정책 생성에 실패했습니다.");
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert("오류가 발생했습니다.");
+              })
+              .finally(() => {
+                LoadingSpinner.hide();
+              });
+    }
   }
 </script>
 
