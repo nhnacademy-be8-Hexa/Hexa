@@ -1,14 +1,6 @@
 package com.nhnacademy.hello.controller.purchase;
 
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
-import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
-import com.nhnacademy.hello.common.feignclient.DeliveryAdapter;
-import com.nhnacademy.hello.common.feignclient.MemberAdapter;
-import com.nhnacademy.hello.common.feignclient.OrderAdapter;
-import com.nhnacademy.hello.common.feignclient.OrderStatusAdapter;
-import com.nhnacademy.hello.common.feignclient.PointDetailsAdapter;
-import com.nhnacademy.hello.common.feignclient.WrappingPaperAdapter;
+import com.nhnacademy.hello.common.feignclient.*;
 import com.nhnacademy.hello.common.feignclient.address.AddressAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.feignclient.coupon.CouponMemberAdapter;
@@ -21,6 +13,7 @@ import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.dto.coupon.CouponDTO;
 import com.nhnacademy.hello.dto.coupon.CouponMemberDTO;
+import com.nhnacademy.hello.dto.delivery.DeliveryCostPolicyDTO;
 import com.nhnacademy.hello.dto.delivery.DeliveryRequestDTO;
 import com.nhnacademy.hello.dto.order.GuestOrderRequestDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
@@ -71,6 +64,7 @@ public class PurchaseController {
     private final CouponAdapter couponAdapter;
     private final CategoryAdapter categoryAdapter;
     private final TossPaymentAdapter tossPaymentAdapter;
+    private final DeliveryCostPolicyAdapter deliveryCostPolicyAdapter;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -182,6 +176,10 @@ public class PurchaseController {
 
             model.addAttribute("bookValidCouponList", bookValidCouponList);
         }
+
+        // 현재 배송비, 무료 배송 주문 최소 금액 조회 후 전달
+        DeliveryCostPolicyDTO deliveryCostPolicyDTO = deliveryCostPolicyAdapter.getRecent().getBody();
+        model.addAttribute("deliveryCostPolicy", deliveryCostPolicyDTO);
 
         // toss client key
         model.addAttribute("clientKey", tossClientKey);

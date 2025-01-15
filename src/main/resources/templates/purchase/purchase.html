@@ -183,7 +183,17 @@
     </div>
 
     <!--    배송비 표시-->
-    <h5 class="mt-4" th:text="#{purchase.deliveryCharge}">배송비 3000원</h5>
+    <h5 class="mt-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <span th:text="#{purchase.deliveryCharge}">배송비</span>
+            <span class="ms-2" id="deliveryCost" th:text="${deliveryCostPolicy.deliveryCost()}">0</span>
+            <span th:text="#{won}">원</span>
+        </div>
+        <small class="text-muted">
+            <span id="freeMinimumAmount" th:text="${deliveryCostPolicy.freeMinimumAmount()}">0</span>
+            <span th:text="#{purchase.deliveryfree}">원 이상 결제 시 배송비 무료!</span>
+        </small>
+    </h5>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -553,6 +563,11 @@
         // 사용된 쿠폰 아이디 리스트
         const selectedCouponIds = [];
 
+        // 배송비, 무료 배송 최소 금액
+        const freeMinimumAmount = parseInt(document.getElementById('freeMinimumAmount').textContent);
+        const deliveryCostElement = document.getElementById('deliveryCost');
+        const deliveryCost = parseInt(deliveryCostElement.textContent);
+
         // 동적 총액 계산 함수
         const calculateTotalPrice = () => {
             LoadingSpinner.show();
@@ -642,7 +657,15 @@
             }
 
             // 배송비 추가
-            totalPrice += 3000;
+            if(totalPrice >= freeMinimumAmount){
+                deliveryCostElement.textContent = "0";
+                deliveryCostElement.style.color = "red";
+            } else {
+                deliveryCostElement.textContent = deliveryCost;
+                deliveryCostElement.style.color = "black";
+
+                totalPrice += deliveryCost;
+            }
 
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
