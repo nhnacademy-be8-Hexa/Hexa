@@ -108,14 +108,14 @@
           </li>
 
           <!-- 페이지 번호 -->
-          <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
-              th:classappend="${i == currentPage} ? 'active'">
+          <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages > 0 ? totalPages : 1)}"
+              th:classappend="${i == currentPage || (totalPages == 0 && i == 1)} ? 'active'">
             <a class="page-link" th:text="${i}"
                th:href="@{'/admin/orders'(page=${i}, statusId=${statusId})}"></a>
           </li>
 
           <!-- 다음 버튼 -->
-          <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+          <li class="page-item" th:classappend="${currentPage == totalPages || totalPages == 0} ? 'disabled'">
             <a class="page-link"
                th:href="@{'/admin/orders'(page=${currentPage < totalPages ? currentPage + 1 : totalPages}, statusId=${statusId})}">
               &raquo;

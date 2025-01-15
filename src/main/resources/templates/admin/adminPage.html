@@ -138,7 +138,7 @@
                         </li>
 
                         <!-- 페이지 번호 -->
-                        <li class="page-item" th:if="${waitOrdersTotalPages != null}"
+                        <li class="page-item" th:if="${waitOrdersTotalPages != null and waitOrdersTotalPages > 0}"
                             th:each="i : ${#numbers.sequence(1, waitOrdersTotalPages)}"
                             th:classappend="${i == waitOrdersCurrentPage} ? 'active'">
                             <a class="page-link" th:text="${i}"
@@ -189,6 +189,9 @@
                             </ul>
                         </td>
                         <td th:text="${orderDetails['returnsReason']}"></td>
+                    </tr>
+                    <tr th:if="${orders == null or #lists.isEmpty(orders)}">
+                        <td colspan="8" class="text-center">No orders available</td>
                     </tr>
                     </tbody>
                 </table>

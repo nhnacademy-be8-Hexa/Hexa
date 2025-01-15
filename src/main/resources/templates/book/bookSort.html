@@ -1,59 +1,59 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hexa Books</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexa Books</title>
 
-  <!-- 외부 CSS 파일 링크 -->
-  <link rel="stylesheet" href="/css/styles.css">
+    <!-- 외부 CSS 파일 링크 -->
+    <link rel="stylesheet" href="/css/styles.css">
 
-  <script>
-    // 책을 클릭 시 상세 페이지로 이동
-    function goToBookPage(bookId) {
-      window.location.href = '/book/' + bookId; // bookId를 URL에 붙여서 상세 페이지로 이동
-    }
-  </script>
+    <script>
+        // 책을 클릭 시 상세 페이지로 이동
+        function goToBookPage(bookId) {
+            window.location.href = '/book/' + bookId; // bookId를 URL에 붙여서 상세 페이지로 이동
+        }
+    </script>
 </head>
 <body>
 
 <div class="container">
-  <!-- 헤더 포함 -->
-  <!--    <div th:replace="~{fragments/header :: header}"></div>-->
-  <div th:replace="~{fragments/header :: header}"></div>
+    <!-- 헤더 포함 -->
+    <!--    <div th:replace="~{fragments/header :: header}"></div>-->
+    <div th:replace="~{fragments/header :: header}"></div>
 
-  <!-- 검색 결과 -->
-  <section>
+    <!-- 검색 결과 -->
+    <section>
 
-      <h2 class="section-title"
-          th:text="${tagName != null} ? '# ' + ${tagName} : '검색 결과'">
-          검색 결과
-      </h2>
+        <h2 class="section-title"
+            th:text="${tagName != null} ? '# ' + ${tagName} : '검색 결과'">
+            검색 결과
+        </h2>
 
-      <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
-    <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
-      <p>검색 결과가 없습니다.</p>
-    </div>
-
-    <div class="book-list">
-      <div class="book-item clickable-book"
-           th:each="book : ${searchBooksWithImages}"
-           th:data-book-id="${book.bookId()}">
-        <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
-        <div class="book-title"
-             th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
-          책 제목
+        <!-- 검색어가 없다면 빈 결과 메시지 출력 -->
+        <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
+            <p>검색 결과가 없습니다.</p>
         </div>
-      </div>
-    </div>
 
-  </section>
+        <div class="book-list">
+            <div class="book-item clickable-book"
+                 th:each="book : ${searchBooksWithImages}"
+                 th:data-book-id="${book.bookId()}">
+                <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
+                <div class="book-title"
+                     th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
+                    책 제목
+                </div>
+            </div>
+        </div>
 
-  <!-- 페이징 네비게이션 -->
-  <nav aria-label="Page navigation example" th:if="${totalPages > 0}">
-    <div class="pagination justify-content-center">
-      <!-- 이전 페이지 버튼 -->
-      <span class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+    </section>
+
+    <!-- 페이징 네비게이션 -->
+    <nav aria-label="Page navigation example" th:if="${totalPages > 0}">
+        <div class="pagination justify-content-center">
+            <!-- 이전 페이지 버튼 -->
+            <span class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{'/search'(page=${currentPage - 1 > 0 ? currentPage - 1 : 1}, search=${search})}"
                    aria-label="Previous">
@@ -61,57 +61,57 @@
                 </a>
             </span>
 
-      <!-- 페이지 번호 -->
-      <span class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
-            th:classappend="${i eq currentPage} ? 'active'">
+            <!-- 페이지 번호 -->
+            <span class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                  th:classappend="${i eq currentPage} ? 'active'">
                 <a class="page-link" th:text="${i}"
                    th:href="@{'/search'(page=${i}, search=${search})}">${i}</a>
             </span>
 
-      <!-- 다음 페이지 버튼 -->
-      <span class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <!-- 다음 페이지 버튼 -->
+            <span class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{'/search'(page=${currentPage + 1 <= totalPages ? currentPage + 1 : totalPages}, search=${search})}"
                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </span>
-    </div>
-  </nav>
+        </div>
+    </nav>
 
-  <!-- 풋터 포함 -->
-  <!--    <div th:replace="~{fragments/footer :: footer}"></div>-->
-  <div th:replace="~{fragments/footer :: footer}"></div>
+    <!-- 풋터 포함 -->
+    <!--    <div th:replace="~{fragments/footer :: footer}"></div>-->
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 
 
 <script>
-  window.onload = function () {
-    // URL에서 clearLocalCart 파라미터가 있는지 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const clearLocalCart = urlParams.get('clearLocalCart');
-    const errorMessage = urlParams.get('error');
+    window.onload = function () {
+        // URL에서 clearLocalCart 파라미터가 있는지 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const clearLocalCart = urlParams.get('clearLocalCart');
+        const errorMessage = urlParams.get('error');
 
-    // 로그인 성공 시 로컬 스토리지에서 cart 삭제
-    if (clearLocalCart === 'true') {
-      localStorage.removeItem("cart");
-    }
+        // 로그인 성공 시 로컬 스토리지에서 cart 삭제
+        if (clearLocalCart === 'true') {
+            localStorage.removeItem("cart");
+        }
 
-    if (errorMessage === 'access_denied') {
-      alert("접근 권한이 없습니다");
-    }
+        if (errorMessage === 'access_denied') {
+            alert("접근 권한이 없습니다");
+        }
 
-    const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-    history.replaceState(null, null, newUrl); // URL에서 파라미터 제거 후 갱신
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        history.replaceState(null, null, newUrl); // URL에서 파라미터 제거 후 갱신
 
-    // 책 아이템 클릭 이벤트 핸들러
-    document.querySelectorAll('.clickable-book').forEach(bookItem => {
-      bookItem.addEventListener('click', function () {
-        const bookId = this.dataset.bookId;
-        goToBookPage(bookId);
-      });
-    });
-  };
+        // 책 아이템 클릭 이벤트 핸들러
+        document.querySelectorAll('.clickable-book').forEach(bookItem => {
+            bookItem.addEventListener('click', function () {
+                const bookId = this.dataset.bookId;
+                goToBookPage(bookId);
+            });
+        });
+    };
 </script>
 
 </body>

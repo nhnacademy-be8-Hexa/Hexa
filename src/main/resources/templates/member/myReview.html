@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <title>내 리뷰 관리</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title th:text="#{myReview.page.title}">내 리뷰 관리</title>
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
         /* 모달 z-index 조정 (필요한 경우) */
         .modal {
-            z-index: 1060 !important; /* 또는 #reviewContentModal { z-index: 1060; } */
+            z-index: 1060 !important;
         }
     </style>
 </head>
@@ -22,7 +22,7 @@
         <div th:replace="~{fragments/mypage :: mypage}"></div>
 
         <div class="container-xl">
-            <h2>내가 쓴 리뷰</h2>
+            <h2 th:text="#{myReview.h2}">내가 쓴 리뷰</h2>
 
             <div th:if="${errorMessage != null}">
                 <div class="alert alert-danger">
@@ -33,12 +33,12 @@
             <div th:if="${reviews != null and #lists.size(reviews) > 0}">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped">
-                        <thead>
+                        <thead class="table-light">
                         <tr>
-                            <th>리뷰 ID</th>
-                            <th>별점</th>
-                            <th>작성자</th>
-                            <th>관리</th>
+                            <th th:text="#{myReview.table.col.id}">리뷰 ID</th>
+                            <th th:text="#{myReview.table.col.rating}">별점</th>
+                            <th th:text="#{myReview.table.col.author}">작성자</th>
+                            <th th:text="#{myReview.table.col.management}">관리</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -51,9 +51,8 @@
                             </td>
                             <td>
                                 <button class="btn btn-secondary btn-sm show-content-button"
-                                        th:data-review-content="${review.reviewContent}">
-                                    내용보기
-                                </button>
+                                        th:data-review-content="${review.reviewContent}"
+                                        th:text="#{myReview.button.viewContent}">내용보기</button>
                             </td>
                         </tr>
                         </tbody>
@@ -85,7 +84,7 @@
             </div>
 
             <div th:if="${reviews == null or #lists.size(reviews) == 0}">
-                <p>작성한 리뷰가 없습니다.</p>
+                <p th:text="#{myReview.empty}">작성한 리뷰가 없습니다.</p>
             </div>
         </div>
     </div>
@@ -97,13 +96,15 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="reviewContentModalLabel">리뷰 내용</h5>
+                <h5 class="modal-title" id="reviewContentModalLabel" th:text="#{myReview.modal.title}">리뷰 내용</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="reviewContentModalBody">
+            <!-- 모달 본문에 HTML 마크업을 그대로 렌더링 -->
+            <div class="modal-body" id="reviewContentModalBody" th:utext="#{myReview.modal.detail}">
+                리뷰 상세 내용이 여기에 표시됩니다.
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{myReview.modal.button.close}">닫기</button>
             </div>
         </div>
     </div>
@@ -112,20 +113,37 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.10/purify.min.js"></script>
-
 <script th:inline="javascript">
     /*<![CDATA[*/
-    document.addEventListener("DOMContentLoaded", function () {
+    var reviewErrorLoading = /*[[#{myReview.error.loading}]]*/ "리뷰 리스트를 불러오는 중 오류가 발생했습니다.";
+    var reviewDetailErrorLoading = /*[[#{myReview.error.loadingDetail}]]*/ "리뷰 상세 정보를 불러오는 중 오류가 발생했습니다.";
+
+    var titleActiveText = /*[[#{myReview.title.active}]]*/ "내가 쓴 리뷰";
+    // (추가) 만약 숨김 리뷰 기능이 있다면 아래 메시지 사용; 없다면 기본 동작 유지.
+    var titleHiddenText = /*[[#{myReview.title.hidden}]]*/ "숨김 리뷰 목록";
+    var toggleShowHiddenText = /*[[#{myReview.button.toggle.showHidden}]]*/ "숨김 리뷰 보기";
+    var toggleShowActiveText = /*[[#{myReview.button.toggle.showActive}]]*/ "사용 가능한 리뷰 보기";
+
+    var modalReviewNameLabel = /*[[#{myReview.modal.label.reviewName}]]*/ "리뷰 이름:";   // 필요 시
+    var modalReviewPolicyLabel = /*[[#{myReview.modal.label.reviewPolicy}]]*/ "리뷰 정책:"; // 필요 시
+    var modalMinPurchaseLabel = /*[[#{myReview.modal.label.minPurchase}]]*/ "최소 구매 금액:"; // 필요 시
+    var modalDiscountTypeLabel = /*[[#{myReview.modal.label.discountType}]]*/ "할인 타입:"; // 필요 시
+    var modalDiscountValueLabel = /*[[#{myReview.modal.label.discountValue}]]*/ "할인량:"; // 필요 시
+    var modalDeadlineLabel = /*[[#{myReview.modal.label.deadline}]]*/ "유효 기간:"; // 필요 시
+
+    const memberId = /*[[(${member != null} ? ${member.memberId} : '')]]*/ '';
+
+    document.addEventListener("DOMContentLoaded", function() {
         const reviewContentModalEl = document.getElementById('reviewContentModal');
         const reviewContentModal = new bootstrap.Modal(reviewContentModalEl, {
             backdrop: true,
             keyboard: true,
-            focus: false // 핵심: 모달 오픈 시 자동 focus 방지
+            focus: false
         });
 
-        const reviewList = document.querySelector('.table-responsive'); // 이벤트 위임 대상 변경
+        const reviewList = document.querySelector('.table-responsive');
         if (reviewList) {
-            reviewList.addEventListener('click', function (event) {
+            reviewList.addEventListener('click', function(event) {
                 if (event.target.classList.contains('show-content-button')) {
                     const button = event.target;
                     const markdownText = button.dataset.reviewContent;
@@ -135,9 +153,8 @@
                         rawHtml = rawHtml.replace(/<img /g, '<img loading="lazy" ');
                         htmlContent = DOMPurify.sanitize(rawHtml);
                     } else {
-                        htmlContent = '<p>리뷰 내용이 없습니다.</p>';
+                        htmlContent = '<p th:text="#{myReview.modal.noContent}">리뷰 내용이 없습니다.</p>';
                     }
-
                     document.getElementById('reviewContentModalBody').innerHTML = htmlContent;
                     reviewContentModal.show();
                 }

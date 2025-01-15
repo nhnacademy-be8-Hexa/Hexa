@@ -64,6 +64,19 @@
                         </div>
                     </div>
                 </div>
+                <!-- 주소 및 상세 주소 -->
+                <div class="mt-4">
+                    <h3 class="h4">배송 정보</h3>
+                    <p><strong>주소:</strong> <span th:text="${order.address}">-</span></p>
+                    <p><strong>상세 주소:</strong> <span th:text="${order.addressDetail}">-</span></p>
+                </div>
+
+                <!-- 반품 상태인 경우 반품 정보 표시 -->
+                <div th:if="${order.orderStatus.orderStatusId == 4 || order.orderStatus.orderStatusId == 6}" class="mt-4">
+                    <h3 class="h4">반품 정보</h3>
+                    <p><strong>반품 사유:</strong> <span th:text="${returnsReason}">정보 없음</span></p>
+                    <p><strong>반품 상세:</strong> <span th:text="${returnsDetail}">정보 없음</span></p>
+                </div>
 
 <!--                주문 상태에 따른 처리-->
                 <div class="mt-4">

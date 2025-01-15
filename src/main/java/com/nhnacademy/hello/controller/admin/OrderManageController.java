@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -58,10 +57,12 @@ public class OrderManageController {
             return "admin/orderManage";
         }
 
-        int totalPages = (totalOrders == null) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
+        int totalPages = (totalOrders == null || totalOrders == 0) ? 0 : (int) Math.ceil((double) totalOrders / pageSize);
+        int currentPage = (totalPages == 0) ? 1 : Math.min(Math.max(page, 1), totalPages);
+
         model.addAttribute("statuses", statuses);
         model.addAttribute("orders", orders);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("statusId", statusId);
 

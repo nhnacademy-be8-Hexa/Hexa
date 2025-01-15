@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>취소/반품 내역</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <div class="container-fluid d-flex gap-4 p-4 align-items-start">
+    <div th:replace="~{fragments/mypage :: mypage}"></div>
+
+    <main class="flex-grow-1 bg-white border rounded p-4">
+      <h1 class="h3 mb-4 fw-bold text-center">취소/반품 내역</h1>
+
+      <!-- 반품 내역 -->
+      <section>
+        <h2 class="h4 fw-bold">반품/반품 대기 내역</h2>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+              <th>주문 ID</th>
+              <th>결제 금액</th>
+              <th>주문 일시</th>
+              <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${refundList}">
+              <td>
+                <a th:href="@{'/mypage/orders/' + ${order.orderId}}" th:text="${order.orderId}"></a>
+              </td>
+              <td th:text="${order.orderPrice}"></td>
+              <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+              <td th:text="${order.orderStatus.orderStatus}"
+                  th:classappend="${order.orderStatus.orderStatusId == 4 || order.orderStatus.orderStatusId == 6 ? 'text-danger' : 'text-success'}">
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- 반품/반품 대기 페이지네이션 -->
+          <nav aria-label="Refund Page Navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" th:classappend="${refundCurrentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/mypage/cancel-refunds'(page=${refundCurrentPage > 1 ? refundCurrentPage - 1 : 1}, size=${10})}">
+                  &laquo;
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(1, refundTotalPages)}"
+                  th:classappend="${i == refundCurrentPage} ? 'active'">
+                <a class="page-link" th:text="${i}"
+                   th:href="@{'/mypage/cancel-refunds'(page=${i}, size=${10})}"></a>
+              </li>
+              <li class="page-item" th:classappend="${refundCurrentPage == refundTotalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/mypage/cancel-refunds'(page=${refundCurrentPage < refundTotalPages ? refundCurrentPage + 1 : refundTotalPages}, size=${10})}">
+                  &raquo;
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </section>
+
+      <!-- 취소 내역 -->
+      <section class="mt-5">
+        <h2 class="h4 fw-bold">취소 내역</h2>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+              <th>주문 ID</th>
+              <th>결제 금액</th>
+              <th>주문 일시</th>
+              <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${cancelList}">
+              <td>
+                <a th:href="@{'/mypage/orders/' + ${order.orderId}}" th:text="${order.orderId}"></a>
+              </td>
+              <td th:text="${order.orderPrice}"></td>
+              <td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+              <td th:text="${order.orderStatus.orderStatus}" class="text-danger"></td>
+            </tr>
+            <tr th:if="${cancelList == null or #lists.isEmpty(cancelList)}">
+              <td colspan="6" class="text-center">취소 내역이 없습니다.</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- 취소 페이지네이션 -->
+          <nav aria-label="Cancel Page Navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" th:classappend="${cancelCurrentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/mypage/cancel-refunds'(page=${cancelCurrentPage > 1 ? cancelCurrentPage - 1 : 1}, size=${10})}">
+                  &laquo;
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(1, cancelTotalPages)}"
+                  th:classappend="${i == cancelCurrentPage} ? 'active'">
+                <a class="page-link" th:text="${i}"
+                   th:href="@{'/mypage/cancel-refunds'(page=${i}, size=${10})}"></a>
+              </li>
+              <li class="page-item" th:classappend="${cancelCurrentPage == cancelTotalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'/mypage/cancel-refunds'(page=${cancelCurrentPage < cancelTotalPages ? cancelCurrentPage + 1 : cancelTotalPages}, size=${10})}">
+                  &raquo;
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
