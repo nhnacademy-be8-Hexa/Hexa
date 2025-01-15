@@ -1,14 +1,7 @@
 package com.nhnacademy.hello.controller.admin;
 
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
-import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
-import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
-import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.book.BookRequestDTO;
-import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
-import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
-import com.nhnacademy.hello.dto.book.PublisherRequestDTO;
+import com.nhnacademy.hello.common.feignclient.*;
+import com.nhnacademy.hello.dto.book.*;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.image.ImageStore;
@@ -37,16 +30,18 @@ public class BookManageController {
     private final BookStatusAdapter bookStatusAdapter;
     private final ImageStore imageStore;
     private final CategoryAdapter categoryAdapter;
+    private final AuthorAdapter authorAdapter;
 
     @Autowired
     public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter,
                                 BookStatusAdapter bookStatusAdapter, ImageStore imageStore,
-                                CategoryAdapter categoryAdapter) {
+                                CategoryAdapter categoryAdapter, AuthorAdapter authorAdapter) {
         this.bookAdapter = bookAdapter;
         this.publisherAdapter = publisherAdapter;
         this.bookStatusAdapter = bookStatusAdapter;
         this.imageStore = imageStore;
         this.categoryAdapter = categoryAdapter;
+        this.authorAdapter = authorAdapter;
     }
 
     @GetMapping
@@ -165,6 +160,7 @@ public class BookManageController {
      */
     @PostMapping("/add")
     public String addBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO,
+                          @ModelAttribute AuthorWrapper authorWrapper,
                           BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             // 출판사 목록과 카테고리 목록을 다시 모델에 추가
@@ -183,6 +179,9 @@ public class BookManageController {
 
         // 도서 등록 API 호출
         ResponseEntity<BookDTO> response = bookAdapter.createBook(bookRequestDTO);
+
+        // 작가 등록 API 호출
+        authorWrapper.getAuthorRequestDTO().forEach(authorAdapter::createAuthor);
 
         List<Long> categoryIds = bookRequestDTO.categoryIds();
 
