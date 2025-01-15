@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/admin.css">
 
+  <script th:src="@{/js/spinner.js}"></script>
+
 </head>
 <body>
 
@@ -98,6 +100,8 @@
       return;
     }
 
+    LoadingSpinner.show();
+
     // POST 요청 전송
     fetch('/admin/delivery-cost-policy', {
       method: 'POST',
@@ -120,6 +124,9 @@
             .catch(error => {
               console.error('Error:', error);
               alert("오류가 발생했습니다.");
+            })
+            .finally(()=>{
+              LoadingSpinner.hide();
             });
   }
 </script>
