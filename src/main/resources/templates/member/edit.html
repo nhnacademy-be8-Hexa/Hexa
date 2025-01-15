@@ -1,24 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>edit member info</title>
-
+  <meta charset="UTF-8">
+  <title th:text="#{edit.page.title}">edit member info</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-
 </head>
 <body>
 
 <div class="container mt-5">
-
   <div th:replace="~{fragments/header :: header}"></div>
 
   <div class="container-fluid d-flex gap-4 p-4 align-items-start">
     <div th:replace="~{fragments/mypage :: mypage}"></div>
 
     <div class="flex-grow-1">
-      <h2 class="text-center mb-4" style="color: #9E8DBF;">정보 수정</h2>
+      <h2 class="text-center mb-4" style="color: #9E8DBF;" th:text="#{edit.h2}">정보 수정</h2>
 
       <!-- 에러 메시지 -->
       <div th:if="${errors}" class="alert alert-danger text-center" role="alert">
@@ -28,52 +25,47 @@
       </div>
 
       <form action="/mypage/edit" method="post">
-
         <!-- Member Name -->
         <div class="mb-3">
-          <label for="memberName" class="form-label">Name</label>
+          <label for="memberName" class="form-label" th:text="#{edit.label.name}">Name</label>
           <input type="text" class="form-control" id="memberName" name="memberName" required
                  th:value="${updateDTO != null ? updateDTO.memberName() : ''}">
-          <div class="form-text">Name must be between 2 and 20 characters.</div>
+          <div class="form-text" th:text="#{edit.hint.name}">Name must be between 2 and 20 characters.</div>
         </div>
 
         <!-- Member Number -->
         <div class="mb-3">
-          <label for="memberNumber" class="form-label">Phone Number</label>
+          <label for="memberNumber" class="form-label" th:text="#{edit.label.phone}">Phone Number</label>
           <input type="text" class="form-control" id="memberNumber" name="memberNumber" required
                  th:value="${updateDTO != null ? updateDTO.memberNumber() : ''}" pattern="\d*">
-          <div class="form-text">Phone number must be 10 to 11 digits.</div>
+          <div class="form-text" th:text="#{edit.hint.phone}">Phone number must be 10 to 11 digits.</div>
         </div>
 
         <!-- Email -->
         <div class="mb-3">
-          <label for="memberEmail" class="form-label">Email</label>
+          <label for="memberEmail" class="form-label" th:text="#{edit.label.email}">Email</label>
           <input type="email" class="form-control" id="memberEmail" name="memberEmail"
                  th:value="${updateDTO != null ? updateDTO.memberEmail() : ''}">
-          <div class="form-text">Email address (optional, max 320 characters).</div>
+          <div class="form-text" th:text="#{edit.hint.email}">Email address (optional, max 320 characters).</div>
         </div>
 
         <!-- Birth Date -->
         <div class="mb-3">
-          <label for="memberBirthAt" class="form-label">Birth Date</label>
+          <label for="memberBirthAt" class="form-label" th:text="#{edit.label.birth}">Birth Date</label>
           <input type="date" class="form-control" id="memberBirthAt" name="memberBirthAt"
                  th:value="${updateDTO != null ? updateDTO.memberBirthAt() : null}">
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn register-btn w-100">수정</button>
+        <button type="submit" class="btn register-btn w-100" th:text="#{edit.button.submit}">수정</button>
 
         <!-- Cancel Button -->
-        <a href="javascript:history.back();" class="btn btn-secondary w-100 mt-2">취소</a>
-
+        <a href="javascript:history.back();" class="btn btn-secondary w-100 mt-2" th:text="#{edit.button.cancel}">취소</a>
       </form>
-
     </div>
   </div>
 
-  <!-- 풋터 -->
   <div th:replace="~{fragments/footer :: footer}"></div>
-
 </div>
 
 </body>
