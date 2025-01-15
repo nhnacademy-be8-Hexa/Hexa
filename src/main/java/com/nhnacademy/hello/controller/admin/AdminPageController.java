@@ -69,8 +69,9 @@ public class AdminPageController {
             List<OrderDTO> orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
             Long totalCount = orderAdapter.countOrdersByStatus(statusId).getBody();
 
-            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
-            int currentPage = Math.min(Math.max(page, 1), totalPages);
+            // totalPages 계산 시 totalCount가 0이면 0으로 설정
+            int totalPages = (totalCount == null || totalCount == 0) ? 1 : (int) Math.ceil((double) totalCount / pageSize);
+            int currentPage = (totalPages == 1 && totalCount == 0) ? 1 : Math.min(Math.max(page, 1), totalPages);
 
             List<Map<String, Object>> enrichedOrders = enrichOrderDetails(orders);
 
@@ -79,7 +80,7 @@ public class AdminPageController {
             model.addAttribute(attributeName + "TotalPages", totalPages);
         } catch (Exception e) {
             model.addAttribute(attributeName, List.of());
-            model.addAttribute(attributeName + "CurrentPage", 1);
+            model.addAttribute(attributeName + "CurrentPage", 0); // 비어있는 경우 페이지 번호 0
             model.addAttribute(attributeName + "TotalPages", 0);
         }
     }
