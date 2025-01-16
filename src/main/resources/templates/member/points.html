@@ -57,19 +57,30 @@
                 <!-- 페이징 처리 -->
                 <div class="d-flex justify-content-center">
                     <ul class="pagination">
-                        <li class="page-item" th:if="${page > 0}">
-                            <a class="page-link" th:href="@{/mypage/points(page=${page - 1}, size=${size}, sort=${sort})}">이전</a>
+                        <!-- 이전 버튼 -->
+                        <li class="page-item" th:classappend="${page == 0} ? ' disabled' : ''">
+                            <a class="page-link" th:href="@{/mypage/points(page=${page - 1}, size=${size}, sort=${sort})}"
+                               th:if="${page > 0}">이전</a>
                         </li>
 
-                        <li class="page-item active">
-                            <span class="page-link" th:text="${page + 1}">1</span>
+                        <!-- 페이지 번호 -->
+                        <li class="page-item"
+                            th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${pageNum == page} ? ' active' : ''">
+                            <a class="page-link" th:href="@{/mypage/points(page=${pageNum}, size=${size}, sort=${sort})}"
+                               th:text="${pageNum + 1}">1</a>
                         </li>
 
-                        <li class="page-item" th:if="${pointDetails.size() == size}">
-                            <a class="page-link" th:href="@{/mypage/points(page=${page + 1}, size=${size}, sort=${sort})}">다음</a>
+                        <!-- 다음 버튼 -->
+                        <li class="page-item" th:classappend="${page + 1 >= totalPages} ? ' disabled' : ''">
+                            <a class="page-link" th:href="@{/mypage/points(page=${page + 1}, size=${size}, sort=${sort})}"
+                               th:if="${page + 1 < totalPages}">다음</a>
                         </li>
                     </ul>
                 </div>
+
+
+
             </div>
         </main>
     </div>
