@@ -73,9 +73,9 @@
             th:text="#{couponList.modal.button.close}">닫기</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script th:src="@{/js/spinner.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
 <script th:inline="javascript">
     /*<![CDATA[*/
     var couponListErrorLoading = /*[[#{couponList.error.loading}]]*/ "쿠폰 리스트를 불러오는 중 오류가 발생했습니다.";
@@ -116,6 +116,8 @@
 
     function loadCouponList() {
         console.log(memberId);
+        LoadingSpinner.show();
+
         fetch(`/members/${memberId}/coupons`)
             .then(response => {
                 if (!response.ok) {
@@ -153,11 +155,16 @@
             .catch(error => {
                 console.error("Error loading coupons:", error);
                 alert(couponListErrorLoading);
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function loadUsedCouponList() {
         console.log(memberId);
+        LoadingSpinner.show();
+
         fetch(`/members/${memberId}/coupons`)
             .then(response => {
                 if (!response.ok) {
@@ -195,10 +202,15 @@
             .catch(error => {
                 console.error("Error loading coupons:", error);
                 alert(couponListErrorLoading);
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function openDetailModal(couponId) {
+        LoadingSpinner.show();
+
         fetch(`/coupons/${couponId}`)
             .then(response => {
                 if (!response.ok) {
@@ -221,6 +233,9 @@
             .catch(error => {
                 console.error("Error loading coupon details:", error);
                 alert(couponDetailErrorLoading);
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
