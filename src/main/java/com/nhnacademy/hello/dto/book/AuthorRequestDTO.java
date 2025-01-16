@@ -13,7 +13,7 @@ public class AuthorRequestDTO {
     @NotBlank
     @NotNull
     private String authorName;
-
+    
     @NotNull
     private Long bookId;
 }
