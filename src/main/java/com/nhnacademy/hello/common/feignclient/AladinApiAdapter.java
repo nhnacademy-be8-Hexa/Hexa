@@ -19,5 +19,5 @@ public interface AladinApiAdapter {
 
     @PostMapping("/api/aladinApi")
     ResponseEntity<BookDTO> createAladinBook(@RequestBody AladinBookRequestDTO aladinBookRequestDTO);
-
+    
 }

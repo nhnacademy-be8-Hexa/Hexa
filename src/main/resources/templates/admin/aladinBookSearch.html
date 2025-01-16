@@ -7,6 +7,7 @@
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <script th:src="@{/js/spinner.js}"></script>
     <style>
         /* 전체 페이지 레이아웃을 flexbox로 설정 */
         .main-container {
@@ -323,6 +324,8 @@
     }
 
     function registerBook() {
+        LoadingSpinner.show();
+
         const title = document.getElementById('registerBookButton').getAttribute('data-title');
 
         const authorsString = document.getElementById('registerBookButton').getAttribute('data-authors');
@@ -376,6 +379,9 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('도서 등록 중 오류가 발생했습니다.');
+            })
+            .finally(() => {
+                LoadingSpinner.hide();
             });
     }
 </script>
