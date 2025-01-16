@@ -1,18 +1,18 @@
 package com.nhnacademy.hello.dto.book;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record AladinBookDTO(
         String title,
         List<String> authors,
-        String priceSales,
-        String priceStandard,
+        int priceSales,
+        int priceStandard,
         String publisher,
-        String pubDate,
-        String isbn13,
+        LocalDate pubDate,
+        Long isbn13,
         String description,
-        String categoryName,
-        String salesPoint,
+        int salesPoint,
         String cover
 ) {
 }

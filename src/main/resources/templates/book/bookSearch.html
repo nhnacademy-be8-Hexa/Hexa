@@ -32,11 +32,6 @@
             Hexa Books Search Results
         </h2>
 
-        <!-- 검색 결과가 없을 때 -->
-        <div th:if="${#lists.isEmpty(searchBooksWithImages)}" class="no-results">
-            <p th:text="#{bookSearch.search.empty}">검색 결과가 없습니다.</p>
-        </div>
-
         <div class="book-list">
             <div class="book-item clickable-book"
                  th:each="book : ${searchBooksWithImages}"
