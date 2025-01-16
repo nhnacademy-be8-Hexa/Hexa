@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>도서 수정</title>
 
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
     <!-- Bootstrap Dropdown Submenu CSS -->
@@ -42,6 +40,10 @@
             display: block;
         }
     </style>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <script th:src="@{/js/spinner.js}"></script>
 </head>
 <body>
 <div class="container">
@@ -193,6 +195,8 @@
             initialValue: initialContent,
             hooks: {
                 addImageBlobHook: (blob, callback) => {
+                    LoadingSpinner.show();
+
                     const formData = new FormData();
                     formData.append('image', blob);
 
@@ -212,6 +216,9 @@
                         .catch(err => {
                             console.error('Error uploading image:', err);
                             callback('', 'Image upload failed');
+                        })
+                        .finally(()=>{
+                            LoadingSpinner.hide();
                         });
                 }
             }
