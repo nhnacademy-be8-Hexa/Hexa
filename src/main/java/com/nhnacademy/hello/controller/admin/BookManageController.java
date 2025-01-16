@@ -160,7 +160,6 @@ public class BookManageController {
      */
     @PostMapping("/add")
     public String addBook(@Valid @ModelAttribute("bookRequestDTO") BookRequestDTO bookRequestDTO,
-                          @ModelAttribute AuthorWrapper authorWrapper,
                           BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             // 출판사 목록과 카테고리 목록을 다시 모델에 추가
@@ -181,7 +180,16 @@ public class BookManageController {
         ResponseEntity<BookDTO> response = bookAdapter.createBook(bookRequestDTO);
 
         // 작가 등록 API 호출
-        authorWrapper.getAuthorRequestDTO().forEach(authorAdapter::createAuthor);
+        List<AuthorRequestDTO> authorRequestDTO = new ArrayList<>();
+        List<String> authors = bookRequestDTO.authorName();
+
+        for (String author : authors) {
+            authorRequestDTO.add(new AuthorRequestDTO(author, response.getBody().bookId()));
+        }
+
+        for (AuthorRequestDTO authorRequestDTO1 : authorRequestDTO) {
+            authorAdapter.createAuthor(authorRequestDTO1);
+        }
 
         List<Long> categoryIds = bookRequestDTO.categoryIds();
 
@@ -226,6 +234,7 @@ public class BookManageController {
                 book.bookDescription(),
                 book.bookPrice(),
                 book.bookWrappable(),
+                null,
                 book.bookStatus().bookStatusId().toString(),
                 new ArrayList<>()
         );
@@ -321,6 +330,8 @@ public class BookManageController {
             }
         }
 
+        // 도서 수량 증가
+        bookAdapter.incrementBookAmountIncrease(bookId, bookUpdateRequestDTO.bookAmount());
         
         bookAdapter.updateBook(bookId, bookUpdateRequestDTO);
         return "redirect:/admin/bookManage";
