@@ -56,28 +56,28 @@
         <div class="pagination justify-content-center">
             <!-- 이전 페이지 버튼 -->
             <span class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{${path}(page=${currentPage - 1 > 0 ? currentPage - 1 : 1}, sort=${sort})}"
-                   aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </span>
+            <a class="page-link"
+               th:href="@{?(page=${currentPage - 1 > 0 ? currentPage - 1 : 1})}"
+               aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </span>
 
             <!-- 페이지 번호 -->
             <span class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
                   th:classappend="${i eq currentPage} ? 'active'">
-                <a class="page-link" th:text="${i}"
-                   th:href="@{${path}(page=${i}, sort=${sort})}">${i}</a>
-            </span>
+            <a class="page-link" th:text="${i}"
+               th:href="@{?(page=${i})}"></a>
+        </span>
 
             <!-- 다음 페이지 버튼 -->
             <span class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{${path}(page=${currentPage + 1 <= totalPages ? currentPage + 1 : totalPages}, sort=${sort})}"
-                   aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </span>
+            <a class="page-link"
+               th:href="@{?(page=${currentPage + 1 <= totalPages ? currentPage + 1 : totalPages})}"
+               aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </span>
         </div>
     </nav>
 

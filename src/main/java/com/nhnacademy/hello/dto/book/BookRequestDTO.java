@@ -53,7 +53,10 @@ public record BookRequestDTO(
         List<Long> categoryIds,
 
         // 도서 수량
-        Integer bookAmount
+        Integer bookAmount,
+
+        // 작가 목록
+        List<String> authorName
 ) {
         // 기본 생성자 제공
         public BookRequestDTO() {
@@ -68,7 +71,8 @@ public record BookRequestDTO(
                         "",
                         "",
                         new ArrayList<>(),
-                        1
+                        1,
+                        new ArrayList<>()
                 );
         }
 

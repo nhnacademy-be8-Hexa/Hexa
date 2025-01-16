@@ -47,11 +47,14 @@ public class CouponConsumer {
 
         List<CouponDTO> coupon = couponAdapter.getCouponByCouponName("겨울 쿠폰"); // 만들어진 쿠폰 중 멤버에게 나눠줄 쿠폰을 쿠폰 이름으로 찾기
 
+        List<Long> allMemberCoupon = couponMemberAdapter.getAllCouponId(); // 멤버들에게 나눠준 모든 쿠폰 아이디
+        Set<Long> allMemberCouponSet = new HashSet<>(allMemberCoupon);
+
         for (CouponDTO couponDTO : coupon) {
             if (couponNameMember.contains(couponDTO.couponName())) { // 멤버가 받은 적 없는 쿠폰이어야 함
                 return "이미 발급받은 쿠폰입니다.";
             }
-            if(!couponMemberAdapter.checkCouponDuplicate(couponDTO.couponId())){ // 다른 사람이 받은 쿠폰이 아니여야 함 // 너무 많은 페인 클라이언트 호출 -> 멤버쿠폰 테이블에 있는 아이디를 모두 뽑아와서 하는게 비교하는게 효율적일듯
+            if(!allMemberCouponSet.contains(couponDTO.couponId())){ // 다른 사람이 받은 쿠폰이 아니여야 함 // 너무 많은 페인 클라이언트 호출 -> 멤버쿠폰 테이블에 있는 아이디를 모두 뽑아와서 하는게 비교하게 바꿈
                 couponMemberAdapter.createMemberCoupon(memberId, couponDTO.couponId());
                 return "쿠폰을 발급 받았습니다!";
             }

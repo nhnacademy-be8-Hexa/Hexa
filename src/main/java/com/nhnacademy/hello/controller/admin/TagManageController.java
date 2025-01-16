@@ -95,15 +95,15 @@ public class TagManageController {
 
         TagRequestDTO tagRequestDTO = null;
         int size = 9;
-        List<TagDTO> tags = tagAdapter.getAllTags(page,pageSize, "").getBody();
-        for(TagDTO tag : tags){
+        TagDTO tag = tagAdapter.getTagById(tagId).getBody();
+
+
             if(tag.tagId().equals(tagId)){
                 tagRequestDTO = new TagRequestDTO(
                         tag.tagName()
                 );
-                break;
             }
-        }
+
 
         model.addAttribute("tagRequestDTO", tagRequestDTO);
         return "admin/tagEditForm";
