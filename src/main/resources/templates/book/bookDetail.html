@@ -362,8 +362,9 @@
 
 <!-- Toast UI Editor JS (필요 시) -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:src="@{/js/spinner.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -481,6 +482,8 @@
                     let formData = new FormData();
                     formData.append('image', blob, 'review-image.' + mime.split('/')[1]); // 확장자 설정
 
+                    LoadingSpinner.show();
+
                     // 업로드 요청 생성 및 배열에 저장
                     let uploadPromise = fetch('/upload-review-image', {
                         method: 'POST',
@@ -505,6 +508,9 @@
                             alert('이미지 업로드 중 오류가 발생했습니다.');
                             // 이미지 삭제 또는 대체
                             updatedMarkdown = updatedMarkdown.replace(match[0], '![이미지 업로드 실패]');
+                        })
+                        .finally(()=>{
+                            LoadingSpinner.hide();
                         });
 
                     uploadPromises.push(uploadPromise);
