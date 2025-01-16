@@ -66,7 +66,7 @@ public class AdminPageController {
     private void addOrderDataToModel(
             int page, int pageSize, String attributeName, Long statusId, Model model) {
         try {
-            List<OrderDTO> orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
+            List<OrderDTO> orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize, "");
             Long totalCount = orderAdapter.countOrdersByStatus(statusId).getBody();
 
             // totalPages 계산 시 totalCount가 0이면 0으로 설정

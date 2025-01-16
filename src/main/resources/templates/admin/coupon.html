@@ -9,6 +9,7 @@
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <script th:src="@{/js/spinner.js}"></script>
     <style>
         .main-content {
             margin-left: 260px;
@@ -138,6 +139,7 @@
     });
 
     function loadCouponList() {
+        LoadingSpinner.show();
         fetch('/coupons') // 쿠폰 리스트 API 호출
             .then(response => {
                 if (!response.ok) {
@@ -164,10 +166,14 @@
             .catch(error => {
                 console.error('Error loading coupons:', error);
                 alert('쿠폰 리스트를 불러오는 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function loadCouponPolicies() {
+        LoadingSpinner.show();
         fetch('/coupon-policies') // 쿠폰 정책 API 호출
             .then(response => {
                 if (!response.ok) {
@@ -186,6 +192,9 @@
             })
             .catch(error => {
                 console.error('쿠폰 정책 데이터를 불러오는 중 오류 발생:', error);
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
@@ -198,6 +207,7 @@
     }
 
     function submitCreateCoupon() {
+        LoadingSpinner.show();
         const couponPolicyId = document.getElementById('couponPolicyId').value;
         const couponName = document.getElementById('couponName').value;
         const couponTarget = document.getElementById('couponTarget').value;
@@ -236,11 +246,15 @@
             .catch(error => {
                 console.error('Error creating coupon:', error);
                 alert('쿠폰 생성 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function deleteCoupon(button, couponId, couponName) {
         if (confirm(`${couponName}을(를) 삭제하시겠습니까?`)) {
+            LoadingSpinner.show();
             fetch(`/coupons/${couponId}/deactivate`, { method: 'POST' }) // DELETE 요청
                 .then(response => {
                     if (!response.ok) {
@@ -252,11 +266,15 @@
                 .catch(error => {
                     console.error('Error deleting coupon:', error);
                     alert('쿠폰 삭제 중 오류가 발생했습니다.');
+                })
+                .finally(()=>{
+                    LoadingSpinner.hide();
                 });
         }
     }
 
     function openDetailModal(couponId) {
+        LoadingSpinner.show();
         fetch(`/coupons/${couponId}`) // 쿠폰 상세 정보 API 호출
             .then(response => {
                 if (!response.ok) {
@@ -282,6 +300,9 @@
             .catch(error => {
                 console.error('Error loading coupon details:', error);
                 alert('쿠폰 상세 정보를 불러오는 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 

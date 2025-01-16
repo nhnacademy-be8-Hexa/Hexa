@@ -22,7 +22,9 @@ public interface OrderAdapter {
 
     @GetMapping("/api/orders")
     public ResponseEntity<List<OrderDTO>> getAllOrders(
-            @RequestParam(defaultValue = "0") int page);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam String sort
+            );
 
     @GetMapping("/api/members/{memberId}/orders")
     public ResponseEntity<List<OrderDTO>> getOrdersByMemberId(
@@ -61,7 +63,8 @@ public interface OrderAdapter {
     public List<OrderDTO> getOrderStatus(
             @RequestParam Long statusId,
             @RequestParam("page") int page,
-            @RequestParam("size") int size);
+            @RequestParam("size") int size,
+            @RequestParam("sort") String sort);
 
     @GetMapping("/api/orders/status/{statusId}/count")
     public ResponseEntity<Long> countOrdersByStatus(@PathVariable("statusId") Long statusId);
