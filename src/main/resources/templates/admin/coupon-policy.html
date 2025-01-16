@@ -7,8 +7,7 @@
     <title>쿠폰 발행</title>
     <!-- CSS files -->
     <link href="/css/dist/tabler.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/admin.css">
+
     <style>
         .main-content {
             margin-left: 260px;
@@ -38,6 +37,10 @@
             }
         }
     </style>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <script th:src="@{/js/spinner.js}"></script>
 </head>
 <body>
 <div class="container">
@@ -177,6 +180,7 @@
     });
 
     function loadCouponPolicyList() {
+        LoadingSpinner.show();
         fetch('/coupon-policies')
             .then(response => {
                 if (!response.ok) {
@@ -205,6 +209,9 @@
             .catch(error => {
                 console.error('Error loading coupons:', error);
                 alert('쿠폰 정책 리스트를 불러오는 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
@@ -214,6 +221,7 @@
     }
 
     function submitCreateCouponPolicy() {
+        LoadingSpinner.show();
         const couponPolicyName = document.getElementById('couponPolicyName').value;
         const minPurchaseAmount = document.getElementById('minPurchaseAmount').value;
         const discountType = document.getElementById('discountType').value;
@@ -251,10 +259,14 @@
             .catch(error => {
                 console.error('Error creating coupon:', error);
                 alert('쿠폰 정책 생성 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function CouponPolicyUpdate(button, couponPolicyId) {
+        LoadingSpinner.show();
         fetch(`/coupon-policies/${couponPolicyId}`)
             .then(response => {
                 if (!response.ok) {
@@ -277,10 +289,14 @@
             .catch(error => {
                 console.error('Error loading coupon policy for edit:', error);
                 alert('쿠폰 정책 정보를 불러오는 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function submitEditCouponPolicy() {
+        LoadingSpinner.show();
         const couponPolicyId = document.getElementById('editCouponPolicyModal').getAttribute('data-id');
         const couponPolicyName = document.getElementById('editCouponPolicyName').value;
         const minPurchaseAmount = document.getElementById('editMinPurchaseAmount').value;
@@ -316,11 +332,15 @@
             .catch(error => {
                 console.error('Error updating coupon policy:', error);
                 alert('쿠폰 정책 수정 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
     function deleteCoupon(button, couponPolicyId, couponPolicyName) {
         if (confirm(`${couponPolicyName}을(를) 삭제하시겠습니까?`)) {
+            LoadingSpinner.show();
             fetch(`/coupon-policies/${couponPolicyId}`, { method: 'DELETE' }) // DELETE 요청
                 .then(response => {
                     if (!response.ok) {
@@ -332,11 +352,15 @@
                 .catch(error => {
                     console.error('Error deleting coupon:', error);
                     alert('쿠폰 정책 삭제 중 오류가 발생했습니다.');
+                })
+                .finally(()=>{
+                    LoadingSpinner.hide();
                 });
         }
     }
 
     function openDetailModal(couponPolicyId) {
+        LoadingSpinner.show();
         fetch(`/coupon-policies/${couponPolicyId}`) // 쿠폰 상세 정보 API 호출
             .then(response => {
                 if (!response.ok) {
@@ -362,6 +386,9 @@
             .catch(error => {
                 console.error('Error loading coupon details:', error);
                 alert('쿠폰 정책 상세 정보를 불러오는 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 

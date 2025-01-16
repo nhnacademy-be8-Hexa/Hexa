@@ -2,6 +2,7 @@ package com.nhnacademy.hello.common.feignclient;
 
 import com.nhnacademy.hello.dto.point.CreatePointDetailDTO;
 import com.nhnacademy.hello.dto.point.PointDetailsDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -29,4 +30,7 @@ public interface PointDetailsAdapter {
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("sort") String sort);
+
+    @GetMapping("/api/members/{memberId}/pointDetails/count")
+    ResponseEntity<Integer> countByMemberId(@PathVariable String memberId);
 }

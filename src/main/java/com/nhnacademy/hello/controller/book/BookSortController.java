@@ -136,6 +136,7 @@ public class BookSortController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", 18);
+        model.addAttribute("sort", sort);
 
         return "book/bookSort";
     }
