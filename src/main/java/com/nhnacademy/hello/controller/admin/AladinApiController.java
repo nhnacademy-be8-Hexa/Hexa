@@ -55,7 +55,6 @@ public class AladinApiController {
         BookDTO bookDTO = aladinApiAdapter.createAladinBook(aladinBookRequestDTO).getBody();
         String fileName = String.format("bookThumbnail_%d", bookDTO.bookId());
         saveImageFromUrl(aladinBookRequestDTO.cover(), fileName);
-
         return ResponseEntity.ok().build();
     }
 

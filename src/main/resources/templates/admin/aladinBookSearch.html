@@ -277,7 +277,6 @@
 </div>
 
 <script>
-    // 책 상세 모달 열기
     function openBookDetailModal(element) {
         const title = element.getAttribute('data-title');
         const authors = element.getAttribute('data-authors');
@@ -290,14 +289,23 @@
         const salesPoint = element.getAttribute('data-sales-point');
         const cover = element.getAttribute('data-cover');
 
-        document.getElementById('modalBookTitle').innerText = title;
-        document.getElementById('modalBookDescription').innerText = description;
-        document.getElementById('modalBookAuthors').innerText = '저자: ' + authors;
-        document.getElementById('modalBookPriceSales').innerText = '판매가: ' + priceSales;
-        document.getElementById('modalBookPriceStandard').innerText = '정가: ' + priceStandard;
-        document.getElementById('modalBookPublisher').innerText = '출판사: ' + publisher;
-        document.getElementById('modalBookPubDate').innerText = '출판일: ' + pubDate;
-        document.getElementById('modalBookIsbn').innerText = 'ISBN: ' + isbn;
+        document.getElementById('modalBookTitle').innerText = title ? title : '제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookAuthors').innerText = authors ? '저자: ' + authors : '저자: 제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookDescription').innerText = description ? description : '제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookPriceSales').innerText = (priceSales && priceSales !== '0')
+            ? '판매가: ' + priceSales
+            : '판매가: 제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookPriceStandard').innerText = (priceStandard && priceStandard !== '0')
+            ? '정가: ' + priceStandard
+            : '정가: 제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookPublisher').innerText = publisher ? '출판사: ' + publisher : '출판사: 제공된 정보가 없습니다.';
+        document.getElementById('modalBookPubDate').innerText = pubDate ? '출판일: ' + pubDate : '출판일: 제공된 정보가 없습니다.';
+        document.getElementById('modalBookIsbn').innerText = isbn ? 'ISBN: ' + isbn : 'ISBN: 제공된 정보가 없습니다.';
         document.getElementById('modalBookSalesPoint').innerText = '판매수: ' + salesPoint;
         document.getElementById('modalBookCover').src = cover;
 
@@ -316,6 +324,7 @@
 
         document.getElementById('bookDetailModal').style.display = 'block';
     }
+
 
     // 모달 닫기
     function closeModal(modalId) {
