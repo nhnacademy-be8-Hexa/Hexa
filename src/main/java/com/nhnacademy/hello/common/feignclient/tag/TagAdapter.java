@@ -36,10 +36,10 @@ public interface TagAdapter {
 
 
     // 전체 태그 수 조회 (검색 조건 포함)
-    @GetMapping("admin/tags/count")
+    @GetMapping("/admin/tags/count")
     public ResponseEntity<Long> getTotalTags();
 
-    @GetMapping("/tags/{tagId}")
+    @GetMapping("/admin/tags/{tagId}")
     public ResponseEntity<TagDTO> getTagById(@PathVariable Long tagId);
 
 }
