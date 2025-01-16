@@ -103,4 +103,9 @@ public interface ReviewAdapter {
 
     @GetMapping("/api/books/{bookId}/review-rating")
     ResponseEntity<BigDecimal> getReviewRating(@PathVariable Long bookId);
+
+    @GetMapping("/api/reviews/{reviewId}")
+    ResponseEntity<ReviewDTO> getReview(
+            @PathVariable Long reviewId
+    );
 }

@@ -39,9 +39,18 @@ public class PointDetailsController {
         // 페이징 처리된 포인트 내역을 받아옵니다.
         List<PointDetailsDTO> pointDetails = pointDetailsAdapter.getPointDetails(username, page, size, sort).getBody();
 
+
+
         model.addAttribute("member", member);
         model.addAttribute("sum", sum);
         model.addAttribute("pointDetails", pointDetails);
+
+        int total = pointDetailsAdapter.countByMemberId(username).getBody();
+
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("total", total);
         model.addAttribute("page", page);
         model.addAttribute("size", size);
         model.addAttribute("sort", sort);
