@@ -93,6 +93,15 @@
                     </div>
                 </div>
 
+                <!-- 도서 수량 증가 -->
+                <div class="mb-3">
+                    <label for="bookAmount" class="form-label">증가할 수량:</label>
+                    <input type="number" id="bookAmount" name="bookAmount" class="form-control"
+                           th:field="*{bookAmount}" min="1" value="1"/>
+                    <div class="text-danger" th:if="${#fields.hasErrors('bookAmount')}"
+                         th:errors="*{bookAmount}">수량 오류</div>
+                </div>
+
                 <div class="mb-3 form-check">
                     <input type="checkbox" id="bookWrappable" name="bookWrappable" class="form-check-input"
                            th:field="*{bookWrappable}"/>

@@ -307,6 +307,7 @@ public class PurchaseController {
                                 null,
                                 null,
                                 null,
+                                null,
                                 bookStatusId.toString(),
                                 new ArrayList<>()
                         )
