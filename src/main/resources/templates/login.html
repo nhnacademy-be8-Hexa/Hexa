@@ -113,36 +113,4 @@
 </div>
 </body>
 </html>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 현재 URL에서 locale 값을 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        const locale = urlParams.get('locale');
-
-        // 기본적으로 두 버튼을 비활성화
-        const korButton = document.getElementById('kor-btn');
-        const engButton = document.getElementById('eng-btn');
-
-        // locale 값에 따라 active 클래스 추가
-        if (locale === 'kor') {
-            korButton.classList.add('active');
-            engButton.classList.remove('active');
-        } else if (locale === 'eng') {
-            engButton.classList.add('active');
-            korButton.classList.remove('active');
-        }
-
-        // 버튼 클릭 시 active 클래스 추가 및 다른 버튼에서 제거
-        korButton.addEventListener('click', function() {
-            this.classList.add('active');
-            engButton.classList.remove('active');
-        });
-
-        engButton.addEventListener('click', function() {
-            this.classList.add('active');
-            korButton.classList.remove('active');
-        });
-    });
-
-</script>
 
