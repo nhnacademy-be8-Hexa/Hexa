@@ -39,11 +39,11 @@ public class ElasticSearchController {
         List<SearchBookDTO> searchBooks = elasticSearchAdapter.searchBooks(adjustedPage, size, search);
         List<SearchBookDTO> searchBooksWithImages = setImagePaths(searchBooks);
         model.addAttribute("searchBooksWithImages", searchBooksWithImages);
-        model.addAttribute("searchResultsCount", searchBooksWithImages.size());
         model.addAttribute("search", search);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", size);
+        model.addAttribute("totalBooks", totalBooks);
 
         return "book/bookSearch";
     }
