@@ -46,7 +46,6 @@
                         </thead>
                         <tbody>
                         <tr th:each="order, indexStat : ${ordersList}">
-<!--                            <td th:text="${order.orderId}"> </td>-->
                             <td>
                                 <a th:href="@{'/mypage/orders/' + ${order.orderId}}" th:text="${order.orderId}"></a>
                             </td>
@@ -78,12 +77,6 @@
                                 </a>
                             </li>
                             <!-- 페이지 번호 -->
-<!--                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"-->
-<!--                                th:classappend="${i == currentPage} ? 'active'">-->
-<!--                                <a class="page-link" th:text="${i}"-->
-<!--                                   th:href="@{'/mypage/orders'(page=${i})}"></a>-->
-<!--                            </li>-->
-
                             <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
                                 <a class="page-link" th:text="${i}" th:href="@{'/mypage/orders'(page=${i})}"></a>
                             </li>
