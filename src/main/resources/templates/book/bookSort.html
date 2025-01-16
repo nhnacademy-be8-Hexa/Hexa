@@ -41,7 +41,8 @@
                  th:data-book-id="${book.bookId()}">
                 <img th:src="${book.imagePath()}" th:alt="|${book.bookTitle()} 이미지|">
                 <div class="book-title"
-                     th:text="${#strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : book.bookTitle()}">
+                     th:text="${book.bookTitle() != null && #strings.contains(book.bookTitle(), '-') ? #strings.substringBefore(book.bookTitle(), '-') : (book.bookTitle() != null ? book.bookTitle() : 'Untitled')}
+">
                     책 제목
                 </div>
             </div>

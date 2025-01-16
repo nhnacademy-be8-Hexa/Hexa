@@ -7,6 +7,7 @@ import com.nhnacademy.hello.common.util.SetImagePathsUtils;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.tag.TagDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,12 +33,8 @@ public class BookSortController {
                 adjustedPage, 18, "", null, null, null, null, null, true, null, null, null, null, null
         );
 
-        Long totalBooks = bookAdapter.getTotalBooks(
-                null,
-                null,
-                null,
-                null
-        ).getBody();
+        ResponseEntity<Long> response = bookAdapter.getTotalBooks(null, null, null, null);
+        Long totalBooks = (response != null && response.getBody() != null) ? response.getBody() : 0L;
 
         int totalPages = (int) Math.ceil((double) totalBooks / 18);
 
@@ -59,12 +56,8 @@ public class BookSortController {
                 adjustedPage, 18, "", null, null, null, null, null, null, null, true, null, null, null
         );
 
-        Long totalBooks = bookAdapter.getTotalBooks(
-                null,
-                null,
-                null,
-                null
-        ).getBody();
+        ResponseEntity<Long> response = bookAdapter.getTotalBooks(null, null, null, null);
+        Long totalBooks = (response != null && response.getBody() != null) ? response.getBody() : 0L;
 
         int totalPages = (int) Math.ceil((double) totalBooks / 18);
 
@@ -85,12 +78,8 @@ public class BookSortController {
                 adjustedPage, 18, "", null, null, null, null, null, null, null, null, null, null, true
         );
 
-        Long totalBooks = bookAdapter.getTotalBooks(
-                null,
-                null,
-                null,
-                null
-        ).getBody();
+        ResponseEntity<Long> response = bookAdapter.getTotalBooks(null, null, null, null);
+        Long totalBooks = (response != null && response.getBody() != null) ? response.getBody() : 0L;
 
         int totalPages = (int) Math.ceil((double) totalBooks / 18);
 
@@ -121,12 +110,8 @@ public class BookSortController {
         }
         sortByTitleBooks = setImagePathsUtils.setImagePaths(sortByTitleBooks);
 
-        Long totalBooks = bookAdapter.getTotalBooks(
-                null,
-                null,
-                null,
-                null
-        ).getBody();
+        ResponseEntity<Long> response = bookAdapter.getTotalBooks(null, null, null, null);
+        Long totalBooks = (response != null && response.getBody() != null) ? response.getBody() : 0L;
 
         int totalPages = (int) Math.ceil((double) totalBooks / 18);
 
