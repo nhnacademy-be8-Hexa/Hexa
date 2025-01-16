@@ -45,7 +45,8 @@
         </thead>
         <tbody>
         <!-- policyList 데이터 순회 -->
-        <tr th:each="policy : ${policyList}">
+        <tr th:each="policy, iterStat : ${policyList}"
+            th:class="${iterStat.index == 0} ? 'table-primary' : ''">
           <td th:text="${policy.deliveryCostPolicyId}"></td>
           <td th:text="${policy.deliveryCost}"></td>
           <td th:text="${policy.freeMinimumAmount}"></td>
