@@ -41,11 +41,11 @@ public class OrderManageController {
 
             if (statusId != null) {
                 // 상태 ID에 따른 주문 목록 가져오기
-                orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize);
+                orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize, "orderId,desc");
                 totalOrders = orderAdapter.countOrdersByStatus(statusId).getBody();
             } else {
                 // 모든 주문 목록 가져오기
-                orders = orderAdapter.getAllOrders(page - 1).getBody();
+                orders = orderAdapter.getAllOrders(page - 1, "orderId,desc").getBody();
                 totalOrders = orderAdapter.getTotalOrderCount().getBody();
             }
 
