@@ -24,12 +24,7 @@ public interface CouponMemberAdapter {
     @DeleteMapping("api/members/{memberId}/coupons/{couponId}")
     Void deleteMemberCoupon(@PathVariable String memberId, @PathVariable Long couponId);
 
-    // 특정 사용자가 특정 쿠폰을 이미 발급았는지 확인
-    @GetMapping("api/members/coupons/is-assigned")
-    Boolean isCouponAlreadyAssigned(@RequestParam Long couponId,
-                                                    @RequestParam String memberId);
-
-    @GetMapping("api/members/coupons/check-duplicate")
-    Boolean checkCouponDuplicate(@RequestParam Long couponId);
+    @GetMapping("api/members/All/coupons")
+    List<Long> getAllCouponId();
 
 }

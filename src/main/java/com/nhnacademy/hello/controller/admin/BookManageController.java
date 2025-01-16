@@ -1,14 +1,7 @@
 package com.nhnacademy.hello.controller.admin;
 
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.BookStatusAdapter;
-import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
-import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
-import com.nhnacademy.hello.dto.book.BookDTO;
-import com.nhnacademy.hello.dto.book.BookRequestDTO;
-import com.nhnacademy.hello.dto.book.BookStatusRequestDTO;
-import com.nhnacademy.hello.dto.book.BookUpdateRequestDTO;
-import com.nhnacademy.hello.dto.book.PublisherRequestDTO;
+import com.nhnacademy.hello.common.feignclient.*;
+import com.nhnacademy.hello.dto.book.*;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.dto.category.PagedCategoryDTO;
 import com.nhnacademy.hello.image.ImageStore;
@@ -37,16 +30,18 @@ public class BookManageController {
     private final BookStatusAdapter bookStatusAdapter;
     private final ImageStore imageStore;
     private final CategoryAdapter categoryAdapter;
+    private final AuthorAdapter authorAdapter;
 
     @Autowired
     public BookManageController(BookAdapter bookAdapter, PublisherAdapter publisherAdapter,
                                 BookStatusAdapter bookStatusAdapter, ImageStore imageStore,
-                                CategoryAdapter categoryAdapter) {
+                                CategoryAdapter categoryAdapter, AuthorAdapter authorAdapter) {
         this.bookAdapter = bookAdapter;
         this.publisherAdapter = publisherAdapter;
         this.bookStatusAdapter = bookStatusAdapter;
         this.imageStore = imageStore;
         this.categoryAdapter = categoryAdapter;
+        this.authorAdapter = authorAdapter;
     }
 
     @GetMapping
@@ -184,6 +179,18 @@ public class BookManageController {
         // 도서 등록 API 호출
         ResponseEntity<BookDTO> response = bookAdapter.createBook(bookRequestDTO);
 
+        // 작가 등록 API 호출
+        List<AuthorRequestDTO> authorRequestDTO = new ArrayList<>();
+        List<String> authors = bookRequestDTO.authorName();
+
+        for (String author : authors) {
+            authorRequestDTO.add(new AuthorRequestDTO(author, response.getBody().bookId()));
+        }
+
+        for (AuthorRequestDTO authorRequestDTO1 : authorRequestDTO) {
+            authorAdapter.createAuthor(authorRequestDTO1);
+        }
+
         List<Long> categoryIds = bookRequestDTO.categoryIds();
 
         for (Long categoryId : categoryIds) {
@@ -227,6 +234,7 @@ public class BookManageController {
                 book.bookDescription(),
                 book.bookPrice(),
                 book.bookWrappable(),
+                null,
                 book.bookStatus().bookStatusId().toString(),
                 new ArrayList<>()
         );
@@ -322,6 +330,8 @@ public class BookManageController {
             }
         }
 
+        // 도서 수량 증가
+        bookAdapter.incrementBookAmountIncrease(bookId, bookUpdateRequestDTO.bookAmount());
         
         bookAdapter.updateBook(bookId, bookUpdateRequestDTO);
         return "redirect:/admin/bookManage";

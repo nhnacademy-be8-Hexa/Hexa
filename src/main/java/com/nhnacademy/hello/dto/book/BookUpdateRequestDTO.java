@@ -16,6 +16,9 @@ public record BookUpdateRequestDTO(
 
         Boolean bookWrappable,
 
+        @Positive
+        Integer bookAmount,
+
         String statusId,
 
         List<Long> categoryIds
