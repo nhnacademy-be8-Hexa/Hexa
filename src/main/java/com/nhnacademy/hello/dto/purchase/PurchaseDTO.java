@@ -17,7 +17,8 @@ public record PurchaseDTO(
         String guestOrderNumber,
         String guestEmail,
         String guestPassword,
-        List<Long> selectedCouponIds
+        List<Long> selectedCouponIds,
+        int deliveryAmount
 ) {
 }
 

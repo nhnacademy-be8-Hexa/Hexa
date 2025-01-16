@@ -6,11 +6,8 @@
     <title>Purchase</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
-
-    <!-- toss payments sdk -->
-    <script src="https://js.tosspayments.com/v2/standard"></script>
 
     <style>
         input[type="number"]::-webkit-inner-spin-button,
@@ -181,7 +178,17 @@
     </div>
 
     <!--    배송비 표시-->
-    <h5 class="mt-4" th:text="#{purchase.deliveryCharge}">배송비 3000원</h5>
+    <h5 class="mt-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <span th:text="#{purchase.deliveryCharge}">배송비</span>
+            <span class="ms-2" id="deliveryCost" th:text="${deliveryCostPolicy.deliveryCost()}">0</span>
+            <span th:text="#{won}">원</span>
+        </div>
+        <small class="text-muted">
+            <span id="freeMinimumAmount" th:text="${deliveryCostPolicy.freeMinimumAmount()}">0</span>
+            <span th:text="#{purchase.deliveryfree}">원 이상 결제 시 배송비 무료!</span>
+        </small>
+    </h5>
 
     <!-- 총 가격 -->
     <div class="text-end mt-4">
@@ -316,9 +323,14 @@
 
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Daum 우편번호 API 스크립트 -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<!-- toss payments sdk -->
+<script src="https://js.tosspayments.com/v2/standard"></script>
+
+<script th:src="@{/js/spinner.js}"></script>
 
 <script>
 
@@ -330,6 +342,8 @@
 
     // 배송지 선택 처리
     function selectAddress(button) {
+        LoadingSpinner.show();
+
         var addressId = button.getAttribute('data-id');
         // AJAX 요청을 통해 선택한 주소 정보 가져오기
         fetch(`/select-address?addressId=${addressId}`, {
@@ -358,6 +372,9 @@
             .catch(error => {
                 console.error('Error selecting address:', error);
                 alert(error.message || '배송지 선택 중 오류가 발생했습니다.');
+            })
+            .finally(()=>{
+                LoadingSpinner.hide();
             });
     }
 
@@ -377,6 +394,8 @@
         var detailAddress = document.getElementById('newDetailAddress').value.trim();
 
         if (recipientName && zonecode && address && detailAddress) {
+            LoadingSpinner.show();
+
             // AJAX 요청을 통해 새 주소 추가
             fetch('/add-address', {
                 method: 'POST',
@@ -415,6 +434,9 @@
                 .catch(error => {
                     console.error('Error adding address:', error);
                     alert(error.message || '배송지 추가 중 오류가 발생했습니다.');
+                })
+                .finally(()=>{
+                    LoadingSpinner.hide();
                 });
         } else {
             alert('모든 필드를 정확히 입력해주세요.');
@@ -511,7 +533,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        const overlay = document.getElementById("loading-overlay");
 
         // 포인트 입력 필드
         const pointInput = document.getElementById("point-input");
@@ -541,9 +562,6 @@
         // 포장지 선택 필드 데이터
         const wrappingPaperSelect = document.getElementById("wrapping-paper-select");
 
-
-        let totalPrice = 0;
-
         // 서버에서 전달된 buynow_quantity가 있는지 확인
         const buynowQuantityElement = document.getElementById("buynow-quantity");
         const buynowQuantity = buynowQuantityElement && buynowQuantityElement.value.trim() !== ""
@@ -552,9 +570,17 @@
         // 사용된 쿠폰 아이디 리스트
         const selectedCouponIds = [];
 
+        // 배송비, 무료 배송 최소 금액
+        const freeMinimumAmount = parseInt(document.getElementById('freeMinimumAmount').textContent);
+        const deliveryCostElement = document.getElementById('deliveryCost');
+        const deliveryCost = deliveryCostElement.textContent;
+
+        let totalPrice = 0;
+        let deliveryAmount = 0;
+
         // 동적 총액 계산 함수
         const calculateTotalPrice = () => {
-            overlay.style.display = "block";
+            LoadingSpinner.show();
 
             // selectedCouponIds 배열 초기화
             selectedCouponIds.length = 0;
@@ -640,13 +666,22 @@
                 totalPrice -= parseInt(pointInput.value, 10) || 0;
             }
 
-            // 배송비 추가
-            totalPrice += 3000;
+            // 배송비
+            if(totalPrice >= freeMinimumAmount){
+                deliveryAmount = 0;
+                deliveryCostElement.textContent = "0";
+                deliveryCostElement.style.color = "red";
+            } else {
+                deliveryAmount = parseInt(deliveryCost);
+                deliveryCostElement.textContent = deliveryCost;
+                deliveryCostElement.style.color = "black";
+            }
+            totalPrice += deliveryAmount;
 
             // 총 가격 업데이트
             document.getElementById("total-price").textContent = totalPrice.toLocaleString();
 
-            overlay.style.display = "none";
+            LoadingSpinner.hide();
         }
 
         // 초기 페이지 로딩 시 가격 계산 실행
@@ -857,7 +892,7 @@
                 const result = await payment.requestPayment(paymentRequest);
 
                 // 서버에 데이터 저장 중 로딩 오버레이
-                overlay.style.display = "block";
+                LoadingSpinner.show();
 
                 // 결제 승인, 데이터 저장
 
@@ -891,6 +926,7 @@
                         usingPoint: isNaN(pointValue) ? 0 : pointValue,
                         deliveryDate: formattedDeliveryDate,
                         ...purchaseData,
+                        deliveryAmount: deliveryAmount,
                     }),
                 });
 
@@ -908,17 +944,15 @@
                 const savedOrderData = await response.json();
 
                 // GET /purchase/success
-                const successUrl = `/purchase/success?orderId=${savedOrderData}&orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
-                window.location.href = successUrl;
+                window.location.href = `/purchase/success?orderId=${savedOrderData}&orderName=${encodeURIComponent(orderName)}&amount=${totalPrice}`;
 
             } catch(error){
                 console.error("결제 에러", error);
 
                 // 에러 메시지와 코드를 fail 페이지로 전달
-                const failUrl = `/purchase/fail?errorCode=${encodeURIComponent(error.code)}&errorMessage=${encodeURIComponent(error.message)}`;
-                window.location.href = failUrl;
+                window.location.href = `/purchase/fail?errorCode=${encodeURIComponent(error.code)}&errorMessage=${encodeURIComponent(error.message)}`;
             } finally {
-                overlay.style.display = "none";
+                LoadingSpinner.hide();
             }
 
         });
@@ -931,32 +965,5 @@
 </script>
 
 </body>
-
-<!-- 결제 처리 중 로딩 오버레이 -->
-<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-        <div class="spinner"></div>
-        <p style="color: white; margin-top: 10px;">잠시만 기다려주세요...</p>
-    </div>
-</div>
-
-<!-- 로딩 스피너 스타일 -->
-<style>
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(255, 255, 255, 0.2);
-        border-top: 5px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto; /* 가운데 정렬 */
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
-
-
 
 </html>

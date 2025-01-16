@@ -39,12 +39,12 @@
         .review-content img {
             max-width: 40%;
             max-height: 50%;
-            height: auto;          /* 이미지 비율 유지 */
-            display: block;        /* 블록 요소로 설정하여 여백 적용 */
-            margin: 10px auto;     /* 이미지 중앙 정렬 및 위/아래 여백 추가 */
+            height: auto; /* 이미지 비율 유지 */
+            display: block; /* 블록 요소로 설정하여 여백 적용 */
+            margin: 10px auto; /* 이미지 중앙 정렬 및 위/아래 여백 추가 */
             border: 1px solid #ddd; /* 선택 사항: 이미지에 테두리 추가 */
-            border-radius: 5px;     /* 선택 사항: 이미지 모서리 둥글게 */
-            padding: 5px;           /* 선택 사항: 이미지 내부 여백 */
+            border-radius: 5px; /* 선택 사항: 이미지 모서리 둥글게 */
+            padding: 5px; /* 선택 사항: 이미지 내부 여백 */
             background-color: #f9f9f9; /* 선택 사항: 이미지 배경 색상 */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
         }
@@ -52,7 +52,7 @@
         /* 작은 화면에서 이미지 크기 조정 */
         @media (max-width: 768px) {
             .review-content img {
-                max-width: 100%;    /* 작은 화면에서는 100%로 설정 */
+                max-width: 100%; /* 작은 화면에서는 100%로 설정 */
             }
         }
 
@@ -60,6 +60,24 @@
         .review-content {
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+
+        .star-filled {
+            color: gold;
+            font-size: 1.5em; /* 크기를 2배로 설정 (필요에 따라 조정 가능) */
+        }
+
+        .star-half {
+            color: gold;
+            background: linear-gradient(90deg, gold 50%, lightgray 50%);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 1.5em; /* 크기를 2배로 설정 (필요에 따라 조정 가능) */
+        }
+
+        .star-empty {
+            color: lightgray;
+            font-size: 1.5em; /* 크기를 2배로 설정 (필요에 따라 조정 가능) */
         }
     </style>
 </head>
@@ -107,7 +125,8 @@
             <p class="mb-1" th:text="'출간일: ' + ${book.bookPubDate}">출간일 정보</p>
 
             <!-- 상태 -->
-            <p class="text-muted mb-3" th:text="'상태: ' + ${book.bookStatus.bookStatus}" style="margin-top: 15px;">책 상태</p>
+            <p class="text-muted mb-3" th:text="'상태: ' + ${book.bookStatus.bookStatus}" style="margin-top: 15px;">책
+                상태</p>
 
             <!-- 가격 -->
             <p class="mb-1">
@@ -116,9 +135,20 @@
             </p>
 
             <!-- 별점 및 리뷰 -->
+            <!--            <p>-->
+            <!--                별점: ★★★☆☆ (리뷰 수: <span th:text="${totalCount}">0</span>개)-->
+            <!--            </p>-->
+            <!-- 별점 및 리뷰 -->
             <p>
-                별점: ★★★☆☆ (리뷰 수: <span th:text="${totalCount}">0</span>개)
+                별점:<span th:each="i : ${#numbers.sequence(1, 5)}">
+                        <!-- 소수점 처리를 위한 반별 표시 -->
+                        <span th:if="${rating >= i}" class="star-filled">★</span>
+                        <span th:if="${rating >= i - 0.5 && rating < i}" class="star-half">★</span>
+                        <span th:if="${rating < i - 0.5}" class="star-empty">★</span>
+                </span>
+                (리뷰 수: <span th:text="${totalCount}">0</span>개)
             </p>
+
 
             <div class="d-flex align-items-center mb-3">
                 <span class="me-3">
@@ -150,7 +180,8 @@
             <div class="d-flex">
                 <button id="addToCartButton" class="btn btn-outline-success me-2">장바구니 담기</button>
                 <a id="buyNowButton" class="btn btn-outline-danger">바로 구매</a>
-                <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId})}"  class="btn btn-outline-dark ms-2" >태그 선택</a>
+                <a sec:authorize="hasRole('ADMIN')" th:href="@{/book/{bookId}/admin/tagSelect(bookId=${book.bookId})}"
+                   class="btn btn-outline-dark ms-2">태그 선택</a>
             </div>
 
         </div>
@@ -205,8 +236,10 @@
                             </div>
                             <!-- 작성자가 아닌 경우에만 '신고' 버튼 표시 -->
                             <div th:if="${review.member.memberId != memberId}" class="d-inline-block">
-                                <form th:action="@{/book/{bookId}/reviews/{reviewId}/report(bookId=${book.bookId}, reviewId=${review.reviewId})}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('이 리뷰를 신고하시겠습니까?');">
+                                <form th:action="@{/book/{bookId}/reviews/{reviewId}/report(bookId=${book.bookId}, reviewId=${review.reviewId})}"
+                                      method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                                            onclick="return confirm('이 리뷰를 신고하시겠습니까?');">
                                         신고
                                     </button>
                                 </form>
@@ -272,10 +305,10 @@
                       method="post">
 
                     <!-- 리뷰 ID (수정 시 사용, 기본적으로 비어있음) -->
-                    <input type="hidden" id="reviewId" name="reviewId" th:value="${null}" />
+                    <input type="hidden" id="reviewId" name="reviewId" th:value="${null}"/>
 
                     <!-- 이미지 포함 여부를 나타내는 숨겨진 필드 추가 -->
-                    <input type="hidden" id="imagesIncluded" name="imagesIncluded" value="false" />
+                    <input type="hidden" id="imagesIncluded" name="imagesIncluded" value="false"/>
 
                     <!-- 리뷰 내용 (Toast UI Editor) -->
                     <div class="mb-3">
@@ -284,18 +317,23 @@
                         <textarea id="reviewContent" name="reviewContent" style="display:none;"
                                   th:field="*{reviewContent}"></textarea>
                         <div class="text-danger" th:if="${#fields.hasErrors('reviewContent')}"
-                             th:errors="*{reviewContent}">리뷰 내용 오류</div>
+                             th:errors="*{reviewContent}">리뷰 내용 오류
+                        </div>
                     </div>
 
                     <!-- 리뷰 평점 -->
                     <div class="mb-3">
                         <label for="reviewRating" class="form-label">평점:</label>
-                        <select id="reviewRating" name="reviewRating" class="form-select" th:field="*{reviewRating}" required>
+                        <select id="reviewRating" name="reviewRating" class="form-select" th:field="*{reviewRating}"
+                                required>
                             <option value="" disabled selected>평점을 선택하세요</option>
-                            <option th:each="i : ${#numbers.sequence(1, 5, 1)}" th:value="${i}" th:text="${i} + '점'">1점</option>
+                            <option th:each="i : ${#numbers.sequence(1, 5, 1)}" th:value="${i}" th:text="${i} + '점'">
+                                1점
+                            </option>
                         </select>
                         <div class="text-danger" th:if="${#fields.hasErrors('reviewRating')}"
-                             th:errors="*{reviewRating}">평점 오류</div>
+                             th:errors="*{reviewRating}">평점 오류
+                        </div>
                     </div>
 
                     <!-- 리뷰 제출 버튼 -->
@@ -324,8 +362,9 @@
 
 <!-- Toast UI Editor JS (필요 시) -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:src="@{/js/spinner.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -364,7 +403,7 @@
     });
 
     // '바로 구매' 버튼 클릭 이벤트
-    document.getElementById("buyNowButton").addEventListener("click", function(e) {
+    document.getElementById("buyNowButton").addEventListener("click", function (e) {
         e.preventDefault();
 
         const quantity = document.getElementById("quantity").value;
@@ -437,11 +476,13 @@
                         byteNumbers[i] = byteCharacters.charCodeAt(i);
                     }
                     let byteArray = new Uint8Array(byteNumbers);
-                    let blob = new Blob([byteArray], { type: mime });
+                    let blob = new Blob([byteArray], {type: mime});
 
                     // 이미지 업로드를 위한 FormData 생성
                     let formData = new FormData();
                     formData.append('image', blob, 'review-image.' + mime.split('/')[1]); // 확장자 설정
+
+                    LoadingSpinner.show();
 
                     // 업로드 요청 생성 및 배열에 저장
                     let uploadPromise = fetch('/upload-review-image', {
@@ -467,6 +508,9 @@
                             alert('이미지 업로드 중 오류가 발생했습니다.');
                             // 이미지 삭제 또는 대체
                             updatedMarkdown = updatedMarkdown.replace(match[0], '![이미지 업로드 실패]');
+                        })
+                        .finally(()=>{
+                            LoadingSpinner.hide();
                         });
 
                     uploadPromises.push(uploadPromise);
@@ -525,7 +569,7 @@
 
                     reviewForm.action = '/book/' + bookId + '/reviews/' + reviewId;
 
-                    reviewForm.scrollIntoView({ behavior: 'smooth' });
+                    reviewForm.scrollIntoView({behavior: 'smooth'});
                 } else {
                     alert('리뷰 작성 폼을 찾을 수 없습니다.');
                 }
@@ -535,7 +579,7 @@
         // 클라이언트 사이드 Markdown 변환 및 렌더링
         // 1. 리뷰 내용 처리
         const reviewElements = document.querySelectorAll('.review-content');
-        reviewElements.forEach(function(el) {
+        reviewElements.forEach(function (el) {
             const markdownText = el.getAttribute('data-markdown');
             if (markdownText) {
                 // marked.js를 사용하여 Markdown을 HTML로 변환
@@ -551,7 +595,7 @@
 
         // 2. 책 설명 처리 추가
         const bookDescriptionElements = document.querySelectorAll('.book-description');
-        bookDescriptionElements.forEach(function(el) {
+        bookDescriptionElements.forEach(function (el) {
             const markdownText = el.getAttribute('data-markdown');
             if (markdownText) {
                 // marked.js를 사용하여 Markdown을 HTML로 변환

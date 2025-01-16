@@ -70,16 +70,9 @@ public class ReviewManageController {
     // 특정 리뷰 상세 조회
     @GetMapping("/{reviewId}")
     public String getReviewDetail(@PathVariable Long reviewId, Model model) {
-        Optional<List<ReviewDTO>> reviews = Optional.ofNullable(reviewAdapter.getReviewsFromAdmin(0, 1, "reviewId").getBody());
-        if (reviews.isPresent()) {
-            for (ReviewDTO review : reviews.get()) {
-                if (review.reviewId().equals(reviewId)) {
-                    model.addAttribute("review", review);
-                    return "admin/reviewDetail";
-                }
-            }
-        }
-        return "redirect:/admin/review";
+        ReviewDTO review = reviewAdapter.getReview(reviewId).getBody();
+        model.addAttribute("review", review);
+        return "admin/reviewDetail";
     }
 
     // 특정 리뷰 수정
