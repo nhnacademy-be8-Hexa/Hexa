@@ -9,8 +9,24 @@
     <!-- 필수 -->
     <link href="/css/dist/tabler.min.css?1692870487" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
+
+    <style>
+        .btn-icon {
+            background: linear-gradient(45deg, #ff6b6b, #f06595); /* 기본 색상 */
+            border: none;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            color: white;
+        }
+
+        .btn-icon:hover {
+            background: linear-gradient(45deg, #ff85a1, #ff99cc); /* 분홍색으로 변경 */
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(255, 153, 204, 0.5); /* 분홍빛 그림자 */
+        }
+    </style>
 
 </head>
 <body>
@@ -22,9 +38,9 @@
         <h1>이벤트 페이지</h1>
         <div>겨울 쿠폰 받아가세요!</div>
         <form method="post" action="/coupon-get">
-            <button type="submit" id="couponButton"
-                    class="btn btn-success btn-lg rounded-pill shadow mt-3">
-            쿠폰 발급받기
+            </button>
+            <button type="submit" id="couponButton" class="btn btn-icon rounded-circle d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                <i class="bi bi-heart-fill"></i>
             </button>
         </form>
         <div id="couponMessage" th:text="${couponMessage}" style="margin-top: 10px; color: green;"></div>
