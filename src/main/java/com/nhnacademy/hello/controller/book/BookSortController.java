@@ -47,6 +47,7 @@ public class BookSortController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", 18);
+        model.addAttribute("path", "/bestsellers");
 
         return "book/bookSort";
     }
@@ -74,6 +75,7 @@ public class BookSortController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", 18);
+        model.addAttribute("path", "/newarrivals");
 
         return "book/bookSort";
     }
@@ -100,6 +102,7 @@ public class BookSortController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", 18);
+        model.addAttribute("path", "/manyreview");
 
         return "book/bookSort";
     }
@@ -136,6 +139,8 @@ public class BookSortController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", 18);
+        model.addAttribute("sort", sort);
+        model.addAttribute("path", "/name");
 
         return "book/bookSort";
     }
