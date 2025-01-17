@@ -59,7 +59,7 @@ public class CategoryManageController {
 
         // 2차 카테고리에 포함된 도서가 있을경우
         List<PagedCategoryDTO> pagedCategories =
-                categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE).getBody();
+                categoryAdapter.getAllPagedCategories(adjustedPage, PAGE_SIZE, "categoryId,desc").getBody();
         model.addAttribute("pagedCategories", pagedCategories);
 
 
