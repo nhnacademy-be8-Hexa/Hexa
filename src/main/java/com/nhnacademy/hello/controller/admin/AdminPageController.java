@@ -29,7 +29,7 @@ public class AdminPageController {
 
     @GetMapping("/admin")
     public String adminPage(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "10") int pageSize,
+                            @RequestParam(defaultValue = "10") int size,
                             Model model) {
         if (!AuthInfoUtils.isLogin()) {
             return "redirect:/login";
@@ -41,7 +41,8 @@ public class AdminPageController {
         }
         model.addAttribute("member", adminMember);
 
-        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null);
+        List<BookDTO> mostVisitedBooks = bookAdapter.getBooks(0, 5, List.of("bookView,desc", "bookId,asc"),
+                null, null, null, null, null, null);
         Map<Long, List<AuthorDTO>> bookAuthorsMap = new HashMap<>();
         Map<Long, Long> bookLikesMap = new HashMap<>();
 
@@ -57,8 +58,8 @@ public class AdminPageController {
         model.addAttribute("bookAuthorsMap", bookAuthorsMap);
         model.addAttribute("bookLikesMap", bookLikesMap);
 
-        addOrderDataToModel(page, pageSize, "waitOrders", 1L, model);
-        addOrderDataToModel(page, pageSize, "returnOrders", 6L, model);
+        addOrderDataToModel(page, size, "waitOrders", 1L, model);
+        addOrderDataToModel(page, size, "returnOrders", 6L, model);
 
         return "admin/adminPage";
     }
