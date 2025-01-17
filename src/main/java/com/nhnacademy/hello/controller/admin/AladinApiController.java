@@ -1,9 +1,6 @@
 package com.nhnacademy.hello.controller.admin;
 
 import com.nhnacademy.hello.common.feignclient.AladinApiAdapter;
-import com.nhnacademy.hello.common.feignclient.AuthorAdapter;
-import com.nhnacademy.hello.common.feignclient.BookAdapter;
-import com.nhnacademy.hello.common.feignclient.PublisherAdapter;
 import com.nhnacademy.hello.dto.book.AladinBookDTO;
 import com.nhnacademy.hello.dto.book.AladinBookRequestDTO;
 import com.nhnacademy.hello.dto.book.BookDTO;
@@ -15,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -37,14 +36,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class AladinApiController {
 
     private final AladinApiAdapter aladinApiAdapter;
-    private final BookAdapter bookAdapter;
-    private final AuthorAdapter authorAdapter;
-    private final PublisherAdapter publisherAdapter;
     private final ImageStore imageStore;
 
     @GetMapping
-    public String aladinApi(@RequestParam(required = false) String query, Model model) {
-        List<AladinBookDTO> books = aladinApiAdapter.searchBooks(query);
+    public String searchAladinBooks(@RequestParam(required = false) String query, Model model) {
+        List<AladinBookDTO> books = aladinApiAdapter.searchAladinBooks(query);
         model.addAttribute("books", books);
         model.addAttribute("query", query);
         return "admin/aladinBookSearch";
@@ -66,24 +62,22 @@ public class AladinApiController {
      */
     public void saveImageFromUrl(String imageUrl, String fileName) {
         try {
-            // URL 객체 생성
-            URL url = new URL(imageUrl);
+
+            URI uri = new URI(imageUrl);
+            URL url = uri.toURL();
             URLConnection connection = url.openConnection();
 
-            // InputStream을 통해 URL에서 이미지 다운로드
             try (InputStream inputStream = connection.getInputStream()) {
-                // 다운로드한 이미지를 ByteArray로 읽기
+
                 byte[] imageBytes = IOUtils.toByteArray(inputStream);
 
-                // MultipartFile로 변환
                 MultipartFile multipartFile = convertToMultipartFile(imageBytes, fileName);
 
-                // 이미지 저장
                 List<MultipartFile> files = new ArrayList<>();
                 files.add(multipartFile);
                 imageStore.saveImages(files, fileName);
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
