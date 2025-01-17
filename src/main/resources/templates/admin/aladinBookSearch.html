@@ -180,6 +180,7 @@
                       style="width: 100%; display: flex; gap: 10px;">
                     <label style="flex-grow: 1;">
                         <input type="text" name="query" class="search-input" placeholder="검색어를 입력하세요"
+                               th:value="${query}"
                                style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;">
                     </label>
                     <button type="submit" class="search-button"
@@ -251,20 +252,39 @@
     </div>
     <div class="modal-content">
         <img id="modalBookCover" src="" alt="책 이미지" style="max-width: 100%; max-height: 300px; margin-bottom: 20px;">
-        <p id="modalBookDescription"></p>
-        <p id="modalBookAuthors"></p>
-        <p id="modalBookPriceSales"></p>
-        <p id="modalBookPriceStandard"></p>
+        <!-- 도서 설명 수정 입력 필드 -->
+        <label for="modalBookDescription"></label>
+        <textarea id="modalBookDescription" placeholder="도서 설명을 수정하세요" rows="4"
+                  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+
+        <p id="modalBookAuthors" class="mt-3"></p>
         <p id="modalBookPublisher"></p>
         <p id="modalBookPubDate"></p>
         <p id="modalBookIsbn"></p>
         <p id="modalBookSalesPoint"></p>
+        <p id="modalBookPriceStandard"></p>
 
         <input type="hidden" id="bookStatusId" value="1">
 
-        <div>
+
+        <!-- 판매가 수정 입력 필드 -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <label for="modalBookPriceSales">판매가</label>
+            <input type="number" id="modalBookPriceSales" placeholder="판매가를 입력하세요"
+                   style="width: 120px; padding: 6px 10px; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+        </div>
+
+        <!-- 재고 수 입력 필드 추가 -->
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 17px;">
+            <label for="modalBookAmount">재고 수</label>
+            <input type="number" id="modalBookAmount" name="modalBookAmount" min="0" placeholder="재고 수를 입력하세요"
+                   value="1000"
+                   style="width: 120px; padding: 6px 10px; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-top: 17px;">
             <label>
-                <input type="checkbox" id="bookWrappable" value="true"> 포장 가능
+                <input type="checkbox" id="bookWrappable" checked> 포장 가능
             </label>
         </div>
 
@@ -293,15 +313,13 @@
 
         document.getElementById('modalBookAuthors').innerText = authors ? '저자: ' + authors : '저자: 제공된 정보가 없습니다.';
 
-        document.getElementById('modalBookDescription').innerText = description ? description : '제공된 정보가 없습니다.';
-
-        document.getElementById('modalBookPriceSales').innerText = (priceSales && priceSales !== '0')
-            ? '판매가: ' + priceSales
-            : '판매가: 제공된 정보가 없습니다.';
+        document.getElementById('modalBookDescription').value = description ? description : '제공된 정보가 없습니다.';
 
         document.getElementById('modalBookPriceStandard').innerText = (priceStandard && priceStandard !== '0')
             ? '정가: ' + priceStandard
             : '정가: 제공된 정보가 없습니다.';
+
+        document.getElementById('modalBookPriceSales').value = priceSales;
 
         document.getElementById('modalBookPublisher').innerText = publisher ? '출판사: ' + publisher : '출판사: 제공된 정보가 없습니다.';
         document.getElementById('modalBookPubDate').innerText = pubDate ? '출판일: ' + pubDate : '출판일: 제공된 정보가 없습니다.';
@@ -309,19 +327,18 @@
         document.getElementById('modalBookSalesPoint').innerText = '판매수: ' + salesPoint;
         document.getElementById('modalBookCover').src = cover;
 
+
         // 등록 버튼에 데이터 추가
         const registerButton = document.getElementById('registerBookButton');
         registerButton.setAttribute('data-title', title);
         registerButton.setAttribute('data-authors', authors);
-        registerButton.setAttribute('data-price-sales', priceSales);
         registerButton.setAttribute('data-price-standard', priceStandard);
         registerButton.setAttribute('data-publisher', publisher);
         registerButton.setAttribute('data-pub-date', pubDate);
         registerButton.setAttribute('data-isbn', isbn);
-        registerButton.setAttribute('data-description', description);
         registerButton.setAttribute('data-sales-point', salesPoint);
         registerButton.setAttribute('data-cover', cover);
-
+        
         document.getElementById('bookDetailModal').style.display = 'block';
     }
 
@@ -340,15 +357,17 @@
         const authorsString = document.getElementById('registerBookButton').getAttribute('data-authors');
         const authors = authorsString.replace(/[\[\]']/g, '').split(',').map(item => item.trim());
 
-        const priceSales = document.getElementById('registerBookButton').getAttribute('data-price-sales');
         const priceStandard = document.getElementById('registerBookButton').getAttribute('data-price-standard');
         const publisher = document.getElementById('registerBookButton').getAttribute('data-publisher');
         const pubDate = document.getElementById('registerBookButton').getAttribute('data-pub-date');
         const isbn = document.getElementById('registerBookButton').getAttribute('data-isbn');
-        const description = document.getElementById('registerBookButton').getAttribute('data-description');
         const salesPoint = document.getElementById('registerBookButton').getAttribute('data-sales-point');
         const cover = document.getElementById('registerBookButton').getAttribute('data-cover');
 
+        const priceSales = document.getElementById('modalBookPriceSales').value;
+        const description = document.getElementById('modalBookDescription').value;
+
+        const bookAmount = document.getElementById('modalBookAmount').value;
 
         const bookStatusId = document.getElementById('bookStatusId').value;
         const bookWrappable = document.getElementById('bookWrappable').checked;
@@ -366,7 +385,8 @@
             description: description,
             salesPoint: salesPoint,
             bookWrappable: bookWrappable,
-            cover: cover
+            cover: cover,
+            bookAmount: bookAmount
         };
 
         // 서버로 POST 요청

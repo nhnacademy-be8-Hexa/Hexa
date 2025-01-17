@@ -12,7 +12,7 @@ public record AladinBookDTO(
         LocalDate pubDate,
         Long isbn13,
         String description,
-        int salesPoint,
+        Long salesPoint,
         String cover
 ) {
 }
