@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
@@ -46,7 +47,10 @@ public record AladinBookRequestDTO(
 
         @NotNull
         boolean bookWrappable,
-                
-        String cover
+
+        String cover,
+
+        @PositiveOrZero
+        int bookAmount
 ) {
 }

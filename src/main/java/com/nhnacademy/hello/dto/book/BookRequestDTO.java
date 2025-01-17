@@ -1,8 +1,11 @@
 package com.nhnacademy.hello.dto.book;
 
-import jakarta.validation.constraints.*;
-import lombok.NoArgsConstructor;
-
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,22 +61,22 @@ public record BookRequestDTO(
         // 작가 목록
         List<String> authorName
 ) {
-        // 기본 생성자 제공
-        public BookRequestDTO() {
-                this(
-                        "",
-                        "",
-                        null,
-                        null,
-                        null,
-                        null,
-                        false,
-                        "",
-                        "",
-                        new ArrayList<>(),
-                        1,
-                        new ArrayList<>()
-                );
-        }
+    // 기본 생성자 제공
+    public BookRequestDTO() {
+        this(
+                "",
+                "",
+                null,
+                null,
+                null,
+                null,
+                false,
+                "",
+                "",
+                new ArrayList<>(),
+                1,
+                new ArrayList<>()
+        );
+    }
 
 }
