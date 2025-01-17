@@ -2,6 +2,7 @@ package com.nhnacademy.hello.dto.book;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
@@ -14,6 +15,7 @@ public record AladinBookRequestDTO(
         @Size(max = 100)
         String title,
 
+        @NotEmpty
         List<String> authors,
 
         @NotNull
@@ -24,7 +26,8 @@ public record AladinBookRequestDTO(
         @Positive
         int priceStandard,
 
-        @NotNull
+        @NotBlank
+        @Size(max = 20)
         String publisher,
 
         @NotNull
@@ -36,14 +39,14 @@ public record AladinBookRequestDTO(
         @NotNull
         @Digits(integer = 13, fraction = 0)
         Long isbn13,
-        
+
         @NotBlank
         @Size(min = 10, max = 10000)
         String description,
 
         @NotNull
         boolean bookWrappable,
-
+                
         String cover
 ) {
 }
