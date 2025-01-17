@@ -30,9 +30,9 @@ public class BookTagController {
     @GetMapping("/book/{bookId}/admin/tagSelect")
     public String selectTagForm(@PathVariable("bookId") Long bookId,
                                 @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int pageSize,
+                                @RequestParam(defaultValue = "10") int size,
                                 Model model) {
-        List<TagDTO> tags = tagAdapter.getAllTags(page,pageSize, "").getBody();
+        List<TagDTO> tags = tagAdapter.getAllTags(page,size, "").getBody();
 
         List<TagDTO> assignedTags = bookTagAdapter.getTagsByBook(bookId).getBody();
         if (assignedTags == null) {
@@ -43,17 +43,17 @@ public class BookTagController {
         Long totalTags = tagAdapter.getTotalTags().getBody();
 
         // 전체 페이지 수 계산 (size가 9인 것을 전제로 함)
-        int totalPages = (int) Math.ceil((double) totalTags / pageSize);
+        int totalPages = (int) Math.ceil((double) totalTags / size);
 
 
-        model.addAttribute("currentPage", page);
+        model.addAttribute("page", page);
+        model.addAttribute("size",size);
         model.addAttribute("totalPages", totalPages);
-
+        model.addAttribute("total", totalTags);
 
         model.addAttribute("assignedTags", assignedTags);
         model.addAttribute("bookId", bookId);
         model.addAttribute("tags", tags);
-        model.addAttribute("bookId", bookId);
 
         return "admin/tagSelect";
     }

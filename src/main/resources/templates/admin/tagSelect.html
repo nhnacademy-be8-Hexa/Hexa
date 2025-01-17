@@ -44,38 +44,32 @@
         <button type="submit" class="btn btn-primary">태그 업데이트</button>
         </form>
         <!-- 페이징 네비게이션 -->
-        <div th:if="${currentPage == null || totalPages == null}">
-            <p class="text-danger">페이지 정보를 가져오는 데 문제가 발생했습니다. 다시 시도해 주세요.</p>
-        </div>
-        <div th:if="${currentPage != null && totalPages != null}">
-            <!-- 페이징 네비게이션 -->
-            <nav aria-label="Page navigation example" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <!-- 이전 버튼 -->
-                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link"
-                           th:href="@{'/admin/tagSelect'(page=${currentPage != null && currentPage > 1 ? currentPage - 1 : 1})}">
-                            &laquo;
-                        </a>
-                    </li>
 
-                    <!-- 페이지 번호 -->
-                    <li class="page-item" th:each="i : ${totalPages != null && totalPages > 0 ? #numbers.sequence(1, totalPages) : #numbers.sequence(1, 1)}"
-                        th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:text="${i}"
-                           th:href="@{'/admin/tagSelect'(page=${i})}"></a>
-                    </li>
+        <div class="d-flex justify-content-center">
+            <ul class="pagination">
+                <!-- 이전 버튼 -->
+                <li class="page-item" th:classappend="${page == 0} ? ' disabled' : ''">
+                    <a class="page-link" th:href="@{?(page=${page - 1}, size=${size})}"
+                       th:if="${page > 0}">이전</a>
+                </li>
 
-                    <!-- 다음 버튼 -->
-                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                        <a class="page-link"
-                           th:href="@{'/admin/tagSelect'(page=${currentPage != null && currentPage < totalPages ? currentPage + 1 : totalPages})}">
-                            &raquo;
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                <!-- 페이지 번호 -->
+                <li class="page-item"
+                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${pageNum == page} ? ' active' : ''">
+                    <a class="page-link" th:href="@{?(page=${pageNum}, size=${size})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- 다음 버튼 -->
+                <li class="page-item" th:classappend="${page + 1 >= totalPages} ? ' disabled' : ''">
+                    <a class="page-link" th:href="@{?(page=${page + 1}, size=${size})}"
+                       th:if="${page + 1 < totalPages}">다음</a>
+                </li>
+            </ul>
         </div>
+
+
     </div>
     <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
