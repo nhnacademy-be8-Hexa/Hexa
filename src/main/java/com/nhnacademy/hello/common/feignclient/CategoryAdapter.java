@@ -76,7 +76,8 @@ public interface CategoryAdapter {
     @GetMapping("/paged")
     ResponseEntity<List<PagedCategoryDTO>> getAllPagedCategories(
             @RequestParam("page") int page,
-            @RequestParam("size") int size
+            @RequestParam("size") int size,
+            @RequestParam String sort
     );
 
     /**
