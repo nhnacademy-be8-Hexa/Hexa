@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AladinApiAdapter {
 
     @GetMapping("/api/aladinApi")
-    List<AladinBookDTO> searchBooks(@RequestParam(required = false) String query);
-
+    List<AladinBookDTO> searchAladinBooks(@RequestParam(required = false) String query);
+    
     @PostMapping("/api/aladinApi")
     ResponseEntity<BookDTO> createAladinBook(@RequestBody AladinBookRequestDTO aladinBookRequestDTO);
-    
+
 }
