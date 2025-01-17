@@ -1,6 +1,9 @@
 package com.nhnacademy.hello.dto.coupon;
 
+
+
 import java.time.ZonedDateTime;
+
 
 public record CouponDTO(Long couponId,
                         CouponPolicyDTO couponPolicy,
@@ -12,4 +15,11 @@ public record CouponDTO(Long couponId,
                         boolean couponIsActive,
                         ZonedDateTime couponUsedAt
 ) {
+    public Object getCouponName() {
+        return couponName;
+    }
+
+    public Object getCouponId() {
+        return couponId;
+    }
 }

@@ -18,4 +18,16 @@ public record CouponPolicyDTO(
         String eventType,
         ZonedDateTime createdAt
 ) {
+    public Object getCouponPolicyId() {
+        return couponPolicyId;
+    }
+
+    public String getCouponPolicyName() {
+        return couponPolicyName;
+    }
+
+
+    public Object getEventType() {
+        return eventType;
+    }
 }
