@@ -24,12 +24,18 @@ public class BookSortController {
     private final TagAdapter tagAdapter;
     private final BooKTagAdapter booKTagAdapter;
 
+    private final int SIZE = 18;
+
     @GetMapping("/bestsellers")
-    public String bestsellers(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, Model model) {
+    public String bestsellers(
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            Model model) {
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
         List<BookDTO> bestSellerBooks = bookAdapter.getBooks(
-                adjustedPage, 18, "", null, null, null, null, null, true, null, null, null, null, null
+                adjustedPage, SIZE, List.of("bookSellCount,desc", "bookId,asc"),
+                null, null, null,
+                null, null, null
         );
 
         Long totalBooks = bookAdapter.getTotalBooks(
@@ -39,24 +45,28 @@ public class BookSortController {
                 null
         ).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / 18);
+        int totalPages = (int) Math.ceil((double) totalBooks / SIZE);
 
         bestSellerBooks = setImagePathsUtils.setImagePaths(bestSellerBooks);
 
         model.addAttribute("searchBooksWithImages", bestSellerBooks);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", 18);
+        model.addAttribute("size", SIZE);
 
         return "book/bookSort";
     }
 
     @GetMapping("/newarrivals")
-    public String newarrivals(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, Model model) {
+    public String newarrivals(
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            Model model) {
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
         List<BookDTO> newArrivalsBooks = bookAdapter.getBooks(
-                adjustedPage, 18, "", null, null, null, null, null, null, null, true, null, null, null
+                adjustedPage, SIZE, List.of("bookPubDate,desc", "bookId,desc"),
+                null, null, null,
+                null, null, null
         );
 
         Long totalBooks = bookAdapter.getTotalBooks(
@@ -66,23 +76,28 @@ public class BookSortController {
                 null
         ).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / 18);
+        int totalPages = (int) Math.ceil((double) totalBooks / SIZE);
 
         newArrivalsBooks = setImagePathsUtils.setImagePaths(newArrivalsBooks);
 
         model.addAttribute("searchBooksWithImages", newArrivalsBooks);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", 18);
+        model.addAttribute("size", SIZE);
 
         return "book/bookSort";
     }
 
     @GetMapping("/manyreview")
-    public String manyreview(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, Model model) {
+    public String manyreview(
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            Model model) {
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
+
         List<BookDTO> manyReivewsBooks = bookAdapter.getBooks(
-                adjustedPage, 18, "", null, null, null, null, null, null, null, null, null, null, true
+                adjustedPage, SIZE, List.of("bookSellCount,desc","bookId,asc"),
+                null, null, null,
+                null, null, true
         );
 
         Long totalBooks = bookAdapter.getTotalBooks(
@@ -92,33 +107,31 @@ public class BookSortController {
                 null
         ).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / 18);
+        int totalPages = (int) Math.ceil((double) totalBooks / SIZE);
 
         manyReivewsBooks = setImagePathsUtils.setImagePaths(manyReivewsBooks);
 
         model.addAttribute("searchBooksWithImages", manyReivewsBooks);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", 18);
+        model.addAttribute("size", SIZE);
 
         return "book/bookSort";
     }
 
     @GetMapping("/name")
-    public String name(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, @RequestParam String sort, Model model) {
+    public String name(
+            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam String sort,
+            Model model) {
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
-        List<BookDTO> sortByTitleBooks = null;
-        if (sort != null && !sort.isEmpty()) {
-            if (sort.equals("desc")) {
-                sortByTitleBooks = bookAdapter.getBooks(
-                        adjustedPage, 18, "", null, null, null, null, null, null, null, null, true, null, null
-                );
-            } else {
-                sortByTitleBooks = bookAdapter.getBooks(
-                        adjustedPage, 18, "", null, null, null, null, null, null, null, null, null, true, null
-                );
-            }
-        }
+
+        List<BookDTO> sortByTitleBooks = bookAdapter.getBooks(
+                adjustedPage, SIZE, List.of(sort),
+                null, null, null,
+                null, null, null
+        );
+
         sortByTitleBooks = setImagePathsUtils.setImagePaths(sortByTitleBooks);
 
         Long totalBooks = bookAdapter.getTotalBooks(
@@ -128,14 +141,14 @@ public class BookSortController {
                 null
         ).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / 18);
+        int totalPages = (int) Math.ceil((double) totalBooks / SIZE);
 
         sortByTitleBooks = setImagePathsUtils.setImagePaths(sortByTitleBooks);
 
         model.addAttribute("searchBooksWithImages", sortByTitleBooks);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", 18);
+        model.addAttribute("size", SIZE);
         model.addAttribute("sort", sort);
 
         return "book/bookSort";
@@ -149,11 +162,11 @@ public class BookSortController {
     ){
         int adjustedPage = (page != null && page > 1) ? page - 1 : 0;
 
-        List<BookDTO> tagBooks = booKTagAdapter.getBooksByTag(tagId, adjustedPage, 18, "").getBody();
+        List<BookDTO> tagBooks = booKTagAdapter.getBooksByTag(tagId, adjustedPage, SIZE, "bookTagId,desc").getBody();
 
         int totalBooks = booKTagAdapter.getBookCountByTag(tagId).getBody();
 
-        int totalPages = (int) Math.ceil((double) totalBooks / 18);
+        int totalPages = (int) Math.ceil((double) totalBooks / SIZE);
 
         tagBooks = setImagePathsUtils.setImagePaths(tagBooks);
 
@@ -164,7 +177,7 @@ public class BookSortController {
         model.addAttribute("searchBooksWithImages", tagBooks);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("size", 18);
+        model.addAttribute("size", SIZE);
 
         return "book/bookSort";
     }
