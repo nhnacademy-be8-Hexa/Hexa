@@ -53,16 +53,7 @@ public class BookManageController {
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 
             // 정렬 파라미터
-            @RequestParam(value = "sort", required = false, defaultValue = "title") String sort,
-
-            // 추가적인 검색 및 정렬 파라미터
-            @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
-            @RequestParam(value = "publisherName", required = false) String publisherName,
-            @RequestParam(value = "authorName", required = false) String authorName,
-            @RequestParam(value = "sortByView", required = false, defaultValue = "false") Boolean sortByView,
-            @RequestParam(value = "sortBySellCount", required = false, defaultValue = "false") Boolean sortBySellCount,
-            @RequestParam(value = "sortByLikeCount", required = false, defaultValue = "false") Boolean sortByLikeCount,
-            @RequestParam(value = "latest", required = false, defaultValue = "false") Boolean latest,
+            @RequestParam(value = "sort", required = false) String sort,
 
             Model model
     ) {
@@ -75,9 +66,9 @@ public class BookManageController {
         // 도서 총계 가져오기 (필터링 조건을 반영)
         Long totalBooks = bookAdapter.getTotalBooks(
                 search,
-                categoryIds,
-                publisherName,
-                authorName
+                null,
+                null,
+                null
         ).getBody();
 
         // 전체 페이지 수 계산 (size가 9인 것을 전제로 함)
@@ -89,19 +80,20 @@ public class BookManageController {
             page = totalPages;
         }
 
+        List<String> sorting = new ArrayList<>();
+        if (sort != null && !sort.isEmpty()) {
+            sorting.add(sort);
+        }
+        sorting.add("bookId,asc");
+
         // 도서 목록 가져오기
         List<BookDTO> books = bookAdapter.getBooks(
                 adjustedPage,
                 size,
-                sort,
+                sorting,
                 search,
-                categoryIds,
-                publisherName,
-                authorName,
-                sortByView,
-                sortBySellCount,
-                sortByLikeCount,
-                latest,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -114,13 +106,6 @@ public class BookManageController {
         model.addAttribute("size", size);
         model.addAttribute("sort", sort);
         model.addAttribute("search", search);
-        model.addAttribute("categoryIds", categoryIds);
-        model.addAttribute("publisherName", publisherName);
-        model.addAttribute("authorName", authorName);
-        model.addAttribute("sortByView", sortByView);
-        model.addAttribute("sortBySellCount", sortBySellCount);
-        model.addAttribute("sortByLikeCount", sortByLikeCount);
-        model.addAttribute("latest", latest);
 
         // 뷰 이름 반환 (예: "admin/bookManage")
         return "admin/bookManage";

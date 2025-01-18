@@ -5,6 +5,8 @@ import com.nhnacademy.hello.common.feignclient.CategoryAdapter;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.category.CategoryDTO;
 import com.nhnacademy.hello.image.ImageStore;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,8 @@ public class CategoryController {
     private final CategoryAdapter categoryAdapter;
     private final BookAdapter bookAdapter;
     private final ImageStore imageStore;
-    private static final int PAGE_SIZE = 18;
+
+    private final int PAGE_SIZE = 18;
 
     @GetMapping
     public String bookList(
@@ -33,16 +36,14 @@ public class CategoryController {
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 
             // 정렬 파라미터
-            @RequestParam(value = "sort", required = false, defaultValue = "title") String sort,
+            @RequestParam(value = "sort", required = false) String sort,
 
             // 추가적인 검색 및 정렬 파라미터
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "publisherName", required = false) String publisherName,
             @RequestParam(value = "authorName", required = false) String authorName,
-            @RequestParam(value = "sortByView", required = false, defaultValue = "false") Boolean sortByView,
-            @RequestParam(value = "sortBySellCount", required = false, defaultValue = "false") Boolean sortBySellCount,
-            @RequestParam(value = "sortByLikeCount", required = false, defaultValue = "false") Boolean sortByLikeCount,
-            @RequestParam(value = "latest", required = false, defaultValue = "false") Boolean latest,
+            @RequestParam(value = "sortByLikeCount", required = false) Boolean sortByLikeCount,
+            @RequestParam(value = "sortByLikeCount", required = false) Boolean sortByReviews,
             Model model
     ) {
 
@@ -75,21 +76,22 @@ public class CategoryController {
             page = totalPages;
         }
 
+        List<String> sorting = new ArrayList<>();
+        if (sort != null && !sort.isEmpty()) {
+            sorting.add(sort);
+        }
+        sorting.add("bookId,desc");
+
         List<BookDTO> books = bookAdapter.getBooks(
                 adjustedPage,
                 PAGE_SIZE,
-                sort,
+                sorting,
                 search,
                 categoryIds,
                 publisherName,
                 authorName,
-                sortByView,
-                sortBySellCount,
                 sortByLikeCount,
-                latest,
-                null,
-                null,
-                null
+                sortByReviews
         );
 
 
