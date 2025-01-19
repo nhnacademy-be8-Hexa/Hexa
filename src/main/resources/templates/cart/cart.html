@@ -49,6 +49,7 @@
       if (confirm('정말로 모든 항목을 삭제하시겠습니까?')) {
         localStorage.removeItem('cart');
         renderCart();
+        calculateCartTotal();
       }
     });
 
@@ -120,10 +121,13 @@
 
   // 특정 장바구니 항목 삭제 함수
   function deleteCartItem(bookId) {
-    let cart = getCart();
-    cart = cart.filter(item => item.bookId !== parseInt(bookId));
-    localStorage.setItem('cart', JSON.stringify(cart));
-    renderCart();
+    if (confirm('해당 항목을 삭제하시겠습니까?')) {
+      let cart = getCart();
+      cart = cart.filter(item => item.bookId !== parseInt(bookId));
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+      calculateCartTotal();
+    }
   }
 
   // 도서 상세 페이지로 이동하는 함수
