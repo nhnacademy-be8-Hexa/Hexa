@@ -84,7 +84,7 @@ public class BookManageController {
         if (sort != null && !sort.isEmpty()) {
             sorting.add(sort);
         }
-        sorting.add("bookId,asc");
+        sorting.add("bookId,desc");
 
         // 도서 목록 가져오기
         List<BookDTO> books = bookAdapter.getBooks(

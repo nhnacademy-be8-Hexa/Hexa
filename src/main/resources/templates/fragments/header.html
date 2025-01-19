@@ -18,7 +18,9 @@
                         </a>
 
                         <a href="/mypage" class="menu-item">마이페이지</a>
-                        <a href="/cart" class="menu-item">장바구니</a>
+                        <a href="/cart" class="menu-item">장바구니
+                            <span id="cart-count"></span>
+                        </a>
                         <a href="/logout" class="menu-item">로그아웃</a>
                     </li>
 
@@ -26,7 +28,9 @@
                     <li th:if="${!T(com.nhnacademy.hello.common.util.AuthInfoUtils).isLogin()}">
                         <a href="/login" class="menu-item">로그인</a>
                         <a href="/register" class="menu-item">회원가입</a>
-                        <a href="/cart" class="menu-item">장바구니</a>
+                        <a href="/cart" class="menu-item">장바구니
+                            <span id="cart-count"></span>
+                        </a>
                         <a href="/guestOrder" class="menu-item">비회원 주문조회</a>
                     </li>
                 </ul>
@@ -95,4 +99,21 @@
             </div>
         </nav>
     </header>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateCartTotal();
+        });
+
+        const calculateCartTotal = () => {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) { // 해당 요소가 있을 때만 실행
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cartCountElement.textContent = `(${cart.length})`;
+            }
+        }
+    </script>
+
 </div>
+
+
