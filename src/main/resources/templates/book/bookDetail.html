@@ -400,6 +400,8 @@
         localStorage.setItem("cart", JSON.stringify(cart));
 
         alert("장바구니에 추가되었습니다!");
+
+        calculateCartTotal();
     });
 
     // '바로 구매' 버튼 클릭 이벤트
