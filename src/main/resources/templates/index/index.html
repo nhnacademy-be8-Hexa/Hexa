@@ -154,16 +154,13 @@
                     console.error("카트 데이터를 파싱하는 중 오류 발생:", e);
                 }
             }
-
-
-
         }
 
         if (errorMessage === 'access_denied') {
             alert("접근 권한이 없습니다");
         }
 
-
+        calculateCartTotal();
 
         // URL에서 clearLocalCart 파라미터 제거
         history.replaceState(null, null, window.location.pathname);  // URL에서 파라미터 제거
