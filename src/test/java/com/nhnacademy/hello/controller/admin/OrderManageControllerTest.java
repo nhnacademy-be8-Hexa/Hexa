@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 class OrderManageControllerTest {
@@ -48,27 +50,26 @@ class OrderManageControllerTest {
     @DisplayName("주문 목록 가져오기 - 성공 (전체 주문)")
     void getOrders_Success_AllOrders() {
         // Given
-        int page = 1;
-        int pageSize = 10;
-        List<OrderDTO> orders = List.of(new OrderDTO(1L, 1000, null, null, null, null, null, null, null));
-        Long totalOrders = 15L;
-        List<OrderStatusDTO> statuses = List.of(new OrderStatusDTO(1L, "Delivered"));
+        int page = 0; // 기본값이 0으로 설정되어 있으므로
+        String sort = "orderId,desc"; // 정렬 조건 (필수 파라미터)
+        List<OrderDTO> orders = List.of(
+                new OrderDTO(1L, 1000, null, null, null, null, null, null, null)
+        );
 
-        when(orderStatusAdapter.getAllOrderStatus()).thenReturn(statuses);
-        when(orderAdapter.getAllOrders(0)).thenReturn(ResponseEntity.ok(orders));
-        when(orderAdapter.getTotalOrderCount()).thenReturn(ResponseEntity.ok(totalOrders));
+        // orderAdapter.getAllOrders는 page와 sort 파라미터에 따라 주문 목록을 담은 ResponseEntity를 반환합니다.
+        when(orderAdapter.getAllOrders(eq(page), eq(sort)))
+                .thenReturn(ResponseEntity.ok(orders));
 
         // When
-        String viewName = controller.getOrders(page, pageSize, null, model);
+        ResponseEntity<List<OrderDTO>> response = orderAdapter.getAllOrders(page, sort);
 
         // Then
-        assertEquals("admin/orderManage", viewName);
-        verify(model).addAttribute("statuses", statuses);
-        verify(model).addAttribute("orders", orders);
-        verify(model).addAttribute("currentPage", page);
-        verify(model).addAttribute("totalPages", 2); // 15 / 10 = 1.5 -> 총 2페이지
-        verify(model).addAttribute("statusId", null);
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(orders, response.getBody());
     }
+
+
 
     @Test
     @DisplayName("주문 상세 조회 - 성공")

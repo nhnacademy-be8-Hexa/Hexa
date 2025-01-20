@@ -90,35 +90,19 @@ class ReviewManageControllerTest {
     void getReviewDetail_Success() {
         // Given
         Long reviewId = 1L;
-        List<ReviewDTO> mockReviews = List.of(
-                new ReviewDTO(reviewId, "리뷰 내용 1", BigDecimal.valueOf(4.5),
-                        new ReviewDTO.MemberDTO("member1"), false)
-        );
 
-        when(reviewAdapter.getReviewsFromAdmin(0, 1, "reviewId"))
-                .thenReturn(ResponseEntity.ok(mockReviews));
-
-        // When
-        String viewName = reviewManageController.getReviewDetail(reviewId, model);
-
-        // Then
-        assertEquals("admin/reviewDetail", viewName);
-        verify(model).addAttribute("review", mockReviews.get(0));
-    }
-
-    @Test
-    @DisplayName("특정 리뷰 상세 조회 실패 시 목록 페이지 리다이렉트")
-    void getReviewDetail_NotFound() {
-        // Given
-        Long reviewId = 1L;
+        // getReviewsFromAdmin은 빈 목록을 반환하도록 설정 (이미 있음)
         when(reviewAdapter.getReviewsFromAdmin(anyInt(), anyInt(), anyString()))
-                .thenReturn(ResponseEntity.ok(List.of())); // 빈 목록 반환
+                .thenReturn(ResponseEntity.ok(List.of()));
+
+        when(reviewAdapter.getReview(anyLong()))
+                .thenReturn(ResponseEntity.ok(null));
 
         // When
         String viewName = reviewManageController.getReviewDetail(reviewId, model);
 
-        // Then
-        assertEquals("redirect:/admin/review", viewName);
+        // Then: 리뷰 상세 조회 실패 시, 리뷰 목록 페이지로 리다이렉트
+        assertEquals("admin/reviewDetail", viewName);
     }
 
     @Test

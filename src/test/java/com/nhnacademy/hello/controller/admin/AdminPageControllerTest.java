@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ class AdminPageControllerTest {
     @DisplayName("로그인한 사용자가 ADMIN 권한을 가진 경우 정상 처리")
     void adminPage_processesForAdmin() {
         try (MockedStatic<AuthInfoUtils> mockedAuthInfoUtils = mockStatic(AuthInfoUtils.class)) {
-            // Mock 설정: 로그인 상태와 ADMIN 권한
+            // 로그인 상태와 ADMIN 권한을 위한 Mock 설정
             mockedAuthInfoUtils.when(AuthInfoUtils::isLogin).thenReturn(true);
             mockedAuthInfoUtils.when(AuthInfoUtils::getUsername).thenReturn("adminId");
 
@@ -105,52 +106,92 @@ class AdminPageControllerTest {
             );
             when(memberAdapter.getMember("adminId")).thenReturn(adminMember);
 
-            // Mock 데이터 준비
+            // 테스트에 사용할 BookDTO 준비
             BookDTO book = new BookDTO(
-                    1L, "Book Title", "Description", LocalDate.of(2020, 1, 1), 1234567890123L,
-                    10000, 9000, true, 500, 100, 50L, null, null, "path/to/image.jpg"
+                    1L, "Book Title", "Description", LocalDate.of(2020, 1, 1),
+                    1234567890123L, 10000, 9000, true, 500, 100, 50L,
+                    null, null, "path/to/image.jpg"
             );
-            when(bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null))
-                    .thenReturn(List.of(book));
+
+            // getBooks 호출 시, 매개변수에 상관없이 stub이 적용되도록 any() 매처 사용
+            when(bookAdapter.getBooks(
+                    anyInt(),      // page
+                    anyInt(),      // size
+                    anyList(),     // sort (List<String>)
+                    any(),         // search
+                    any(),         // categoryIds
+                    any(),         // publisherName
+                    any(),         // authorName
+                    any(),         // sortByLikeCount
+                    any()          // sortByReviews
+            )).thenReturn(List.of(book));
 
             AuthorDTO author = new AuthorDTO(1L, "Author Name");
             when(bookAdapter.getAuthors(book.bookId())).thenReturn(List.of(author));
 
-            // Mock 설정: getLikeCount 반환값 설정
+            // getLikeCount 반환값 Mock 설정
             when(bookAdapter.getLikeCount(book.bookId())).thenReturn(ResponseEntity.ok(100L));
 
-            // 테스트 실행
+            // 테스트 실행 (페이지 번호 1, 사이즈 10 전달 → 내부에서 적절한 값 변환)
             String result = adminPageController.adminPage(1, 10, model);
 
-            // 검증
-            assertEquals("admin/adminPage", result); // 컨트롤러에서 반환하는 View 이름
+            // 검증: 결과 뷰 이름 및 Model에 추가된 값 확인
+            assertEquals("admin/adminPage", result);
             verify(model, times(1)).addAttribute(eq("member"), eq(adminMember));
             verify(model, times(1)).addAttribute(eq("mostVisitedBooks"), eq(List.of(book)));
         }
     }
 
+
+
     @Test
     @DisplayName("Valid Admin: Admin 페이지 로드 시 정상적으로 데이터 반환")
     void adminPage_withValidAdmin_returnsAdminPage() {
-        // Mock 데이터 준비
-        MemberDTO adminMember = new MemberDTO(
-                "adminId", "Admin User", "12345", "admin@example.com",
-                LocalDate.of(1990, 1, 1), LocalDate.of(2020, 1, 1),
-                LocalDateTime.now(), "ADMIN", null, null
-        );
+        // Model 객체를 Mock 처리 (필요한 경우)
+        Model model = mock(Model.class);
 
         try (MockedStatic<AuthInfoUtils> mockedAuthInfoUtils = mockStatic(AuthInfoUtils.class)) {
-            // Mock 설정
+            // 로그인 상태와 ADMIN 권한을 위한 Mock 설정
             mockedAuthInfoUtils.when(AuthInfoUtils::isLogin).thenReturn(true);
             mockedAuthInfoUtils.when(AuthInfoUtils::getUsername).thenReturn("adminId");
+
+            MemberDTO adminMember = new MemberDTO(
+                    "adminId", "Admin User", "12345", "admin@example.com",
+                    LocalDate.of(1990, 1, 1), LocalDate.of(2020, 1, 1),
+                    LocalDateTime.now(), "ADMIN", null, null
+            );
             when(memberAdapter.getMember("adminId")).thenReturn(adminMember);
 
+            // 테스트에 사용할 BookDTO 준비
             BookDTO book = new BookDTO(
-                    1L, "Book Title", "Description", LocalDate.of(2020, 1, 1), 1234567890123L,
-                    10000, 9000, true, 500, 100, 50L, null, null, "path/to/image.jpg"
+                    1L,
+                    "Book Title",
+                    "Description",
+                    LocalDate.of(2020, 1, 1),
+                    1234567890123L,
+                    10000,
+                    9000,
+                    true,
+                    500,
+                    100,
+                    50L,
+                    null,
+                    null,
+                    "path/to/image.jpg"
             );
-            when(bookAdapter.getBooks(0, 5, "", null, null, null, null, true, null, null, null, null, null, null))
-                    .thenReturn(List.of(book));
+
+            // 수정된 getBooks stub: 검색 파라미터에는 any()를 사용 (null 포함)
+            when(bookAdapter.getBooks(
+                    anyInt(),
+                    anyInt(),
+                    anyList(),
+                    any(),        // any() 대신 anyString() 사용하면 null과 매칭되지 않음
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+            )).thenReturn(List.of(book));
 
             AuthorDTO author = new AuthorDTO(1L, "Author Name");
             when(bookAdapter.getAuthors(book.bookId())).thenReturn(List.of(author));
@@ -162,10 +203,11 @@ class AdminPageControllerTest {
             when(orderBookAdapter.getOrderBooksByOrderId(anyLong()))
                     .thenReturn(new OrderBookResponseDTO[]{orderBookResponse});
 
-            // 테스트 실행
-            adminPageController.adminPage(1, 10, model);
+            // 테스트 실행 (페이지 번호 1, 사이즈 10 전달)
+            String result = adminPageController.adminPage(1, 10, model);
 
             // 검증
+            assertEquals("admin/adminPage", result); // 컨트롤러에서 반환하는 뷰 이름
             verify(model, times(1)).addAttribute("member", adminMember);
             verify(model, times(1)).addAttribute("mostVisitedBooks", List.of(book));
             verify(model, times(1)).addAttribute(eq("bookAuthorsMap"), anyMap());
@@ -193,7 +235,8 @@ class AdminPageControllerTest {
 
         // Mock 설정: countOrdersByStatus 및 getOrderStatus
         when(orderAdapter.countOrdersByStatus(1L)).thenReturn(ResponseEntity.ok(1L));
-        when(orderAdapter.getOrderStatus(1L, 0, 10)).thenReturn(List.of(order));
+        // 변경된 메서드 시그니처에 맞춰 sort 파라미터(여기서는 빈 문자열 "")를 추가
+        when(orderAdapter.getOrderStatus(1L, 0, 10, "")).thenReturn(List.of(order));
 
         // Mock 설정: memberAdapter.getMember
         when(memberAdapter.getMember("memberId")).thenReturn(fullMemberInfo);
@@ -218,6 +261,7 @@ class AdminPageControllerTest {
         verify(model, times(1)).addAttribute("waitOrdersCurrentPage", 1);
         verify(model, times(1)).addAttribute("waitOrdersTotalPages", 1);
     }
+
 
     @Test
     @DisplayName("Valid Orders: 주문 데이터 상세 정보 추가")
