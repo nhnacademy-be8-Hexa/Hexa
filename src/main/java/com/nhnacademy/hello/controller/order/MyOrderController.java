@@ -1,7 +1,6 @@
 package com.nhnacademy.hello.controller.order;
 
 import com.nhnacademy.hello.common.feignclient.*;
-import com.nhnacademy.hello.common.feignclient.coupon.CouponAdapter;
 import com.nhnacademy.hello.common.util.AuthInfoUtils;
 import com.nhnacademy.hello.dto.delivery.DeliveryDTO;
 import com.nhnacademy.hello.dto.member.MemberDTO;
@@ -28,11 +27,10 @@ public class MyOrderController {
     private final MemberAdapter memberAdapter;
     private final OrderAdapter orderAdapter;
     private final OrderBookAdapter orderBookAdapter;
-    private final CouponAdapter couponAdapter;
-    private final WrappingPaperAdapter wrappingPaperAdapter;
     private final DeliveryAdapter deliveryAdapter;
     private final ReturnsReasonAdapter returnsReasonAdapter;
     private final ReturnsAdapter returnsAdapter;
+
     private final Long SIZE = 10L;
 
     @GetMapping("/mypage/orders")
@@ -44,7 +42,6 @@ public class MyOrderController {
         Long totalCount = orderAdapter.countAllByMember_MemberId(member.memberId()).getBody();
 
         Long totalPage = (totalCount + SIZE - 1) / SIZE;
-                //(long) Math.ceil( (double)(totalCount/SIZE) );
 
         if(page <=0 || totalPage<page){
             page=1;
@@ -61,7 +58,6 @@ public class MyOrderController {
         model.addAttribute("pageSize", SIZE);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPage);
-
 
         return "member/orders";
     }
@@ -132,6 +128,7 @@ public class MyOrderController {
 
         return "member/orderBooks";
     }
+
     @GetMapping("/mypage/cancel-refunds")
     public String cancelRefundPage(
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
