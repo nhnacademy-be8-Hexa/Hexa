@@ -80,8 +80,9 @@ public class BookController {
         totalCount = totalCount != null ? totalCount : 0L;
         model.addAttribute("totalCount", totalCount);
 
+        ResponseEntity<BigDecimal> response = reviewAdapter.getReviewRating(bookId);
 
-        BigDecimal rating = reviewAdapter.getReviewRating(bookId).getBody();
+        BigDecimal rating = (response != null && response.getBody() !=null ) ? response.getBody() : BigDecimal.ZERO;
         // 모델에 데이터를 추가
         model.addAttribute("rating", rating);
 
