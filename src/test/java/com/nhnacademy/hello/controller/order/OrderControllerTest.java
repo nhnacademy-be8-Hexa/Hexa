@@ -11,6 +11,7 @@ import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
 import com.nhnacademy.hello.dto.toss.TossPaymentDto;
 import com.nhnacademy.hello.service.TossService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,6 +58,7 @@ class OrderControllerTest {
     private TossService tossService;
 
     @Test
+    @DisplayName("주문 취소")
     void testCancelOrder() throws Exception {
         Long orderId = 1L;
         TossPaymentDto paymentDto = mock(TossPaymentDto.class);
@@ -71,6 +73,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("주문 확정")
     void testConfirmOrder() throws Exception {
         Long orderId = 1L;
 
@@ -81,6 +84,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("반품 신청")
     void testReturnRequestOrder() throws Exception {
         Long orderId = 1L;
         OrderController.ReturnsRequest returnsRequest = new OrderController.ReturnsRequest(1L, "불량품");
@@ -96,6 +100,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("반품 처리")
     void testReturnOrder() throws Exception {
         Long orderId = 1L;
         TossPaymentDto paymentDto = new TossPaymentDto(1L, "key", 10000);
