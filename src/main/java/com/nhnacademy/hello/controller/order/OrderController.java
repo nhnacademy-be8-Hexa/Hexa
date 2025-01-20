@@ -1,9 +1,11 @@
 package com.nhnacademy.hello.controller.order;
 
+import com.nhnacademy.hello.common.feignclient.DeliveryAdapter;
 import com.nhnacademy.hello.common.feignclient.OrderAdapter;
 import com.nhnacademy.hello.common.feignclient.ReturnsAdapter;
 import com.nhnacademy.hello.common.feignclient.ReturnsReasonAdapter;
 import com.nhnacademy.hello.common.feignclient.payment.TossPaymentAdapter;
+import com.nhnacademy.hello.dto.delivery.DeliveryDTO;
 import com.nhnacademy.hello.dto.order.OrderRequestDTO;
 import com.nhnacademy.hello.dto.returns.ReturnsDTO;
 import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
@@ -27,6 +29,7 @@ public class OrderController {
 
     private final ReturnsReasonAdapter returnsReasonAdapter;
     private final ReturnsAdapter returnsAdapter;
+    private final DeliveryAdapter deliveryAdapter;
 
     private final TossService tossService;
 
@@ -136,8 +139,10 @@ public class OrderController {
         // 토스 결제 정보 조회
         TossPaymentDto payment = tossPaymentAdapter.getPayment(orderId).getBody();
 
-        // 환불 비용이 3000원 이상일 경우에만 환불 해줌
-        if(payment.amount() > 3000) {
+        DeliveryDTO deliveryDTO = deliveryAdapter.getDelivery(orderId);
+
+        // 환불 비용이 배송비 이상일 경우에만 환불 해줌
+        if(payment.amount() > deliveryDTO.deliveryAmount()) {
 
             // 반품 사유 조회
             ReturnsDTO returnsDTO = returnsAdapter.getReturnsByOrderId(orderId);
@@ -146,7 +151,7 @@ public class OrderController {
             ResponseEntity<?> response = tossService.cancelPayment(
                     payment.paymentKey(),
                     "구매자 반품 신청: " + returnsDTO.returnsReason().returnsReason(),
-                    payment.amount() - 3000 // 배송비 제외한 금액 환불
+                    payment.amount() - deliveryDTO.deliveryAmount() // 배송비 제외한 금액 환불
             );
 
             if(response.getStatusCode() != HttpStatus.OK) {
