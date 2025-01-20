@@ -7,6 +7,7 @@ import com.nhnacademy.hello.dto.order.OrderBookResponseDTO;
 import com.nhnacademy.hello.dto.order.OrderDTO;
 import com.nhnacademy.hello.dto.order.OrderStatusDTO;
 import com.nhnacademy.hello.dto.returns.ReturnsReasonDTO;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -55,7 +56,7 @@ class GuestOrderControllerTest {
     private ReturnsReasonAdapter returnsReasonAdapter;
 
     @Test
-    @WithMockUser(username = "user", roles = "ADMIN")
+    @DisplayName("비회원 주문 조회 로그인 창 표시")
     void guestOrderPage_ShouldReturnGuestOrderLoginView() throws Exception {
         mockMvc.perform(get("/guestOrder"))
                 .andExpect(status().isOk())
@@ -63,6 +64,7 @@ class GuestOrderControllerTest {
     }
 
     @Test
+    @DisplayName("비회원 주문 조회 페이지 성공")
     void checkGuestOrder_WithValidData_ShouldReturnGuestOrderInfoView() throws Exception {
         Long orderId = 123L;
         String guestOrderPassword = "password";
@@ -109,6 +111,7 @@ class GuestOrderControllerTest {
     }
 
     @Test
+    @DisplayName("비회원 주문 조회 페이지 실패")
     void checkGuestOrder_WithInvalidPassword_ShouldRedirectToGuestOrderLogin() throws Exception {
         Long orderId = 123L;
         String guestOrderPassword = "wrongPassword";
