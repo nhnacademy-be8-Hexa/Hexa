@@ -70,42 +70,39 @@ public class OrderManageController {
 
     @GetMapping("/{orderId}")
     public String getOrderDetail(@PathVariable Long orderId, Model model) {
-        OrderDTO order = orderAdapter.getOrderById(orderId).getBody();
+        OrderDTO order = null;
         List<OrderBookResponseDTO> books = List.of();
         GuestOrderDTO guestOrder = null;
         String returnsReason = "Unknown";
         String returnsDetail = "Unknown";
 
         try {
+            // Order 정보 가져오기
+            order = orderAdapter.getOrderById(orderId).getBody();
             if (order != null) {
+                // OrderBook 정보 가져오기
                 OrderBookResponseDTO[] orderBooks = orderBookAdapter.getOrderBooksByOrderId(orderId);
                 if (orderBooks != null) {
                     books = Arrays.asList(orderBooks);
                 }
 
-                String orderStatus = order.orderStatus().orderStatus();
-                if ("RETURN_REQUEST".equalsIgnoreCase(orderStatus) || "RETURNED".equalsIgnoreCase(orderStatus)) {
-                    ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
-                    if (returns != null) {
-                        if (returns.returnsReason() != null) {
-                            returnsReason = returns.returnsReason().returnsReason();
-                        }
-                        if (returns.returnsDetail() != null) {
-                            returnsDetail = returns.returnsDetail();
+                // 반품 상태 처리
+                if (order.orderStatus() != null && order.orderStatus().orderStatus() != null) {
+                    String orderStatus = order.orderStatus().orderStatus();
+                    if ("RETURN_REQUEST".equalsIgnoreCase(orderStatus) || "RETURNED".equalsIgnoreCase(orderStatus)) {
+                        ReturnsDTO returns = returnsAdapter.getReturnsByOrderId(orderId);
+                        if (returns != null) {
+                            returnsReason = returns.returnsReason() != null ? returns.returnsReason().returnsReason() : returnsReason;
+                            returnsDetail = returns.returnsDetail() != null ? returns.returnsDetail() : returnsDetail;
                         }
                     }
                 }
 
+                // 멤버 정보 처리
                 order = processOrderMemberInfo(order);
             }
         } catch (Exception e) {
-            // 예외 발생 시 기본 정보를 설정
-            model.addAttribute("order", null);
-            model.addAttribute("books", List.of());
-            model.addAttribute("guestOrder", null);
-            model.addAttribute("returnsReason", "Unknown");
-            model.addAttribute("returnsDetail", "Unknown");
-            return "admin/orderDetail";
+            e.printStackTrace();
         }
 
         model.addAttribute("order", order);
@@ -117,7 +114,7 @@ public class OrderManageController {
         return "admin/orderDetail";
     }
 
-    private OrderDTO processOrderMemberInfo(OrderDTO order) {
+    protected OrderDTO processOrderMemberInfo(OrderDTO order) {
         OrderDTO.MemberDTO member = order.member();
 
         if (member == null) {
