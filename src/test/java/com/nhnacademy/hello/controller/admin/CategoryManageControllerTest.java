@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,7 +71,9 @@ class CategoryManageControllerTest {
         // Mock 설정
         when(categoryAdapter.getTotal()).thenReturn(ResponseEntity.ok((long) totalCategories));
         when(categoryAdapter.getCategories()).thenReturn(ResponseEntity.ok(categories));
-        when(categoryAdapter.getAllPagedCategories(anyInt(), eq(9))).thenReturn(ResponseEntity.ok(pagedCategories));
+        // 수정: 새 메서드는 세 개의 파라미터(page, size, sort)를 받으므로 sort 값을 추가한다.
+        when(categoryAdapter.getAllPagedCategories(anyInt(), eq(9), anyString()))
+                .thenReturn(ResponseEntity.ok(pagedCategories));
         when(categoryAdapter.getAllCategories()).thenReturn(ResponseEntity.ok(pagedCategories));
 
         // When
@@ -85,6 +88,7 @@ class CategoryManageControllerTest {
         verify(model).addAttribute(eq("allCategories"), eq(pagedCategories));
         verify(model).addAttribute(eq("categoryIdsWithSubCategories"), anyList());
     }
+
 
     @Test
     @DisplayName("1차 카테고리 생성 - 성공")
@@ -103,8 +107,12 @@ class CategoryManageControllerTest {
     @Test
     @DisplayName("2차 카테고리 생성 - 성공")
     void testCreateSecondCategory() {
-        // Given
-        SecondCategoryRequestDTO requestDTO = new SecondCategoryRequestDTO(1L, 2L);
+        // Given: parentCategoryId가 필요하지 않다면 null 전달 (또는 필요한 값을 전달)
+        SecondCategoryRequestDTO requestDTO = new SecondCategoryRequestDTO(1L, 2L, null);
+
+        // 새 2차 카테고리 생성 전에, 컨트롤러에서 categoryAdapter.getAllBooksByCategoryId(...)를 호출할 경우를 위해 모의 설정
+        when(categoryAdapter.getAllBooksByCategoryId(anyLong()))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         // When
         String viewName = controller.createSecondCategory(requestDTO);
@@ -113,6 +121,8 @@ class CategoryManageControllerTest {
         assertEquals("redirect:/admin/categoryManage", viewName);
         verify(categoryAdapter).insertCategory(eq(1L), eq(2L));
     }
+
+
 
     @Test
     @DisplayName("카테고리 삭제 - 성공")

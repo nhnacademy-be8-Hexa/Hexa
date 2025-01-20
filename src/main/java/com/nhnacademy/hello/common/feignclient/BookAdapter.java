@@ -102,6 +102,4 @@ public interface BookAdapter {
             @RequestParam(value = "publisherName", required = false) String publisherName,
             @RequestParam(value = "authorName", required = false) String authorName
     );
-    
-
 }
