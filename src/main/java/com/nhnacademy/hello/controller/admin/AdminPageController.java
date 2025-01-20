@@ -64,7 +64,7 @@ public class AdminPageController {
         return "admin/adminPage";
     }
 
-    private void addOrderDataToModel(
+    protected void addOrderDataToModel(
             int page, int pageSize, String attributeName, Long statusId, Model model) {
         try {
             List<OrderDTO> orders = orderAdapter.getOrderStatus(statusId, page - 1, pageSize, "");
@@ -86,7 +86,7 @@ public class AdminPageController {
         }
     }
 
-    private List<Map<String, Object>> enrichOrderDetails(List<OrderDTO> orders) {
+    protected List<Map<String, Object>> enrichOrderDetails(List<OrderDTO> orders) {
         return orders.stream().map(order -> {
             Map<String, Object> orderDetails = new HashMap<>();
             orderDetails.put("order", order);
