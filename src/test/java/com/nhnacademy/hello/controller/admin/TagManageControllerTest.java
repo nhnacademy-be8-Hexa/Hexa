@@ -163,6 +163,9 @@ class TagManageControllerTest {
         List<TagDTO> mockTags = List.of(new TagDTO(tagId, "Tag1"));
         when(tagAdapter.getAllTags(eq(1), eq(10), eq(""))).thenReturn(ResponseEntity.ok(mockTags));
 
+        // 추가: getTagById 호출에 대한 stub 설정
+        when(tagAdapter.getTagById(eq(tagId))).thenReturn(ResponseEntity.ok(new TagDTO(tagId, "Tag1")));
+
         // When
         String viewName = tagManageController.showEditTagForm(tagId, 1, 10, model);
 

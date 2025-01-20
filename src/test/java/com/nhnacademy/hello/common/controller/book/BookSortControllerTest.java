@@ -6,7 +6,6 @@ import com.nhnacademy.hello.common.feignclient.tag.BooKTagAdapter;
 import com.nhnacademy.hello.common.feignclient.tag.TagAdapter;
 import com.nhnacademy.hello.common.util.SetImagePathsUtils;
 import com.nhnacademy.hello.controller.advice.GlobalControllerAdvice;
-import com.nhnacademy.hello.controller.book.BookController;
 import com.nhnacademy.hello.controller.book.BookSortController;
 import com.nhnacademy.hello.dto.book.BookDTO;
 import com.nhnacademy.hello.dto.tag.TagDTO;
@@ -17,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.ResponseEntity;
@@ -61,24 +58,23 @@ class BookSortControllerTest {
     @DisplayName("GET /bestsellers - Bestsellers Page")
     void testBestsellers() throws Exception {
         List<BookDTO> mockBooks = List.of(Mockito.mock(BookDTO.class));
+
+        // 새로운 getBooks는 9개의 파라미터를 받습니다.
         Mockito.when(bookAdapter.getBooks(
                 anyInt(),          // page
                 anyInt(),          // size
-                anyString(),       // sort
+                anyList(),         // sort (List<String>)
                 anyString(),       // search
                 anyList(),         // categoryIds
                 anyString(),       // publisherName
                 anyString(),       // authorName
-                anyBoolean(),      // sortByView
-                anyBoolean(),      // sortBySellCount
-                anyBoolean(),      // sortByLikeCount
-                anyBoolean(),      // latest
-                anyBoolean(),      // sortByBookTitleDesc
-                anyBoolean(),      // sortByBookTitleAsc
-                anyBoolean()       // sortByReviews
-                )).thenReturn(mockBooks);
+                any(),             // sortByLikeCount
+                any()              // sortByReviews
+        )).thenReturn(mockBooks);
+
         Mockito.when(bookAdapter.getTotalBooks(any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(20L));
+
         Mockito.when(setImagePathsUtils.setImagePaths(mockBooks)).thenReturn(mockBooks);
 
         mockMvc.perform(get("/bestsellers"))
@@ -87,29 +83,27 @@ class BookSortControllerTest {
                 .andExpect(model().attributeExists("searchBooksWithImages", "currentPage", "totalPages", "size"));
     }
 
+
     @Test
     @DisplayName("GET /newarrivals - New Arrivals Page")
     void testNewArrivals() throws Exception {
         List<BookDTO> mockBooks = List.of(Mockito.mock(BookDTO.class));
+
         Mockito.when(bookAdapter.getBooks(
-                        anyInt(),          // page
-                        anyInt(),          // size
-                        anyString(),       // sort
-                        anyString(),       // search
-                        anyList(),         // categoryIds
-                        anyString(),       // publisherName
-                        anyString(),       // authorName
-                        anyBoolean(),      // sortByView
-                        anyBoolean(),      // sortBySellCount
-                        anyBoolean(),      // sortByLikeCount
-                        anyBoolean(),      // latest
-                        anyBoolean(),      // sortByBookTitleDesc
-                        anyBoolean(),      // sortByBookTitleAsc
-                        anyBoolean()       // sortByReviews
-                ))
-                .thenReturn(mockBooks);
+                anyInt(),
+                anyInt(),
+                anyList(),
+                anyString(),
+                anyList(),
+                anyString(),
+                anyString(),
+                any(),
+                any()
+        )).thenReturn(mockBooks);
+
         Mockito.when(bookAdapter.getTotalBooks(any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(20L));
+
         Mockito.when(setImagePathsUtils.setImagePaths(mockBooks)).thenReturn(mockBooks);
 
         mockMvc.perform(get("/newarrivals"))
@@ -118,29 +112,27 @@ class BookSortControllerTest {
                 .andExpect(model().attributeExists("searchBooksWithImages", "currentPage", "totalPages", "size"));
     }
 
+
     @Test
     @DisplayName("GET /manyreview - Many Reviews Page")
     void testManyReviews() throws Exception {
         List<BookDTO> mockBooks = List.of(Mockito.mock(BookDTO.class));
+
         Mockito.when(bookAdapter.getBooks(
-                        anyInt(),          // page
-                        anyInt(),          // size
-                        anyString(),       // sort
-                        anyString(),       // search
-                        anyList(),         // categoryIds
-                        anyString(),       // publisherName
-                        anyString(),       // authorName
-                        anyBoolean(),      // sortByView
-                        anyBoolean(),      // sortBySellCount
-                        anyBoolean(),      // sortByLikeCount
-                        anyBoolean(),      // latest
-                        anyBoolean(),      // sortByBookTitleDesc
-                        anyBoolean(),      // sortByBookTitleAsc
-                        anyBoolean()       // sortByReviews
-                ))
-                .thenReturn(mockBooks);
+                anyInt(),
+                anyInt(),
+                anyList(),
+                anyString(),
+                anyList(),
+                anyString(),
+                anyString(),
+                any(),
+                any()
+        )).thenReturn(mockBooks);
+
         Mockito.when(bookAdapter.getTotalBooks(any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(20L));
+
         Mockito.when(setImagePathsUtils.setImagePaths(mockBooks)).thenReturn(mockBooks);
 
         mockMvc.perform(get("/manyreview"))
@@ -149,29 +141,28 @@ class BookSortControllerTest {
                 .andExpect(model().attributeExists("searchBooksWithImages", "currentPage", "totalPages", "size"));
     }
 
+
     @Test
     @DisplayName("GET /name - Sort by Name Page")
     void testSortByName() throws Exception {
         List<BookDTO> mockBooks = List.of(Mockito.mock(BookDTO.class));
+
         Mockito.when(bookAdapter.getBooks(
-                        anyInt(),          // page
-                        anyInt(),          // size
-                        anyString(),       // sort
-                        anyString(),       // search
-                        anyList(),         // categoryIds
-                        anyString(),       // publisherName
-                        anyString(),       // authorName
-                        anyBoolean(),      // sortByView
-                        anyBoolean(),      // sortBySellCount
-                        anyBoolean(),      // sortByLikeCount
-                        anyBoolean(),      // latest
-                        anyBoolean(),      // sortByBookTitleDesc
-                        anyBoolean(),      // sortByBookTitleAsc
-                        anyBoolean()       // sortByReviews
-                ))
-                .thenReturn(mockBooks);
+                anyInt(),
+                anyInt(),
+                anyList(),
+                anyString(),
+                anyList(),
+                anyString(),
+                anyString(),
+                any(),
+                any()
+        )).thenReturn(mockBooks);
+
+        // 만약 getTotalBooks 메서드의 파라미터가 다르다면 그대로 사용
         Mockito.when(bookAdapter.getTotalBooks(anyString(), anyList(), anyString(), anyString()))
                 .thenReturn(ResponseEntity.ok(20L));
+
         Mockito.when(setImagePathsUtils.setImagePaths(mockBooks)).thenReturn(mockBooks);
 
         mockMvc.perform(get("/name").param("sort", "asc"))
@@ -179,6 +170,7 @@ class BookSortControllerTest {
                 .andExpect(view().name("book/bookSort"))
                 .andExpect(model().attributeExists("searchBooksWithImages", "currentPage", "totalPages", "size"));
     }
+
 
     @Test
     @DisplayName("GET /tag/{tagId} - Books by Tag Page")

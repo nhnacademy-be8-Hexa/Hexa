@@ -79,7 +79,8 @@ class CategoryControllerTest {
 
         mockCategories.add(category1);
         mockCategories.add(category2);
-        when(categoryAdapter.getCategories()).thenReturn(ResponseEntity.ok(mockCategories));
+        when(categoryAdapter.getCategories())
+                .thenReturn(ResponseEntity.ok(mockCategories));
 
         Long totalBooks = 30L;
         when(bookAdapter.getTotalBooks(anyString(), anyList(), anyString(), anyString()))
@@ -89,9 +90,20 @@ class CategoryControllerTest {
                 new BookDTO(1L, "Book 1", "Description 1", null, 123456789L, 20000, 18000, true, 100, 50, 10L, null, null, null),
                 new BookDTO(2L, "Book 2", "Description 2", null, 987654321L, 25000, 22000, true, 120, 60, 15L, null, null, null)
         );
-        when(bookAdapter.getBooks(anyInt(), anyInt(), anyString(), anyString(), anyList(), anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), any(), any(), any()))
-                .thenReturn(mockBooks);
+        // 수정: getBooks의 stub을 새 시그니처에 맞게 9개 인자로 설정
+        when(bookAdapter.getBooks(
+                anyInt(),          // page
+                anyInt(),          // size
+                anyList(),         // sort 리스트 (예: [sort, "bookId,desc"] 등)
+                anyString(),       // search
+                anyList(),         // categoryIds
+                anyString(),       // publisherName
+                anyString(),       // authorName
+                any(),             // sortByLikeCount (Boolean)
+                any()              // sortByReviews (Boolean)
+        )).thenReturn(mockBooks);
 
+        // 이미지 경로 관련 stub: imageStore.getImage() 호출 시 이미지 경로 목록 반환
         when(imageStore.getImage(anyString())).thenReturn(List.of("/images/mock-image.jpg"));
 
         // when & then
@@ -99,23 +111,25 @@ class CategoryControllerTest {
                         .param("search", "book")
                         .param("page", "1")
                         .param("sort", "title")
-                        .param("categoryId", "1")
+                        .param("categoryId", "1")   // 단일 categoryId --> 내부에서 List<Long>로 변환될 것으로 가정
                         .param("publisherName", "Publisher")
                         .param("authorName", "Author")
+                        // 원래 테스트의 파라미터들은 컨트롤러에서 사용 후 내부적으로 변환됨
                         .param("sortByView", "true")
                         .param("sortBySellCount", "false")
                         .param("sortByLikeCount", "false")
                         .param("latest", "true"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("book/categoryBooks"))
-                .andExpect(model().attributeExists("searchBooksWithImages"))
-                .andExpect(model().attributeExists("categories"))
+                .andExpect(model().attributeExists("searchBooksWithImages", "categories", "currentPage", "totalPages", "size"))
+                // currentPage: 1, totalPages: ceil(30 / size) -> size가 18 (고정값) 인 경우 총 2페이지 가정.
                 .andExpect(model().attribute("currentPage", 1))
                 .andExpect(model().attribute("totalPages", 2))
                 .andExpect(model().attribute("size", 18));
 
         verify(categoryAdapter, times(1)).getCategories();
         verify(bookAdapter, times(1)).getTotalBooks(anyString(), anyList(), anyString(), anyString());
-        verify(bookAdapter, times(1)).getBooks(anyInt(), anyInt(), anyString(), anyString(), anyList(), anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), any(), any(), any());
+        verify(bookAdapter, times(1)).getBooks(anyInt(), anyInt(), anyList(), anyString(), anyList(), anyString(), anyString(), any(), any());
     }
+
 }
