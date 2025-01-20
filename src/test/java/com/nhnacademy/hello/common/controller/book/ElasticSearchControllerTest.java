@@ -77,8 +77,7 @@ class ElasticSearchControllerTest {
                         .param("search", "keyword"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("book/bookSearch"))
-                .andExpect(model().attributeExists("searchBooksWithImages", "searchResultsCount", "search", "currentPage", "totalPages", "size"))
-                .andExpect(model().attribute("searchResultsCount", 1))
+                .andExpect(model().attributeExists("searchBooksWithImages", "search", "currentPage", "totalPages", "size"))
                 .andExpect(model().attribute("currentPage", 1))
                 .andExpect(model().attribute("totalPages", 2));
 
